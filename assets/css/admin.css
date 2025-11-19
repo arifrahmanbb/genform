@@ -1,0 +1,226 @@
+/**
+ * GenForm Admin Styles
+ * 
+ * @package GenForm
+ * @since 1.0.0
+ */
+
+/* Admin Wrapper */
+.genform-admin-wrap {
+    margin: 20px 20px 0 0;
+}
+
+/* Empty State */
+.genform-empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-top: 20px;
+}
+
+.genform-empty-state p {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+/* Status Badge */
+.genform-status {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.genform-status-active {
+    background: #d4edda;
+    color: #155724;
+}
+
+.genform-status-inactive {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Copy Shortcode Button */
+.genform-copy-shortcode {
+    margin-left: 8px;
+}
+
+/* Form Builder */
+.genform-builder-wrap {
+    margin: 20px 20px 0 0;
+}
+
+.genform-builder-header {
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.genform-form-name-wrapper label {
+    display: inline-block;
+    margin-right: 10px;
+    font-weight: 600;
+}
+
+.genform-builder-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.genform-builder-container {
+    display: flex;
+    gap: 20px;
+}
+
+.genform-builder-sidebar {
+    flex: 0 0 250px;
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    height: fit-content;
+}
+
+.genform-builder-sidebar h3 {
+    margin-top: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.genform-field-types {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.genform-add-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    background: #f7f7f7;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    font-size: 14px;
+}
+
+.genform-add-field:hover {
+    background: #0073aa;
+    color: #fff;
+    border-color: #0073aa;
+}
+
+.genform-add-field .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+.genform-builder-canvas {
+    flex: 1;
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-height: 500px;
+}
+
+.genform-builder-canvas h3 {
+    margin-top: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.genform-fields-container {
+    margin-top: 20px;
+}
+
+.genform-field-item {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 15px;
+    cursor: move;
+}
+
+.genform-field-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.genform-field-item-title {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.genform-field-item-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.genform-field-item-actions button {
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+.genform-field-settings {
+    display: none;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #ddd;
+}
+
+.genform-field-settings.active {
+    display: block;
+}
+
+.genform-field-setting {
+    margin-bottom: 12px;
+}
+
+.genform-field-setting label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+    font-size: 13px;
+}
+
+.genform-field-setting input[type="text"],
+.genform-field-setting input[type="number"],
+.genform-field-setting textarea {
+    width: 100%;
+    padding: 6px 10px;
+}
+
+.genform-field-setting input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+/* Settings Page */
+.genform-settings-wrap {
+    margin: 20px 20px 0 0;
+}
+
+.genform-settings-wrap .form-table {
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}

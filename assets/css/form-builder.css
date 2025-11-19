@@ -1,0 +1,79 @@
+/**
+ * GenForm Form Builder CSS
+ * 
+ * @package GenForm
+ * @since 1.0.0
+ */
+
+.genform-builder-canvas {
+    position: relative;
+}
+
+.genform-fields-container {
+    min-height: 400px;
+}
+
+.genform-field-item {
+    position: relative;
+    transition: all 0.2s;
+}
+
+.genform-field-item:hover {
+    border-color: #0073aa;
+    box-shadow: 0 2px 8px rgba(0, 115, 170, 0.1);
+}
+
+.genform-field-item.ui-sortable-helper {
+    opacity: 0.8;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.genform-field-item.ui-sortable-placeholder {
+    background: #e3f2fd;
+    border: 2px dashed #0073aa;
+    visibility: visible !important;
+}
+
+.genform-field-preview {
+    pointer-events: none;
+}
+
+.genform-field-preview input,
+.genform-field-preview textarea,
+.genform-field-preview select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.genform-field-preview label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.genform-required {
+    color: #d63638;
+}
+
+.genform-option-item {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    align-items: center;
+}
+
+.genform-option-item input {
+    flex: 1;
+}
+
+.genform-option-item button {
+    flex-shrink: 0;
+}
+
+.genform-add-option {
+    margin-top: 8px;
+}
