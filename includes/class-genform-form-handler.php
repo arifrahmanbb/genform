@@ -37,6 +37,13 @@ class GenForm_Form_Handler {
             ) );
         }
         
+        // Honeypot spam check
+        if ( isset( $_POST['genform_website'] ) && ! empty( $_POST['genform_website'] ) ) {
+            wp_send_json_error( array(
+                'message' => __( 'Spam detected.', 'genform' ),
+            ) );
+        }
+        
         // Get form data
         global $wpdb;
         $forms_table = $wpdb->prefix . 'genform_forms';
@@ -114,14 +121,21 @@ class GenForm_Form_Handler {
         // Fire action after submission
         do_action( 'genform/after_submission', $entry_id, $form_id, $entry_data );
         
-        // Get success message
+        // Get success message and redirect URL
         $form_settings = json_decode( $form->form_settings, true );
         $success_message = isset( $form_settings['success_message'] ) ? $form_settings['success_message'] : __( 'Thank you! Your form has been submitted successfully.', 'genform' );
+        $redirect_url = isset( $form_settings['redirect_url'] ) && ! empty( $form_settings['redirect_url'] ) ? esc_url_raw( $form_settings['redirect_url'] ) : '';
         
-        wp_send_json_success( array(
+        $response_data = array(
             'message' => $success_message,
             'entry_id' => $entry_id,
-        ) );
+        );
+        
+        if ( $redirect_url ) {
+            $response_data['redirect_url'] = $redirect_url;
+        }
+        
+        wp_send_json_success( $response_data );
     }
     
     /**

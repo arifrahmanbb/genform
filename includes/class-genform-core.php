@@ -181,7 +181,8 @@ class GenForm_Core {
         );
         
         // Form Builder JS (only on builder page)
-        if ( strpos( $hook, 'genform-add-new' ) !== false || isset( $_GET['action'] ) && $_GET['action'] === 'edit' ) {
+        $action = isset( $_GET['action'] ) ? sanitize_text_field( wp_unslash( $_GET['action'] ) ) : '';
+        if ( strpos( $hook, 'genform-add-new' ) !== false || $action === 'edit' ) {
             wp_enqueue_script(
                 'genform-builder-js',
                 GENFORM_PLUGIN_URL . 'assets/js/form-builder.js',

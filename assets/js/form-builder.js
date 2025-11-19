@@ -347,9 +347,14 @@
             };
 
             var formSettings = {
-                submit_text: 'Submit',
-                success_message: 'Thank you! Your form has been submitted successfully.',
-                redirect_url: ''
+                submit_text: $('#genform-submit-text').val() || 'Submit',
+                success_message: $('#genform-success-message').val() || 'Thank you! Your form has been submitted successfully.',
+                redirect_url: $('#genform-redirect-url').val() || '',
+                disable_admin_notification: $('#genform-disable-admin-notification').is(':checked'),
+                admin_email: $('#genform-admin-email').val() || '',
+                enable_user_confirmation: $('#genform-enable-user-confirmation').is(':checked'),
+                user_email_subject: $('#genform-user-email-subject').val() || '',
+                user_email_message: $('#genform-user-email-message').val() || ''
             };
 
             $('#genform-data-input').val(JSON.stringify(formData));

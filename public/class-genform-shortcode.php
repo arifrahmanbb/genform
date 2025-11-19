@@ -74,6 +74,9 @@ class GenForm_Shortcode {
                 <input type="hidden" name="genform_id" value="<?php echo esc_attr( $form_id ); ?>" />
                 <input type="hidden" name="action" value="genform_submit" />
                 
+                <!-- Honeypot field for spam protection -->
+                <input type="text" name="genform_website" value="" style="position: absolute; left: -9999px; width: 1px; height: 1px;" tabindex="-1" autocomplete="off" />
+                
                 <div class="genform-fields">
                     <?php
                     if ( isset( $form_data['fields'] ) && is_array( $form_data['fields'] ) ) {

@@ -11,12 +11,17 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+// Check user capabilities
+if ( ! current_user_can( 'manage_options' ) ) {
+    wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'genform' ) );
+}
+
 global $wpdb;
 $forms_table = $wpdb->prefix . 'genform_forms';
 
 // Handle delete action
 if ( isset( $_GET['action'] ) && $_GET['action'] === 'delete' && isset( $_GET['form_id'] ) && isset( $_GET['_wpnonce'] ) ) {
-    if ( wp_verify_nonce( $_GET['_wpnonce'], 'genform_delete_form' ) ) {
+    if ( wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'genform_delete_form' ) ) {
         $form_id = absint( $_GET['form_id'] );
         $wpdb->delete( $forms_table, array( 'id' => $form_id ), array( '%d' ) );
         echo '<div class="notice notice-success"><p>' . esc_html__( 'Form deleted successfully.', 'genform' ) . '</p></div>';
