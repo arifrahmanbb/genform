@@ -136,7 +136,7 @@ if ( isset( $_POST['genform_save'] ) && isset( $_POST['genform_builder_nonce'] )
                 
                 <div class="genform-setting-group">
                     <label for="genform-redirect-url"><?php esc_html_e( 'Redirect URL (Optional)', 'genform' ); ?></label>
-                    <input type="url" id="genform-redirect-url" class="regular-text" value="<?php echo isset( $genform_form_settings['redirect_url'] ) ? esc_url( $genform_form_settings['redirect_url'] ) : ''; ?>" placeholder="https://example.com/thank-you" />
+                    <input type="url" id="genform-redirect-url" class="regular-text" value="<?php echo isset( $genform_form_settings['redirect_url'] ) ? esc_url( $genform_form_settings['redirect_url'] ) : ''; ?>" placeholder="https://yoursite.com/thank-you" />
                     <p class="description"><?php esc_html_e( 'Redirect users to this URL after successful submission.', 'genform' ); ?></p>
                 </div>
                 
