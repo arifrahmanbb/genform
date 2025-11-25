@@ -1,12 +1,4 @@
 <?php
-/**
- * Admin View: Form Builder
- * 
- * @package GenForm
- * @since 1.0.0
- */
-
-// Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -17,45 +9,45 @@ if ( ! current_user_can( 'manage_options' ) ) {
 }
 
 global $wpdb;
-$forms_table = $wpdb->prefix . 'genform_forms';
-$action = isset( $_GET['action'] ) ? sanitize_text_field( wp_unslash( $_GET['action'] ) ) : '';
-$is_edit = $action === 'edit' && isset( $_GET['form_id'] );
-$form = null;
-$form_data = array();
-$form_settings = array();
+$genform_forms_table = $wpdb->prefix . 'genform_forms';
+$genform_action = isset( $_GET['action'] ) ? sanitize_text_field( wp_unslash( $_GET['action'] ) ) : '';
+$genform_is_edit = $genform_action === 'edit' && isset( $_GET['form_id'] );
+$genform_form = null;
+$genform_form_data = array();
+$genform_form_settings = array();
 
-if ( $is_edit ) {
-    $form_id = absint( $_GET['form_id'] );
-    $form = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $forms_table WHERE id = %d", $form_id ) );
+if ( $genform_is_edit ) {
+    $genform_form_id = absint( $_GET['form_id'] );
+    $genform_form = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $genform_forms_table WHERE id = %d", $genform_form_id ) );
     
-    if ( $form ) {
-        $form_data = json_decode( $form->form_data, true );
-        $form_settings = json_decode( $form->form_settings, true );
+    if ( $genform_form ) {
+        $genform_form_data = json_decode( $genform_form->form_data, true );
+        $genform_form_settings = json_decode( $genform_form->form_settings, true );
     }
 }
 
 // Handle form save
 if ( isset( $_POST['genform_save'] ) && isset( $_POST['genform_builder_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['genform_builder_nonce'] ) ), 'genform_save_form' ) ) {
-    $form_name = isset( $_POST['form_name'] ) ? sanitize_text_field( wp_unslash( $_POST['form_name'] ) ) : '';
-    $form_fields = isset( $_POST['form_data'] ) ? wp_unslash( $_POST['form_data'] ) : '';
-    $form_settings_data = isset( $_POST['form_settings'] ) ? wp_unslash( $_POST['form_settings'] ) : '';
+    $genform_form_name = isset( $_POST['form_name'] ) ? sanitize_text_field( wp_unslash( $_POST['form_name'] ) ) : '';
+    $genform_form_fields = isset( $_POST['form_data'] ) ? wp_kses_post( wp_unslash( $_POST['form_data'] ) ) : '';
+    $genform_form_settings_data = isset( $_POST['form_settings'] ) ? wp_kses_post( wp_unslash( $_POST['form_settings'] ) ) : '';
     
-    if ( $form_name && $form_fields ) {
-        $data = array(
-            'form_name' => $form_name,
-            'form_data' => $form_fields,
-            'form_settings' => $form_settings_data,
+    if ( $genform_form_name && $genform_form_fields ) {
+        $genform_data = array(
+            'form_name' => $genform_form_name,
+            'form_data' => $genform_form_fields,
+            'form_settings' => $genform_form_settings_data,
             'status' => 'active',
         );
         
-        if ( $is_edit && $form ) {
-            $wpdb->update( $forms_table, $data, array( 'id' => $form->id ), array( '%s', '%s', '%s', '%s' ), array( '%d' ) );
+        if ( $genform_is_edit && $genform_form ) {
+            $wpdb->update( $genform_forms_table, $genform_data, array( 'id' => $genform_form->id ), array( '%s', '%s', '%s', '%s' ), array( '%d' ) );
             echo '<div class="notice notice-success"><p>' . esc_html__( 'Form updated successfully.', 'genform' ) . '</p></div>';
         } else {
-            $wpdb->insert( $forms_table, $data, array( '%s', '%s', '%s', '%s' ) );
+            $wpdb->insert( $genform_forms_table, $genform_data, array( '%s', '%s', '%s', '%s' ) );
             echo '<div class="notice notice-success"><p>' . esc_html__( 'Form created successfully.', 'genform' ) . '</p></div>';
-            $form_id = $wpdb->insert_id;
-            wp_safe_redirect( admin_url( 'admin.php?page=genform-add-new&action=edit&form_id=' . $form_id ) );
+            $genform_form_id = $wpdb->insert_id;
+            wp_safe_redirect( admin_url( 'admin.php?page=genform-add-new&action=edit&form_id=' . $genform_form_id ) );
             exit;
         }
     }
@@ -63,7 +55,7 @@ if ( isset( $_POST['genform_save'] ) && isset( $_POST['genform_builder_nonce'] )
 ?>
 
 <div class="wrap genform-builder-wrap">
-    <h1><?php echo $is_edit ? esc_html__( 'Edit Form', 'genform' ) : esc_html__( 'Add New Form', 'genform' ); ?></h1>
+    <h1><?php echo $genform_is_edit ? esc_html__( 'Edit Form', 'genform' ) : esc_html__( 'Add New Form', 'genform' ); ?></h1>
     
     <form method="post" action="" id="genform-builder-form">
         <?php wp_nonce_field( 'genform_save_form', 'genform_builder_nonce' ); ?>
@@ -71,7 +63,7 @@ if ( isset( $_POST['genform_save'] ) && isset( $_POST['genform_builder_nonce'] )
         <div class="genform-builder-header">
             <div class="genform-form-name-wrapper">
                 <label for="form_name"><?php esc_html_e( 'Form Name:', 'genform' ); ?></label>
-                <input type="text" name="form_name" id="form_name" value="<?php echo $form ? esc_attr( $form->form_name ) : ''; ?>" required class="regular-text" />
+                <input type="text" name="form_name" id="form_name" value="<?php echo $genform_form ? esc_attr( $genform_form->form_name ) : ''; ?>" required class="regular-text" />
             </div>
             
             <div class="genform-builder-actions">
@@ -139,18 +131,18 @@ if ( isset( $_POST['genform_save'] ) && isset( $_POST['genform_builder_nonce'] )
                 
                 <div class="genform-setting-group">
                     <label for="genform-success-message"><?php esc_html_e( 'Success Message', 'genform' ); ?></label>
-                    <textarea id="genform-success-message" class="regular-text" rows="3"><?php echo isset( $form_settings['success_message'] ) ? esc_textarea( $form_settings['success_message'] ) : esc_textarea__( 'Thank you! Your form has been submitted successfully.', 'genform' ); ?></textarea>
+                    <textarea id="genform-success-message" class="regular-text" rows="3"><?php echo isset( $genform_form_settings['success_message'] ) ? esc_textarea( $genform_form_settings['success_message'] ) : esc_textarea( __( 'Thank you! Your form has been submitted successfully.', 'genform' ) ); ?></textarea>
                 </div>
                 
                 <div class="genform-setting-group">
                     <label for="genform-redirect-url"><?php esc_html_e( 'Redirect URL (Optional)', 'genform' ); ?></label>
-                    <input type="url" id="genform-redirect-url" class="regular-text" value="<?php echo isset( $form_settings['redirect_url'] ) ? esc_url( $form_settings['redirect_url'] ) : ''; ?>" placeholder="https://example.com/thank-you" />
+                    <input type="url" id="genform-redirect-url" class="regular-text" value="<?php echo isset( $genform_form_settings['redirect_url'] ) ? esc_url( $genform_form_settings['redirect_url'] ) : ''; ?>" placeholder="https://example.com/thank-you" />
                     <p class="description"><?php esc_html_e( 'Redirect users to this URL after successful submission.', 'genform' ); ?></p>
                 </div>
                 
                 <div class="genform-setting-group">
                     <label for="genform-submit-text"><?php esc_html_e( 'Submit Button Text', 'genform' ); ?></label>
-                    <input type="text" id="genform-submit-text" class="regular-text" value="<?php echo isset( $form_settings['submit_text'] ) ? esc_attr( $form_settings['submit_text'] ) : esc_attr__( 'Submit', 'genform' ); ?>" />
+                    <input type="text" id="genform-submit-text" class="regular-text" value="<?php echo isset( $genform_form_settings['submit_text'] ) ? esc_attr( $genform_form_settings['submit_text'] ) : esc_attr__( 'Submit', 'genform' ); ?>" />
                 </div>
                 
                 <hr />
@@ -159,32 +151,32 @@ if ( isset( $_POST['genform_save'] ) && isset( $_POST['genform_builder_nonce'] )
                 
                 <div class="genform-setting-group">
                     <label>
-                        <input type="checkbox" id="genform-disable-admin-notification" <?php checked( isset( $form_settings['disable_admin_notification'] ) && $form_settings['disable_admin_notification'] ); ?> />
+                        <input type="checkbox" id="genform-disable-admin-notification" <?php checked( isset( $genform_form_settings['disable_admin_notification'] ) && $genform_form_settings['disable_admin_notification'] ); ?> />
                         <?php esc_html_e( 'Disable admin notification', 'genform' ); ?>
                     </label>
                 </div>
                 
                 <div class="genform-setting-group">
                     <label for="genform-admin-email"><?php esc_html_e( 'Admin Email', 'genform' ); ?></label>
-                    <input type="email" id="genform-admin-email" class="regular-text" value="<?php echo isset( $form_settings['admin_email'] ) ? esc_attr( $form_settings['admin_email'] ) : esc_attr( get_option( 'admin_email' ) ); ?>" />
+                    <input type="email" id="genform-admin-email" class="regular-text" value="<?php echo isset( $genform_form_settings['admin_email'] ) ? esc_attr( $genform_form_settings['admin_email'] ) : esc_attr( get_option( 'admin_email' ) ); ?>" />
                     <p class="description"><?php esc_html_e( 'Email address to receive form submissions.', 'genform' ); ?></p>
                 </div>
                 
                 <div class="genform-setting-group">
                     <label>
-                        <input type="checkbox" id="genform-enable-user-confirmation" <?php checked( isset( $form_settings['enable_user_confirmation'] ) && $form_settings['enable_user_confirmation'] ); ?> />
+                        <input type="checkbox" id="genform-enable-user-confirmation" <?php checked( isset( $genform_form_settings['enable_user_confirmation'] ) && $genform_form_settings['enable_user_confirmation'] ); ?> />
                         <?php esc_html_e( 'Send confirmation email to user', 'genform' ); ?>
                     </label>
                 </div>
                 
                 <div class="genform-setting-group">
                     <label for="genform-user-email-subject"><?php esc_html_e( 'User Email Subject', 'genform' ); ?></label>
-                    <input type="text" id="genform-user-email-subject" class="regular-text" value="<?php echo isset( $form_settings['user_email_subject'] ) ? esc_attr( $form_settings['user_email_subject'] ) : ''; ?>" placeholder="<?php esc_attr_e( 'Thank you for your submission', 'genform' ); ?>" />
+                    <input type="text" id="genform-user-email-subject" class="regular-text" value="<?php echo isset( $genform_form_settings['user_email_subject'] ) ? esc_attr( $genform_form_settings['user_email_subject'] ) : ''; ?>" placeholder="<?php esc_attr_e( 'Thank you for your submission', 'genform' ); ?>" />
                 </div>
                 
                 <div class="genform-setting-group">
                     <label for="genform-user-email-message"><?php esc_html_e( 'User Email Message', 'genform' ); ?></label>
-                    <textarea id="genform-user-email-message" class="regular-text" rows="4"><?php echo isset( $form_settings['user_email_message'] ) ? esc_textarea( $form_settings['user_email_message'] ) : ''; ?></textarea>
+                    <textarea id="genform-user-email-message" class="regular-text" rows="4"><?php echo isset( $genform_form_settings['user_email_message'] ) ? esc_textarea( $genform_form_settings['user_email_message'] ) : ''; ?></textarea>
                     <p class="description"><?php esc_html_e( 'Custom message for user confirmation email.', 'genform' ); ?></p>
                 </div>
             </div>
@@ -196,6 +188,6 @@ if ( isset( $_POST['genform_save'] ) && isset( $_POST['genform_builder_nonce'] )
 </div>
 
 <script type="text/javascript">
-    var genformInitialData = <?php echo wp_json_encode( $form_data ); ?>;
-    var genformInitialSettings = <?php echo wp_json_encode( $form_settings ); ?>;
+    var genformInitialData = <?php echo wp_json_encode( $genform_form_data ); ?>;
+    var genformInitialSettings = <?php echo wp_json_encode( $genform_form_settings ); ?>;
 </script>

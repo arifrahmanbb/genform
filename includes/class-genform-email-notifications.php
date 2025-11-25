@@ -1,28 +1,10 @@
 <?php
-/**
- * Email Notifications Handler
- * 
- * @package GenForm
- * @since 1.0.0
- */
-
-// Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-/**
- * GenForm_Email_Notifications Class
- */
 class GenForm_Email_Notifications {
     
-    /**
-     * Send admin notification
-     *
-     * @param int $entry_id Entry ID
-     * @param int $form_id Form ID
-     * @param array $entry_data Entry data
-     */
     public static function send_admin_notification( $entry_id, $form_id, $entry_data ) {
         global $wpdb;
         $forms_table = $wpdb->prefix . 'genform_forms';
@@ -45,8 +27,10 @@ class GenForm_Email_Notifications {
         }
         
         // Build email content
+        /* translators: %s: Form name */
         $subject = sprintf( __( 'New Form Submission: %s', 'genform' ), $form->form_name );
         
+        /* translators: %s: Form name */
         $message = sprintf( __( 'You have received a new form submission for "%s"', 'genform' ), $form->form_name ) . "\n\n";
         $message .= __( 'Submission Details:', 'genform' ) . "\n";
         $message .= str_repeat( '-', 50 ) . "\n\n";
@@ -59,8 +43,11 @@ class GenForm_Email_Notifications {
         }
         
         $message .= "\n" . str_repeat( '-', 50 ) . "\n";
+        /* translators: %d: Entry ID number */
         $message .= sprintf( __( 'Entry ID: %d', 'genform' ), $entry_id ) . "\n";
+        /* translators: %s: Submission timestamp */
         $message .= sprintf( __( 'Submitted: %s', 'genform' ), current_time( 'mysql' ) ) . "\n";
+        /* translators: %s: URL to view the entry */
         $message .= sprintf( __( 'View Entry: %s', 'genform' ), admin_url( 'admin.php?page=genform-entries&form_id=' . $form_id ) ) . "\n";
         
         // Send email
@@ -89,12 +76,10 @@ class GenForm_Email_Notifications {
         
         $form_settings = json_decode( $form->form_settings, true );
         
-        // Check if user confirmation is enabled
         if ( ! isset( $form_settings['enable_user_confirmation'] ) || ! $form_settings['enable_user_confirmation'] ) {
             return;
         }
         
-        // Find email field in entry data
         $user_email = '';
         foreach ( $entry_data as $field_name => $value ) {
             if ( is_email( $value ) ) {
@@ -110,6 +95,7 @@ class GenForm_Email_Notifications {
         // Build email content
         $subject = isset( $form_settings['user_email_subject'] ) && ! empty( $form_settings['user_email_subject'] )
             ? $form_settings['user_email_subject']
+            /* translators: %s: Form name */
             : sprintf( __( 'Thank you for your submission: %s', 'genform' ), $form->form_name );
         
         $message = isset( $form_settings['user_email_message'] ) && ! empty( $form_settings['user_email_message'] )

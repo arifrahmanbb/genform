@@ -1,37 +1,20 @@
 <?php
-/**
- * Form Handler Class
- * 
- * @package GenForm
- * @since 1.0.0
- */
-
-// Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-/**
- * GenForm_Form_Handler Class
- */
 class GenForm_Form_Handler {
     
-    /**
-     * Constructor
-     */
     public function __construct() {
         add_action( 'wp_ajax_genform_submit', array( $this, 'handle_submission' ) );
         add_action( 'wp_ajax_nopriv_genform_submit', array( $this, 'handle_submission' ) );
     }
     
-    /**
-     * Handle form submission
-     */
     public function handle_submission() {
         // Verify nonce
         $form_id = isset( $_POST['genform_id'] ) ? absint( $_POST['genform_id'] ) : 0;
         
-        if ( ! $form_id || ! isset( $_POST['genform_nonce'] ) || ! wp_verify_nonce( $_POST['genform_nonce'], 'genform_submit_' . $form_id ) ) {
+        if ( ! $form_id || ! isset( $_POST['genform_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['genform_nonce'] ) ), 'genform_submit_' . $form_id ) ) {
             wp_send_json_error( array(
                 'message' => __( 'Security check failed.', 'genform' ),
             ) );
@@ -55,7 +38,7 @@ class GenForm_Form_Handler {
             ) );
         }
         
-        // Sanitize and validate form data
+        // Sanitize and validate form fields
         $form_data = json_decode( $form->form_data, true );
         $entry_data = array();
         
@@ -69,11 +52,12 @@ class GenForm_Form_Handler {
                     continue;
                 }
                 
-                $value = isset( $_POST[ $field_name ] ) ? $_POST[ $field_name ] : '';
+                $value = isset( $_POST[ $field_name ] ) ? wp_unslash( $_POST[ $field_name ] ) : '';
                 
                 // Validate required fields
                 if ( $field_required && empty( $value ) ) {
                     wp_send_json_error( array(
+                        /* translators: %s: Field label */
                         'message' => sprintf( __( 'Field "%s" is required.', 'genform' ), $field['label'] ),
                     ) );
                 }
@@ -84,6 +68,7 @@ class GenForm_Form_Handler {
                 // Validate email
                 if ( $field_type === 'email' && ! empty( $sanitized_value ) && ! is_email( $sanitized_value ) ) {
                     wp_send_json_error( array(
+                        /* translators: %s: Field label */
                         'message' => sprintf( __( 'Please enter a valid email address for "%s".', 'genform' ), $field['label'] ),
                     ) );
                 }
@@ -92,7 +77,6 @@ class GenForm_Form_Handler {
             }
         }
         
-        // Apply filter for custom validation
         $entry_data = apply_filters( 'genform/form_data_sanitization', $entry_data, $form_id );
         
         // Save entry to database
@@ -103,7 +87,7 @@ class GenForm_Form_Handler {
                 'form_id' => $form_id,
                 'entry_data' => wp_json_encode( $entry_data ),
                 'user_ip' => $this->get_user_ip(),
-                'user_agent' => isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( $_SERVER['HTTP_USER_AGENT'] ) : '',
+                'user_agent' => isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '',
                 'created_at' => current_time( 'mysql' ),
                 'status' => 'unread',
             ),
@@ -173,11 +157,11 @@ class GenForm_Form_Handler {
         $ip = '';
         
         if ( isset( $_SERVER['HTTP_CLIENT_IP'] ) ) {
-            $ip = $_SERVER['HTTP_CLIENT_IP'];
+            $ip = sanitize_text_field( wp_unslash( $_SERVER['HTTP_CLIENT_IP'] ) );
         } elseif ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
-            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+            $ip = sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_FORWARDED_FOR'] ) );
         } elseif ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
-            $ip = $_SERVER['REMOTE_ADDR'];
+            $ip = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) );
         }
         
         return sanitize_text_field( $ip );

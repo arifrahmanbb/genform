@@ -1,33 +1,12 @@
 <?php
-/**
- * Core plugin class
- * 
- * @package GenForm
- * @since 1.0.0
- */
-
-// Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-/**
- * Main GenForm_Core Class
- */
 class GenForm_Core {
     
-    /**
-     * Single instance of the class
-     *
-     * @var GenForm_Core
-     */
     private static $instance = null;
     
-    /**
-     * Get instance
-     *
-     * @return GenForm_Core
-     */
     public static function get_instance() {
         if ( null === self::$instance ) {
             self::$instance = new self();
@@ -35,17 +14,11 @@ class GenForm_Core {
         return self::$instance;
     }
     
-    /**
-     * Constructor
-     */
     private function __construct() {
         $this->init_hooks();
         $this->load_dependencies();
     }
     
-    /**
-     * Initialize hooks
-     */
     private function init_hooks() {
         add_action( 'init', array( $this, 'register_post_types' ) );
         add_action( 'admin_menu', array( $this, 'register_admin_menu' ) );
@@ -53,31 +26,19 @@ class GenForm_Core {
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_assets' ) );
     }
     
-    /**
-     * Load plugin dependencies
-     */
     private function load_dependencies() {
-        // Admin classes
         if ( is_admin() ) {
             new GenForm_Admin_Settings();
         }
         
-        // Frontend classes
         new GenForm_Shortcode();
         new GenForm_Form_Handler();
     }
     
-    /**
-     * Register custom post types if needed
-     */
     public function register_post_types() {
-        // Can be used for future extensions
         do_action( 'genform/register_post_types' );
     }
     
-    /**
-     * Register admin menu
-     */
     public function register_admin_menu() {
         add_menu_page(
             __( 'GenForm', 'genform' ),
@@ -126,44 +87,27 @@ class GenForm_Core {
         );
     }
     
-    /**
-     * Render main admin page
-     */
     public function render_admin_page() {
         include GENFORM_PLUGIN_PATH . 'admin/views/forms-list.php';
     }
     
-    /**
-     * Render add new form page
-     */
     public function render_add_new_page() {
         include GENFORM_PLUGIN_PATH . 'admin/views/form-builder.php';
     }
     
-    /**
-     * Render entries page
-     */
     public function render_entries_page() {
         include GENFORM_PLUGIN_PATH . 'admin/views/entries-list.php';
     }
     
-    /**
-     * Render settings page
-     */
     public function render_settings_page() {
         include GENFORM_PLUGIN_PATH . 'admin/views/settings.php';
     }
     
-    /**
-     * Enqueue admin assets
-     */
     public function enqueue_admin_assets( $hook ) {
-        // Only load on GenForm admin pages
         if ( strpos( $hook, 'genform' ) === false ) {
             return;
         }
         
-        // Admin CSS
         wp_enqueue_style(
             'genform-admin-css',
             GENFORM_PLUGIN_URL . 'assets/css/admin.css',
@@ -171,7 +115,6 @@ class GenForm_Core {
             GENFORM_VERSION
         );
         
-        // Admin JS
         wp_enqueue_script(
             'genform-admin-js',
             GENFORM_PLUGIN_URL . 'assets/js/admin.js',
@@ -180,7 +123,7 @@ class GenForm_Core {
             true
         );
         
-        // Form Builder JS (only on builder page)
+        // Note: $_GET['action'] is used only for conditional script loading (read-only)
         $action = isset( $_GET['action'] ) ? sanitize_text_field( wp_unslash( $_GET['action'] ) ) : '';
         if ( strpos( $hook, 'genform-add-new' ) !== false || $action === 'edit' ) {
             wp_enqueue_script(
@@ -199,7 +142,6 @@ class GenForm_Core {
             );
         }
         
-        // Localize script
         wp_localize_script(
             'genform-admin-js',
             'genformAdmin',
@@ -214,11 +156,7 @@ class GenForm_Core {
         );
     }
     
-    /**
-     * Enqueue frontend assets
-     */
     public function enqueue_frontend_assets() {
-        // Only load if shortcode is present
         global $post;
         
         if ( is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'genform' ) ) {
