@@ -35,8 +35,8 @@
         },
 
         loadInitialData: function () {
-            if (typeof genformInitialData !== 'undefined' && genformInitialData && genformInitialData.fields) {
-                this.fields = genformInitialData.fields;
+            if (typeof genformBuilder !== 'undefined' && genformBuilder.initialData && genformBuilder.initialData.fields) {
+                this.fields = genformBuilder.initialData.fields;
                 this.renderAllFields();
             }
         },
