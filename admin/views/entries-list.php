@@ -1,89 +1,71 @@
 <?php
-if (! defined('ABSPATH')) {
-    exit;
-}
+if (!defined('ABSPATH')) exit;
 
-// Check user capabilities
-if (! current_user_can('manage_options')) {
-    wp_die(esc_html__('You do not have sufficient permissions to access this page.', 'genform'));
+if (!current_user_can('manage_options')) {
+	wp_die(__('Unauthorized.', 'genform'));
 }
 
 global $wpdb;
-$genform_entries_table = $wpdb->prefix . 'genform_entries';
-$genform_forms_table = $wpdb->prefix . 'genform_forms';
+$id      = isset($_GET['form_id']) ? absint($_GET['form_id']) : 0;
+$table   = "{$wpdb->prefix}genform_entries";
+$f_table = "{$wpdb->prefix}genform_forms";
 
-$genform_form_id = 0;
-if (isset($_GET['form_id'])) {
-    // Verify nonce if filtering by form_id
-    if (! isset($_GET['_wpnonce']) || ! wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'])), 'genform_view_entries')) {
-        wp_die(esc_html__('Security check failed. Please try again.', 'genform'));
-    }
-    $genform_form_id = absint($_GET['form_id']);
-}
-
-// Get entries
-if ($genform_form_id) {
-    $genform_entries = $wpdb->get_results($wpdb->prepare("SELECT * FROM $genform_entries_table WHERE form_id = %d ORDER BY created_at DESC", $genform_form_id));
-    $genform_form = $wpdb->get_row($wpdb->prepare("SELECT * FROM $genform_forms_table WHERE id = %d", $genform_form_id));
+if ($id) {
+	if (!isset($_GET['_wpnonce']) || !wp_verify_nonce($_GET['_wpnonce'], 'genform_view_entries')) {
+		wp_die(__('Security check failed.', 'genform'));
+	}
+	$entries = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table WHERE form_id = %d ORDER BY created_at DESC", $id));
+	$form    = $wpdb->get_row($wpdb->prepare("SELECT name FROM $f_table WHERE id = %d", $id));
 } else {
-    $genform_entries = $wpdb->get_results("SELECT * FROM $genform_entries_table ORDER BY created_at DESC LIMIT 100");
-    $genform_form = null;
+	$entries = $wpdb->get_results("SELECT * FROM $table ORDER BY created_at DESC LIMIT 100");
+	$form    = null;
 }
 ?>
 
 <div class="wrap genform-admin-wrap">
-    <h1><?php esc_html_e('Form Entries', 'genform'); ?></h1>
+	<h1><?php _e('Form Entries', 'genform'); ?></h1>
+	<?php if ($form): ?>
+		<p><?php printf(__('Showing entries for: <strong>%s</strong>', 'genform'), esc_html($form->name)); ?></p>
+	<?php endif; ?>
 
-    <?php if ($genform_form) : ?>
-        <p><?php
-            /* translators: %s: Form name */
-            printf(esc_html__('Showing entries for: %s', 'genform'), '<strong>' . esc_html($genform_form->form_name) . '</strong>');
-            ?></p>
-    <?php endif; ?>
-
-    <?php if (empty($genform_entries)) : ?>
-        <p><?php esc_html_e('No entries found.', 'genform'); ?></p>
-    <?php else : ?>
-        <table class="wp-list-table widefat fixed striped">
-            <thead>
-                <tr>
-                    <th><?php esc_html_e('ID', 'genform'); ?></th>
-                    <th><?php esc_html_e('Form', 'genform'); ?></th>
-                    <th><?php esc_html_e('Data', 'genform'); ?></th>
-                    <th><?php esc_html_e('IP Address', 'genform'); ?></th>
-                    <th><?php esc_html_e('Status', 'genform'); ?></th>
-                    <th><?php esc_html_e('Submitted', 'genform'); ?></th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($genform_entries as $genform_entry) :
-                    $genform_entry_data = json_decode($genform_entry->entry_data, true);
-                    $genform_entry_form = $wpdb->get_row($wpdb->prepare("SELECT form_name FROM $genform_forms_table WHERE id = %d", $genform_entry->form_id));
-                ?>
-                    <tr>
-                        <td><?php echo esc_html($genform_entry->id); ?></td>
-                        <td><?php echo $genform_entry_form ? esc_html($genform_entry_form->form_name) : esc_html__('Unknown', 'genform'); ?></td>
-                        <td>
-                            <details>
-                                <summary><?php esc_html_e('View Data', 'genform'); ?></summary>
-                                <table class="widefat">
-                                    <?php if (is_array($genform_entry_data)) : ?>
-                                        <?php foreach ($genform_entry_data as $genform_key => $genform_value) : ?>
-                                            <tr>
-                                                <th><?php echo esc_html(ucfirst(str_replace('_', ' ', $genform_key))); ?></th>
-                                                <td><?php echo esc_html(is_array($genform_value) ? implode(', ', $genform_value) : $genform_value); ?></td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    <?php endif; ?>
-                                </table>
-                            </details>
-                        </td>
-                        <td><?php echo esc_html($genform_entry->user_ip); ?></td>
-                        <td><?php echo esc_html(ucfirst($genform_entry->status)); ?></td>
-                        <td><?php echo esc_html(date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($genform_entry->created_at))); ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    <?php endif; ?>
+	<div class="gfm-card">
+		<?php if (empty($entries)): ?>
+			<p><?php _e('No entries found.', 'genform'); ?></p>
+		<?php else: ?>
+			<table class="wp-list-table widefat fixed striped">
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Form</th>
+						<th>Data</th>
+						<th>IP</th>
+						<th>Date</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php foreach ($entries as $entry):
+						$data = json_decode($entry->entry_data, true);
+						$f = $wpdb->get_var($wpdb->prepare("SELECT name FROM $f_table WHERE id = %d", $entry->form_id));
+					?>
+						<tr>
+							<td><?php echo $entry->id; ?></td>
+							<td><?php echo esc_html($f ?: __('ID: ', 'genform') . $entry->form_id); ?></td>
+							<td>
+								<details>
+									<summary><?php _e('View Details', 'genform'); ?></summary>
+									<div class="gfm-entry-details">
+										<?php foreach ($data as $k => $v): ?>
+											<div><strong><?php echo esc_html(ucfirst($k)); ?>:</strong> <?php echo esc_html($v); ?></div>
+										<?php endforeach; ?>
+									</div>
+								</details>
+							</td>
+							<td><?php echo esc_html($entry->ip); ?></td>
+							<td><?php echo esc_html($entry->created_at); ?></td>
+						</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+		<?php endif; ?>
+	</div>
 </div>

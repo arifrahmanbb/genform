@@ -1,162 +1,72 @@
-/**
- * GenForm Frontend Styles
- * 
- * @package GenForm
- * @since 1.0.0
- */
-
-.genform-wrapper {
-    max-width: 100%;
-    margin: 0 auto;
+.gfm-form-container {
+  max-width: 600px;
+  margin: 20px auto;
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
-.genform-form {
-    background: #fff;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.gfm-form-field {
+  margin-bottom: 24px;
 }
 
-.genform-fields {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+.gfm-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #374151;
 }
 
-.genform-field {
-    display: flex;
-    flex-direction: column;
+.gfm-input,
+.gfm-textarea,
+.gfm-select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.2s;
+  box-sizing: border-box;
 }
 
-.genform-label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    font-size: 14px;
-    color: #333;
+.gfm-input:focus,
+.gfm-textarea:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
 }
 
-.genform-required {
-    color: #d63638;
-    margin-left: 2px;
+.gfm-submit {
+  width: 100%;
+  background: #6366f1;
+  color: white;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
-.genform-input,
-.genform-textarea,
-.genform-select {
-    width: 100%;
-    padding: 12px 15px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-    transition: border-color 0.2s;
+.gfm-submit:hover {
+  background: #4f46e5;
 }
 
-.genform-input:focus,
-.genform-textarea:focus,
-.genform-select:focus {
-    outline: none;
-    border-color: #0073aa;
-    box-shadow: 0 0 0 1px #0073aa;
+.gfm-message {
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
 }
 
-.genform-textarea {
-    resize: vertical;
-    min-height: 100px;
+.gfm-success {
+  background: #ecfdf5;
+  color: #065f46;
 }
 
-.genform-checkbox-label,
-.genform-radio-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.genform-checkbox,
-.genform-radio {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-}
-
-.genform-field-description {
-    margin-top: 5px;
-    font-size: 13px;
-    color: #666;
-    font-style: italic;
-}
-
-.genform-submit-wrapper {
-    margin-top: 25px;
-}
-
-.genform-submit-btn {
-    background: #0073aa;
-    color: #fff;
-    padding: 12px 30px;
-    border: none;
-    border-radius: 4px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.genform-submit-btn:hover {
-    background: #005a87;
-}
-
-.genform-submit-btn:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-}
-
-.genform-message {
-    margin-top: 20px;
-    padding: 15px;
-    border-radius: 4px;
-    font-size: 14px;
-}
-
-.genform-message.success {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.genform-message.error {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-.genform-loading {
-    position: relative;
-}
-
-.genform-loading::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .genform-form {
-        padding: 20px;
-    }
-
-    .genform-submit-btn {
-        width: 100%;
-    }
+.gfm-error {
+  background: #fef2f2;
+  color: #991b1b;
 }

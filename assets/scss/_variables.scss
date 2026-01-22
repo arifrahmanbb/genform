@@ -1,0 +1,48 @@
+/**
+ * GenForm SCSS Variables
+ *
+ * Only essential variables: breakpoints and semantic colors.
+ * All other values (spacing, fonts, radius, etc.) are used directly in code.
+ *
+ * @package GenForm
+ * @since 1.0.0
+ */
+
+// ========================================
+// Breakpoints
+// ========================================
+
+$gfm-bp-sm: 576px;
+$gfm-bp-md: 768px;
+$gfm-bp-lg: 992px;
+$gfm-bp-xl: 1200px;
+$gfm-bp-xxl: 1400px;
+
+// ========================================
+// Semantic Colors
+// ========================================
+
+// Brand Colors
+$gfm-color-brand: #0073aa;
+$gfm-color-brand-dark: #005a87;
+
+// Text Colors
+$gfm-color-text: #333;
+$gfm-color-text-secondary: #666;
+
+// State Colors
+$gfm-color-success: #d4edda;
+$gfm-color-success-text: #155724;
+$gfm-color-success-border: #c3e6cb;
+
+$gfm-color-error: #f8d7da;
+$gfm-color-error-text: #721c24;
+$gfm-color-error-border: #f5c6cb;
+
+$gfm-color-warning: #fff3cd;
+$gfm-color-warning-text: #856404;
+$gfm-color-warning-border: #ffeaa7;
+
+$gfm-color-info: #cfe2ff;
+$gfm-color-info-text: #084298;
+$gfm-color-info-border: #b6d4fe;

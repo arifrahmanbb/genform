@@ -1,0 +1,248 @@
+/**
+ * GenForm CSS Custom Properties (CSS Variables)
+ *
+ * Root-level CSS variables for dynamic theming and runtime customization.
+ * Allows users to override plugin colors without recompiling SCSS.
+ *
+ * @package GenForm
+ * @since 1.0.0
+ */
+
+:root {
+  /* ========================================
+     Brand & Primary Colors
+     ======================================== */
+
+  --genform-primary: var(--genform-primary-opt, #0073aa);
+  --genform-primary-dark: var(--genform-primary-dark-opt, #005a87);
+  --genform-primary-light: var(--genform-primary-light-opt, #e7f3f7);
+
+  /* ========================================
+     Semantic Colors
+     ======================================== */
+
+  /* Success */
+  --genform-success-bg: var(--genform-success-bg-opt, #d4edda);
+  --genform-success-text: var(--genform-success-text-opt, #155724);
+  --genform-success-border: var(--genform-success-border-opt, #c3e6cb);
+
+  /* Error / Alert */
+  --genform-error-bg: var(--genform-error-bg-opt, #f8d7da);
+  --genform-error-text: var(--genform-error-text-opt, #721c24);
+  --genform-error-border: var(--genform-error-border-opt, #f5c6cb);
+
+  /* Info */
+  --genform-info-bg: var(--genform-info-bg-opt, #cfe2ff);
+  --genform-info-text: var(--genform-info-text-opt, #084298);
+  --genform-info-border: var(--genform-info-border-opt, #b6d4fe);
+
+  /* ========================================
+     Neutral Colors & Grayscale
+     ======================================== */
+
+  /* Pure Colors */
+  --genform-white: var(--genform-white-opt, #ffffff);
+  --genform-black: var(--genform-black-opt, #000000);
+
+  /* Text Colors */
+  --genform-text-primary: var(--genform-text-primary-opt, #333333);
+  --genform-text-secondary: var(--genform-text-secondary-opt, #666666);
+  --genform-text-muted: var(--genform-text-muted-opt, #999999);
+  --genform-text-light: var(--genform-text-light-opt, #cccccc);
+
+  /* Border Colors */
+  --genform-border-primary: var(--genform-border-primary-opt, #dddddd);
+  --genform-border-light: var(--genform-border-light-opt, #e5e5e5);
+  --genform-border-dark: var(--genform-border-dark-opt, #999999);
+
+  /* Background Colors */
+  --genform-bg-primary: var(--genform-bg-primary-opt, #ffffff);
+  --genform-bg-secondary: var(--genform-bg-secondary-opt, #f5f5f5);
+  --genform-bg-tertiary: var(--genform-bg-tertiary-opt, #fafafa);
+
+  /* Grayscale Palette */
+  --genform-gray-25: var(--genform-gray-25-opt, #f9f9f9);
+  --genform-gray-50: var(--genform-gray-50-opt, #f2f2f2);
+  --genform-gray-75: var(--genform-gray-75-opt, #eeeeee);
+  --genform-gray-100: var(--genform-gray-100-opt, #d6d9dc);
+  --genform-gray-150: var(--genform-gray-150-opt, #c8ccd0);
+  --genform-gray-200: var(--genform-gray-200-opt, #bbbbbb);
+  --genform-gray-300: var(--genform-gray-300-opt, #9fa6ad);
+  --genform-gray-400: var(--genform-gray-400-opt, #848d95);
+  --genform-gray-500: var(--genform-gray-500-opt, #6a737c);
+  --genform-gray-600: var(--genform-gray-600-opt, #535a60);
+  --genform-gray-700: var(--genform-gray-700-opt, #3c4146);
+  --genform-gray-800: var(--genform-gray-800-opt, #242729);
+  --genform-gray-900: var(--genform-gray-900-opt, #0c0d0e);
+
+  /* Status Colors */
+  --genform-required: var(--genform-required-opt, #d63638);
+  --genform-disabled: var(--genform-disabled-opt, #cccccc);
+  --genform-focus: var(--genform-focus-opt, #0073aa);
+
+  /* ========================================
+     Spacing Scale
+     ======================================== */
+
+  --genform-space-xs: var(--genform-space-xs-opt, 4px);
+  --genform-space-sm: var(--genform-space-sm-opt, 8px);
+  --genform-space-md: var(--genform-space-md-opt, 12px);
+  --genform-space-base: var(--genform-space-base-opt, 15px);
+  --genform-space-lg: var(--genform-space-lg-opt, 20px);
+  --genform-space-xl: var(--genform-space-xl-opt, 25px);
+  --genform-space-xxl: var(--genform-space-xxl-opt, 30px);
+
+  /* ========================================
+     Typography
+     ======================================== */
+
+  /* Font Sizes */
+  --genform-font-size-xs: var(--genform-font-size-xs-opt, 12px);
+  --genform-font-size-sm: var(--genform-font-size-sm-opt, 13px);
+  --genform-font-size-base: var(--genform-font-size-base-opt, 14px);
+  --genform-font-size-md: var(--genform-font-size-md-opt, 16px);
+
+  /* Font Weights */
+  --genform-font-weight-semibold: var(--genform-font-weight-semibold-opt, 600);
+  --genform-font-weight-bold: var(--genform-font-weight-bold-opt, 700);
+
+  /* Font Family */
+  --genform-font-family-base: var(
+    --genform-font-family-base-opt,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Oxygen-Sans",
+    Ubuntu,
+    Cantarell,
+    "Helvetica Neue",
+    sans-serif
+  );
+
+  /* ========================================
+     Border Radius
+     ======================================== */
+
+  --genform-border-radius-sm: var(--genform-border-radius-sm-opt, 4px);
+  --genform-border-radius-md: var(--genform-border-radius-md-opt, 6px);
+  --genform-border-radius-lg: var(--genform-border-radius-lg-opt, 8px);
+
+  /* ========================================
+     Component Sizing
+     ======================================== */
+
+  --genform-checkbox-size: var(--genform-checkbox-size-opt, 18px);
+  --genform-radio-size: var(--genform-radio-size-opt, 18px);
+
+  /* ========================================
+     Input Styling
+     ======================================== */
+
+  --genform-input-padding-y: var(--genform-input-padding-y-opt, 12px);
+  --genform-input-padding-x: var(--genform-input-padding-x-opt, 15px);
+
+  --genform-textarea-min-height: var(--genform-textarea-min-height-opt, 100px);
+
+  /* ========================================
+     Transitions & Animations
+     ======================================== */
+
+  --genform-transition-duration: var(--genform-transition-duration-opt, 0.2s);
+  --genform-transition-timing: var(--genform-transition-timing-opt, ease-in-out);
+
+  --genform-transition-base: var(--genform-transition-base-opt, all 0.2s ease-in-out);
+  --genform-transition-background: var(--genform-transition-background-opt, background 0.2s ease-in-out);
+
+  /* ========================================
+     Shadows & Elevation
+     ======================================== */
+
+  --genform-shadow-sm: var(--genform-shadow-sm-opt, 0 1px 2px rgba(0, 0, 0, 0.05));
+  --genform-shadow-base: var(--genform-shadow-base-opt, 0 2px 8px rgba(0, 0, 0, 0.1));
+  --genform-shadow-lg: var(--genform-shadow-lg-opt, 0 8px 24px rgba(0, 0, 0, 0.12));
+
+  /* ========================================
+     Z-Index Scale
+     ======================================== */
+
+  --genform-z-modal: var(--genform-z-modal-opt, 1050);
+
+  /* ========================================
+     Responsive Breakpoints
+     ======================================== */
+
+  --genform-breakpoint-md: var(--genform-breakpoint-md-opt, 768px);
+  --genform-breakpoint-lg: var(--genform-breakpoint-lg-opt, 992px);
+  --genform-breakpoint-xl: var(--genform-breakpoint-xl-opt, 1200px);
+  --genform-breakpoint-2xl: var(--genform-breakpoint-2xl-opt, 1400px);
+
+  /* ========================================
+     Form-Specific Variables
+     ======================================== */
+
+  --genform-form-bg: var(--genform-form-bg-opt, #ffffff);
+  --genform-form-border-color: var(--genform-form-border-color-opt, #dddddd);
+  --genform-form-shadow: var(--genform-form-shadow-opt, 0 2px 8px rgba(0, 0, 0, 0.1));
+
+  --genform-input-bg: var(--genform-input-bg-opt, #ffffff);
+  --genform-input-border: var(--genform-input-border-opt, #dddddd);
+  --genform-input-focus-border: var(--genform-input-focus-border-opt, #0073aa);
+  --genform-input-focus-shadow: var(--genform-input-focus-shadow-opt, 0 0 0 1px #0073aa);
+
+  --genform-button-primary-bg: var(--genform-button-primary-bg-opt, #0073aa);
+  --genform-button-primary-text: var(--genform-button-primary-text-opt, #ffffff);
+  --genform-button-primary-hover: var(--genform-button-primary-hover-opt, #005a87);
+
+  --genform-button-secondary-bg: var(--genform-button-secondary-bg-opt, #dddddd);
+  --genform-button-secondary-text: var(--genform-button-secondary-text-opt, #333333);
+  --genform-button-secondary-hover: var(--genform-button-secondary-hover-hover, #f5f5f5);
+
+  --genform-label-color: var(--genform-label-color-opt, #333333);
+  --genform-label-weight: var(--genform-label-weight-opt, 600);
+
+  --genform-placeholder-color: var(--genform-placeholder-color-opt, #999999);
+
+  /* ========================================
+     Admin Panel Variables
+     ======================================== */
+
+  --genform-admin-header-bg: var(--genform-admin-header-bg-opt, #ffffff);
+  --genform-admin-header-border: var(--genform-admin-header-border-opt, #dddddd);
+
+  --genform-admin-sidebar-bg: var(--genform-admin-sidebar-bg-opt, #ffffff);
+  --genform-admin-sidebar-border: var(--genform-admin-sidebar-border-opt, #dddddd);
+
+  --genform-builder-canvas-bg: var(--genform-builder-canvas-bg-opt, #ffffff);
+  --genform-builder-field-bg: var(--genform-builder-field-bg-opt, #f9f9f9);
+
+  --genform-admin-hover-bg: var(--genform-admin-hover-bg-opt, #f5f5f5);
+  --genform-admin-active-bg: var(--genform-admin-active-bg-opt, #e7f3f7);
+
+  /* ========================================
+     Opacity & Transparency
+     ======================================== */
+
+  --genform-opacity-disabled: var(--genform-opacity-disabled-opt, 0.6);
+  --genform-opacity-hover: var(--genform-opacity-hover-opt, 0.85);
+}
+
+/* ========================================
+   Media Query Helpers (for CSS-only solutions)
+   ======================================== */
+
+@media (max-width: 767px) {
+  :root {
+    /* Mobile-specific adjustments */
+    --genform-space-lg: var(--genform-space-lg-mobile-opt, 16px);
+    --genform-space-xxl: var(--genform-space-xxl-mobile-opt, 20px);
+    --genform-font-size-md: var(--genform-font-size-md-mobile-opt, 14px);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  :root {
+    /* Tablet-specific adjustments */
+    --genform-space-lg: var(--genform-space-lg-tablet-opt, 18px);
+  }
+}

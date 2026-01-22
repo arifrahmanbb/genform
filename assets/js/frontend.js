@@ -1,70 +1,38 @@
-/**
- * GenForm Frontend JavaScript
- * 
- * @package GenForm
- * @since 1.0.0
- */
-
 (function ($) {
-    'use strict';
+	'use strict';
 
-    $(document).ready(function () {
+	$(document).on('submit', '.gfm-form-js', function (e) {
+		e.preventDefault();
+		const $form = $(this);
+		const $btn = $form.find('.gfm-submit');
+		const $msg = $form.find('.gfm-message');
+		const formData = $form.serialize();
 
-        // Handle form submission via AJAX
-        $('.genform-form').on('submit', function (e) {
-            e.preventDefault();
+		$btn.prop('disabled', true).text('Processing...');
+		$msg.hide().removeClass('gfm-success gfm-error');
 
-            var $form = $(this);
-            var $submitBtn = $form.find('.genform-submit-btn');
-            var $message = $form.find('.genform-message');
-            var formData = new FormData(this);
-
-            // Disable submit button
-            $submitBtn.prop('disabled', true).text('Submitting...');
-            $message.hide().removeClass('success error');
-
-            // AJAX request
-            $.ajax({
-                url: genformFrontend.ajaxUrl,
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function (response) {
-                    if (response.success) {
-                        $message
-                            .addClass('success')
-                            .html(response.data.message)
-                            .show();
-
-                        // Reset form
-                        $form[0].reset();
-
-                        // Redirect if URL is set
-                        if (response.data.redirect_url) {
-                            setTimeout(function () {
-                                window.location.href = response.data.redirect_url;
-                            }, 2000);
-                        }
-                    } else {
-                        $message
-                            .addClass('error')
-                            .html(response.data.message)
-                            .show();
-                    }
-                },
-                error: function () {
-                    $message
-                        .addClass('error')
-                        .html('An error occurred. Please try again.')
-                        .show();
-                },
-                complete: function () {
-                    $submitBtn.prop('disabled', false).text('Submit');
-                }
-            });
-        });
-
-    });
+		$.ajax({
+			url: genform.ajax_url,
+			type: 'POST',
+			data: formData,
+			success: function (response) {
+				if (response.success) {
+					$msg.addClass('gfm-success').text(response.data.message).fadeIn();
+					if (response.data.redirect) {
+						window.location.href = response.data.redirect;
+					}
+					$form[0].reset();
+				} else {
+					$msg.addClass('gfm-error').text(response.data.message).fadeIn();
+				}
+			},
+			error: function () {
+				$msg.addClass('gfm-error').text('An error occurred. Please try again.').fadeIn();
+			},
+			complete: function () {
+				$btn.prop('disabled', false).text($btn.data('original-text') || 'Submit');
+			}
+		});
+	});
 
 })(jQuery);

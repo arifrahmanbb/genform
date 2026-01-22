@@ -1,0 +1,317 @@
+/**
+ * GenForm Admin Core Styles
+ *
+ * Core styling for GenForm admin interface.
+ * Uses direct values for spacing, fonts, radius, etc.
+ * Only semantic colors use variables.
+ *
+ * @package GenForm
+ * @since 1.0.0
+ */
+
+@import 'variables';
+@import 'mixins';
+
+// ========================================
+// Admin Wrapper
+// ========================================
+
+.gfm-admin-wrap {
+  margin: 20px 20px 0 0;
+}
+
+// ========================================
+// Empty State
+// ========================================
+
+.gfm-empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-top: 20px;
+
+  p {
+    font-size: 16px;
+    color: $gfm-color-text-secondary;
+    margin-bottom: 20px;
+  }
+}
+
+// ========================================
+// Status Badge
+// ========================================
+
+.gfm-status {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 600;
+
+  &-active {
+    background: $gfm-color-success;
+    color: $gfm-color-success-text;
+  }
+
+  &-inactive {
+    background: $gfm-color-error;
+    color: $gfm-color-error-text;
+  }
+}
+
+// ========================================
+// Copy Shortcode Button
+// ========================================
+
+.gfm-copy-shortcode {
+  margin-left: 8px;
+}
+
+// ========================================
+// Form Builder Layout
+// ========================================
+
+.gfm-builder-wrap {
+  margin: 20px 20px 0 0;
+}
+
+.gfm-builder-header {
+  background: #fff;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  @include gfm-flex-between;
+
+  h1,
+  h2 {
+    margin: 0;
+  }
+}
+
+.gfm-form-name-wrapper {
+  label {
+    display: inline-block;
+    margin-right: 16px;
+    font-weight: 600;
+  }
+}
+
+.gfm-builder-actions {
+  @include gfm-flex-row-center;
+  gap: 16px;
+}
+
+// ========================================
+// Builder Container & Layout
+// ========================================
+
+.gfm-builder-container {
+  display: flex;
+  gap: 20px;
+}
+
+// ========================================
+// Builder Sidebar (Field Types)
+// ========================================
+
+.gfm-builder-sidebar {
+  flex: 0 0 250px;
+  background: #fff;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  height: fit-content;
+
+  h3 {
+    margin-top: 0;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #ddd;
+  }
+}
+
+.gfm-field-types {
+  @include gfm-flex-column;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.gfm-add-field {
+  @include gfm-flex-row-center;
+  gap: 8px;
+  padding: 16px;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  @include gfm-transition(all);
+  text-align: left;
+  font-size: 14px;
+
+  &:hover {
+    background: $gfm-color-brand;
+    color: #fff;
+    border-color: $gfm-color-brand;
+  }
+
+  .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// ========================================
+// Builder Canvas (Form Preview)
+// ========================================
+
+.gfm-builder-canvas {
+  flex: 1;
+  background: #fff;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  min-height: 500px;
+
+  h3 {
+    margin-top: 0;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #ddd;
+  }
+}
+
+.gfm-fields-container {
+  margin-top: 20px;
+}
+
+// ========================================
+// Field Item (Builder Canvas)
+// ========================================
+
+.gfm-field-item {
+  background: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 16px;
+  margin-bottom: 16px;
+  cursor: move;
+
+  &-header {
+    @include gfm-flex-between;
+    margin-bottom: 16px;
+  }
+
+  &-title {
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  &-actions {
+    display: flex;
+    gap: 5px;
+
+    button {
+      padding: 4px 8px;
+      font-size: 13px;
+    }
+  }
+
+  &-settings {
+    display: none;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #ddd;
+
+    &.active {
+      display: block;
+    }
+  }
+}
+
+.gfm-field-setting {
+  margin-bottom: 12px;
+
+  label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+    font-size: 13px;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  textarea {
+    width: 100%;
+    padding: 6px 10px;
+  }
+
+  input[type="checkbox"] {
+    margin-right: 5px;
+  }
+}
+
+// ========================================
+// Builder Settings Panel
+// ========================================
+
+.gfm-builder-settings {
+  flex: 0 0 300px;
+  background: #fff;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  height: fit-content;
+
+  h3 {
+    margin-top: 0;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  h4 {
+    margin-top: 20px;
+    margin-bottom: 16px;
+  }
+}
+
+.gfm-setting-group {
+  margin-bottom: 16px;
+
+  label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+    font-size: 13px;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="url"],
+  textarea {
+    width: 100%;
+    padding: 6px 10px;
+  }
+
+  .description {
+    font-size: 12px;
+    color: $gfm-color-text-secondary;
+    margin-top: 5px;
+  }
+}
+
+// ========================================
+// Settings Page
+// ========================================
+
+.gfm-settings-wrap {
+  margin: 20px 20px 0 0;
+
+  .form-table {
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+}

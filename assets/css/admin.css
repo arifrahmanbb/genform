@@ -1,271 +1,106 @@
-/**
- * GenForm Admin Styles
- * 
- * @package GenForm
- * @since 1.0.0
- */
+:root {
+    --gfm-primary: #6366f1;
+    --gfm-primary-hover: #4f46e5;
+    --gfm-bg: #f8fafc;
+    --gfm-card-bg: rgba(255, 255, 255, 0.8);
+    --gfm-text: #1e293b;
+    --gfm-border: #e2e8f0;
+    --gfm-radius: 12px;
+    --gfm-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
 
-/* Admin Wrapper */
 .genform-admin-wrap {
-    margin: 20px 20px 0 0;
-}
-
-/* Empty State */
-.genform-empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-top: 20px;
-}
-
-.genform-empty-state p {
-    font-size: 16px;
-    color: #666;
-    margin-bottom: 20px;
-}
-
-/* Status Badge */
-.genform-status {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 3px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.genform-status-active {
-    background: #d4edda;
-    color: #155724;
-}
-
-.genform-status-inactive {
-    background: #f8d7da;
-    color: #721c24;
-}
-
-/* Copy Shortcode Button */
-.genform-copy-shortcode {
-    margin-left: 8px;
-}
-
-/* Form Builder */
-.genform-builder-wrap {
-    margin: 20px 20px 0 0;
-}
-
-.genform-builder-header {
-    background: #fff;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--gfm-text);
     padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    background: var(--gfm-bg);
 }
 
-.genform-form-name-wrapper label {
-    display: inline-block;
-    margin-right: 10px;
+.gfm-card {
+    background: var(--gfm-card-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--gfm-border);
+    border-radius: var(--gfm-radius);
+    box-shadow: var(--gfm-shadow);
+    padding: 24px;
+    margin-bottom: 24px;
+    transition: transform 0.2s ease;
+}
+
+.gfm-card:hover {
+    transform: translateY(-2px);
+}
+
+.gfm-btn {
+    appearance: none;
+    background: var(--gfm-primary);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
     font-weight: 600;
-}
-
-.genform-builder-actions {
-    display: flex;
-    gap: 10px;
-}
-
-.genform-builder-container {
-    display: flex;
-    gap: 20px;
-}
-
-.genform-builder-sidebar {
-    flex: 0 0 250px;
-    background: #fff;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    height: fit-content;
-}
-
-.genform-builder-sidebar h3 {
-    margin-top: 0;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #ddd;
-}
-
-.genform-field-types {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 15px;
-}
-
-.genform-add-field {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 15px;
-    background: #f7f7f7;
-    border: 1px solid #ddd;
-    border-radius: 4px;
     cursor: pointer;
-    transition: all 0.2s;
-    text-align: left;
-    font-size: 14px;
+    transition: all 0.3s ease;
 }
 
-.genform-add-field:hover {
-    background: #0073aa;
-    color: #fff;
-    border-color: #0073aa;
+.gfm-btn:hover {
+    background: var(--gfm-primary-hover);
+    box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
 }
 
-.genform-add-field .dashicons {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
+/* Builder UI */
+.gfm-builder-container {
+    display: grid;
+    grid-template-columns: 300px 1fr 350px;
+    gap: 24px;
+    margin-top: 24px;
 }
 
-.genform-builder-canvas {
-    flex: 1;
-    background: #fff;
+.gfm-sidebar {
+    background: white;
+    border-radius: var(--gfm-radius);
     padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    min-height: 500px;
+    border: 1px solid var(--gfm-border);
 }
 
-.genform-builder-settings {
-    flex: 0 0 300px;
-    background: #fff;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    height: fit-content;
-}
-
-.genform-builder-settings h3 {
-    margin-top: 0;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #ddd;
-}
-
-.genform-builder-settings h4 {
-    margin-top: 15px;
-    margin-bottom: 10px;
-}
-
-.genform-setting-group {
-    margin-bottom: 15px;
-}
-
-.genform-setting-group label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 5px;
-    font-size: 13px;
-}
-
-.genform-setting-group input[type="text"],
-.genform-setting-group input[type="email"],
-.genform-setting-group input[type="url"],
-.genform-setting-group textarea {
-    width: 100%;
-    padding: 6px 10px;
-}
-
-.genform-setting-group .description {
-    font-size: 12px;
-    color: #666;
-    margin-top: 5px;
-}
-
-.genform-builder-canvas h3 {
-    margin-top: 0;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #ddd;
-}
-
-.genform-fields-container {
-    margin-top: 20px;
-}
-
-.genform-field-item {
-    background: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 15px;
-    margin-bottom: 15px;
-    cursor: move;
-}
-
-.genform-field-item-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.genform-field-item-title {
-    font-weight: 600;
-    font-size: 14px;
-}
-
-.genform-field-item-actions {
-    display: flex;
-    gap: 5px;
-}
-
-.genform-field-item-actions button {
-    padding: 4px 8px;
-    font-size: 12px;
-}
-
-.genform-field-settings {
-    display: none;
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid #ddd;
-}
-
-.genform-field-settings.active {
-    display: block;
-}
-
-.genform-field-setting {
+.gfm-field-node {
+    padding: 12px;
     margin-bottom: 12px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid transparent;
 }
 
-.genform-field-setting label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 5px;
-    font-size: 13px;
+.gfm-field-node:hover {
+    background: white;
+    border-color: var(--gfm-primary);
+    color: var(--gfm-primary);
 }
 
-.genform-field-setting input[type="text"],
-.genform-field-setting input[type="number"],
-.genform-field-setting textarea {
-    width: 100%;
-    padding: 6px 10px;
+.gfm-canvas {
+    background: white;
+    border-radius: var(--gfm-radius);
+    min-height: 600px;
+    padding: 30px;
+    border: 2px dashed var(--gfm-border);
 }
 
-.genform-field-setting input[type="checkbox"] {
-    margin-right: 5px;
-}
-
-/* Settings Page */
-.genform-settings-wrap {
-    margin: 20px 20px 0 0;
-}
-
-.genform-settings-wrap .form-table {
-    background: #fff;
+.gfm-settings-panel {
+    background: white;
+    border-radius: var(--gfm-radius);
     padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    border: 1px solid var(--gfm-border);
+}
+
+/* Form Styles */
+.gfm-form-field {
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid var(--gfm-border);
+    background: #fff;
 }

@@ -1,0 +1,274 @@
+/**
+ * GenForm Frontend Styles
+ *
+ * Public-facing form styling.
+ * Uses direct values for spacing, fonts, radius, etc.
+ * Only semantic colors use variables.
+ *
+ * @package GenForm
+ * @since 1.0.0
+ */
+
+@import 'variables';
+@import 'mixins';
+
+// ========================================
+// Form Wrapper & Container
+// ========================================
+
+.gfm-wrapper {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.gfm-form {
+  background: #fff;
+  padding: 32px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+// ========================================
+// Fields Container & Layout
+// ========================================
+
+.gfm-fields {
+  @include gfm-flex-column;
+  gap: 20px;
+}
+
+.gfm-field {
+  @include gfm-flex-column;
+}
+
+// ========================================
+// Form Labels
+// ========================================
+
+.gfm-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  color: $gfm-color-text;
+}
+
+.gfm-required {
+  color: #d63638;
+  margin-left: 2px;
+}
+
+// ========================================
+// Text Inputs & Textareas
+// ========================================
+
+.gfm-input,
+.gfm-textarea,
+.gfm-select {
+  @include gfm-form-input-base;
+}
+
+.gfm-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+// ========================================
+// Checkboxes & Radio Buttons
+// ========================================
+
+.gfm-checkbox-label,
+.gfm-radio-label {
+  @include gfm-flex-row-center;
+  gap: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  user-select: none;
+}
+
+.gfm-checkbox,
+.gfm-radio {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+// ========================================
+// Field Description
+// ========================================
+
+.gfm-field-description {
+  margin-top: 5px;
+  font-size: 13px;
+  color: $gfm-color-text-secondary;
+  font-style: italic;
+}
+
+// ========================================
+// Submit Button
+// ========================================
+
+.gfm-submit-wrapper {
+  margin-top: 24px;
+}
+
+.gfm-submit-btn {
+  @include gfm-btn-primary;
+}
+
+// ========================================
+// Form Messages (Success/Error)
+// ========================================
+
+.gfm-message {
+  margin-top: 20px;
+  padding: 16px;
+  border-radius: 4px;
+  font-size: 14px;
+
+  &.success {
+    @include gfm-alert-success;
+  }
+
+  &.error {
+    @include gfm-alert-error;
+  }
+
+  &.warning {
+    @include gfm-alert($gfm-color-warning, $gfm-color-warning-text, $gfm-color-warning-border);
+  }
+
+  &.info {
+    @include gfm-alert($gfm-color-info, $gfm-color-info-text, $gfm-color-info-border);
+  }
+}
+
+// ========================================
+// Loading State
+// ========================================
+
+.gfm-loading {
+  position: relative;
+
+  &::after {
+    content: '';
+    @include gfm-absolute-cover;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+  }
+}
+
+// ========================================
+// Form Field Groups
+// ========================================
+
+.gfm-field-group {
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e5e5e5;
+
+  &:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  legend {
+    display: block;
+    margin-bottom: 16px;
+    font-weight: 600;
+    font-size: 14px;
+    color: $gfm-color-text;
+  }
+}
+
+.gfm-checkbox-group,
+.gfm-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+// ========================================
+// Responsive Layout
+// ========================================
+
+@include gfm-mobile-only {
+  .gfm-form {
+    padding: 20px;
+  }
+
+  .gfm-submit-btn {
+    width: 100%;
+  }
+
+  .gfm-fields {
+    gap: 12px;
+  }
+}
+
+// ========================================
+// Accessibility Improvements
+// ========================================
+
+.gfm-form {
+
+  input,
+  select,
+  textarea {
+    &:focus {
+      outline: 2px solid $gfm-color-brand;
+      outline-offset: 2px;
+    }
+  }
+}
+
+// ========================================
+// Error State Styling
+// ========================================
+
+.gfm-field {
+  &.error {
+
+    .gfm-input,
+    .gfm-textarea,
+    .gfm-select {
+      border-color: #d63638;
+      background-color: rgba(214, 54, 56, 0.02);
+
+      &:focus {
+        @include gfm-focus-styles(#d63638);
+      }
+    }
+  }
+
+  .gfm-error-message {
+    margin-top: 5px;
+    font-size: 13px;
+    color: #d63638;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+// ========================================
+// Success State Styling
+// ========================================
+
+.gfm-field {
+  &.success {
+
+    .gfm-input,
+    .gfm-textarea,
+    .gfm-select {
+      border-color: $gfm-color-success-text;
+      background-color: rgba(21, 87, 36, 0.02);
+    }
+  }
+}

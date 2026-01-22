@@ -1,0 +1,17 @@
+/**
+ * GenForm Admin Styles
+ *
+ * Main SCSS entry point for admin styles. Imports shared variables and mixins first,
+ * then specific admin stylesheets for maintainability and consistency.
+ *
+ * @package GenForm
+ * @since 1.0.0
+ */
+
+// Import shared utilities first
+@import "variables";
+@import "mixins";
+
+// Import admin stylesheets
+@import "admin/core";
+@import "admin/from-builder";
