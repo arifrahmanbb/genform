@@ -1,106 +1,121 @@
 <?php
+if (!defined('ABSPATH')) exit;
 
-/**
- * Admin View: Forms List
- *
- * Displays the list of all forms.
- *
- * @package GenForm
- * @since 1.0.0
- */
-
-// Exit if accessed directly.
-if (! defined('ABSPATH')) {
-	exit;
-}
-
-// Check user capabilities.
-if (! current_user_can('manage_options')) {
-	wp_die(esc_html__('You do not have sufficient permissions to access this page.', 'genform'));
+if (!current_user_can('manage_options')) {
+	wp_die(__('Unauthorized.', 'genform'));
 }
 
 global $wpdb;
-$forms_table = $wpdb->prefix . 'genform_forms';
+$table = $wpdb->prefix . 'genform_forms';
+$e_table = $wpdb->prefix . 'genform_entries';
 
-// Handle delete action.
-if (isset($_GET['action']) && 'delete' === $_GET['action'] && isset($_GET['form_id']) && isset($_GET['_wpnonce'])) {
-	if (wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'])), 'genform_delete_form')) {
-		$form_id = absint($_GET['form_id']);
-		$wpdb->delete($forms_table, array('id' => $form_id), array('%d'));
-		echo '<div class="notice notice-success"><p>' . esc_html__('Form deleted successfully.', 'genform') . '</p></div>';
-	}
-}
-
-// Get all forms.
-$forms = $wpdb->get_results("SELECT * FROM $forms_table ORDER BY created_at DESC");
+$forms = $wpdb->get_results("SELECT f.*, (SELECT COUNT(*) FROM $e_table WHERE form_id = f.id) as entries_count FROM $table f ORDER BY f.created_at DESC");
 ?>
 
-<div class="wrap gfm-admin-wrap">
-	<h1 class="wp-heading-inline"><?php esc_html_e('All Forms', 'genform'); ?></h1>
-	<a href="<?php echo esc_url(admin_url('admin.php?page=genform-builder')); ?>" class="page-title-action">
-		<?php esc_html_e('Add New', 'genform'); ?>
-	</a>
-	<hr class="wp-header-end">
+<div class="wrap genform-admin-wrap">
+	<div class="gfm-header-flex">
+		<h1><?php _e('All Forms', 'genform'); ?></h1>
+		<a href="<?php echo admin_url('admin.php?page=genform-builder'); ?>" class="gfm-btn gfm-btn-primary"><?php _e('Add New Form', 'genform'); ?></a>
+	</div>
 
-	<?php if (empty($forms)) : ?>
-		<div class="gfm-empty-state">
-			<p><?php esc_html_e('No forms found. Create your first form to get started!', 'genform'); ?></p>
-			<a href="<?php echo esc_url(admin_url('admin.php?page=genform-builder')); ?>" class="button button-primary">
-				<?php esc_html_e('Create Your First Form', 'genform'); ?>
-			</a>
-		</div>
-	<?php else : ?>
-		<table class="wp-list-table widefat fixed striped">
-			<thead>
-				<tr>
-					<th><?php esc_html_e('Form Name', 'genform'); ?></th>
-					<th><?php esc_html_e('Shortcode', 'genform'); ?></th>
-					<th><?php esc_html_e('Entries', 'genform'); ?></th>
-					<th><?php esc_html_e('Status', 'genform'); ?></th>
-					<th><?php esc_html_e('Created', 'genform'); ?></th>
-					<th><?php esc_html_e('Actions', 'genform'); ?></th>
-				</tr>
-			</thead>
-			<tbody>
-				<?php
-				foreach ($forms as $form) :
-					$entries_table = $wpdb->prefix . 'genform_entries';
-					$entries_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $entries_table WHERE form_id = %d", $form->id));
-				?>
+	<div class="gfm-card">
+		<?php if (empty($forms)): ?>
+			<div class="gfm-empty-state">
+				<span class="dashicons dashicons-forms"></span>
+				<p><?php _e('You haven\'t created any forms yet.', 'genform'); ?></p>
+				<a href="<?php echo admin_url('admin.php?page=genform-builder'); ?>" class="gfm-btn gfm-btn-outline"><?php _e('Create Your First Form', 'genform'); ?></a>
+			</div>
+		<?php else: ?>
+			<table class="wp-list-table widefat fixed striped">
+				<thead>
 					<tr>
-						<td>
-							<strong><?php echo esc_html($form->name); ?></strong>
-						</td>
-						<td>
-							<code>[genform id="<?php echo esc_attr($form->id); ?>"]</code>
-							<button class="button button-small gfm-copy-shortcode" data-shortcode='[genform id="<?php echo esc_attr($form->id); ?>"]'>
-								<?php esc_html_e('Copy', 'genform'); ?>
-							</button>
-						</td>
-						<td>
-							<a href="<?php echo esc_url(wp_nonce_url(admin_url('admin.php?page=genform-entries&form_id=' . $form->id), 'genform_view_entries')); ?>">
-								<?php echo esc_html($entries_count); ?>
-							</a>
-						</td>
-						<td>
-							<span class="gfm-status gfm-status-<?php echo esc_attr($form->status); ?>">
-								<?php echo esc_html(ucfirst($form->status)); ?>
-							</span>
-						</td>
-						<td><?php echo esc_html(date_i18n(get_option('date_format'), strtotime($form->created_at))); ?></td>
-						<td>
-							<a href="<?php echo esc_url(wp_nonce_url(admin_url('admin.php?page=genform-builder&action=edit&form_id=' . $form->id), 'genform_edit_form')); ?>" class="button button-small">
-								<?php esc_html_e('Edit', 'genform'); ?>
-							</a>
-							<a href="<?php echo esc_url(wp_nonce_url(admin_url('admin.php?page=genform&action=delete&form_id=' . $form->id), 'genform_delete_form')); ?>"
-								class="button button-small gfm-delete-form"
-								onclick="return confirm('<?php echo esc_js(__('Are you sure you want to delete this form?', 'genform')); ?>');">
-								<?php esc_html_e('Delete', 'genform'); ?>
-							</a>
-						</td>
+						<th><?php _e('Form Name', 'genform'); ?></th>
+						<th width="250"><?php _e('Shortcode', 'genform'); ?></th>
+						<th width="100"><?php _e('Entries', 'genform'); ?></th>
+						<th><?php _e('Status', 'genform'); ?></th>
+						<th><?php _e('Created', 'genform'); ?></th>
+						<th width="150"><?php _e('Actions', 'genform'); ?></th>
 					</tr>
-				<?php endforeach; ?>
-			</tbody>
-		</table>
-	<?php endif; ?>
+				</thead>
+				<tbody>
+					<?php foreach ($forms as $form): ?>
+						<tr>
+							<td>
+								<strong><a href="<?php echo wp_nonce_url(admin_url('admin.php?page=genform-builder&action=edit&form_id=' . $form->id), 'genform_edit_form'); ?>"><?php echo esc_html($form->form_name); ?></a></strong>
+							</td>
+							<td>
+								<div class="gfm-shortcode-copy">
+									<code>[genform id="<?php echo $form->id; ?>"]</code>
+									<button class="gfm-copy-btn dashicons dashicons-admin-page" data-code='[genform id="<?php echo $form->id; ?>"]'></button>
+								</div>
+							</td>
+							<td>
+								<a href="<?php echo wp_nonce_url(admin_url('admin.php?page=genform-entries&form_id=' . $form->id), 'genform_view_entries'); ?>" class="gfm-count-badge">
+									<?php echo $form->entries_count; ?>
+								</a>
+							</td>
+							<td>
+								<span class="gfm-status gfm-status-<?php echo esc_attr($form->status); ?>">
+									<?php echo ucfirst($form->status); ?>
+								</span>
+							</td>
+							<td><?php echo date_i18n(get_option('date_format'), strtotime($form->created_at)); ?></td>
+							<td>
+								<a href="<?php echo wp_nonce_url(admin_url('admin.php?page=genform-builder&action=edit&form_id=' . $form->id), 'genform_edit_form'); ?>" class="button"><?php _e('Edit', 'genform'); ?></a>
+								<a href="<?php echo wp_nonce_url(admin_url('admin.php?page=genform&action=delete&form_id=' . $form->id), 'genform_delete_form'); ?>" class="button button-link-delete" onclick="return confirm('Really delete this form and all its entries?')"><?php _e('Delete', 'genform'); ?></a>
+							</td>
+						</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+		<?php endif; ?>
+	</div>
 </div>
+
+<script>
+	jQuery(document).ready(function($) {
+		$('.gfm-copy-btn').on('click', function() {
+			const code = $(this).data('code');
+			const $temp = $("<input>");
+			$("body").append($temp);
+			$temp.val(code).select();
+			document.execCommand("copy");
+			$temp.remove();
+			$(this).removeClass('dashicons-admin-page').addClass('dashicons-yes');
+			setTimeout(() => $(this).removeClass('dashicons-yes').addClass('dashicons-admin-page'), 2000);
+		});
+	});
+</script>
+
+<style>
+	.gfm-shortcode-copy {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.gfm-copy-btn {
+		background: none;
+		border: none;
+		cursor: pointer;
+		color: #999;
+	}
+
+	.gfm-copy-btn:hover {
+		color: #666;
+	}
+
+	.gfm-count-badge {
+		background: #6366f1;
+		color: #fff;
+		padding: 2px 8px;
+		border-radius: 99px;
+		text-decoration: none;
+		font-size: 11px;
+		font-weight: 700;
+	}
+
+	.gfm-count-badge:hover {
+		background: #4f46e5;
+	}
+</style>

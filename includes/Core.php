@@ -10,6 +10,9 @@ use GenForm\Handlers\FormHandler;
 use GenForm\Integrations\Block;
 use GenForm\Integrations\Shortcode;
 
+/**
+ * Core Class for GenForm
+ */
 final class Core
 {
     private static ?self $instance = null;
@@ -80,6 +83,7 @@ final class Core
         wp_enqueue_script('genform-admin', GENFORM_URL . 'assets/js/admin.js', ['jquery'], GENFORM_VERSION, ['strategy' => 'defer', 'in_footer' => true]);
 
         if (str_contains($hook, 'genform-builder')) {
+            wp_enqueue_script('jquery-ui-sortable');
             wp_enqueue_script('genform-builder', GENFORM_URL . 'assets/js/form-builder.js', ['jquery', 'jquery-ui-sortable'], GENFORM_VERSION, ['strategy' => 'defer', 'in_footer' => true]);
 
             $id = isset($_GET['form_id']) ? absint($_GET['form_id']) : 0;
@@ -87,7 +91,8 @@ final class Core
             $form = $id ? $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}genform_forms WHERE id = %d", $id)) : null;
 
             wp_localize_script('genform-builder', 'genformBuilder', [
-                'initialData' => $form ? json_decode($form->data, true) : null,
+                'initialData' => $form ? json_decode($form->form_data, true) : null,
+                'initialSettings' => $form ? json_decode($form->form_settings, true) : null,
             ]);
         }
 
@@ -104,6 +109,10 @@ final class Core
     {
         wp_enqueue_style('genform-frontend', GENFORM_URL . 'assets/css/frontend.css', [], GENFORM_VERSION);
         wp_enqueue_script('genform-frontend', GENFORM_URL . 'assets/js/frontend.js', ['jquery'], GENFORM_VERSION, ['strategy' => 'defer', 'in_footer' => true]);
+
+        wp_localize_script('genform-frontend', 'genform', [
+            'ajax_url' => admin_url('admin-ajax.php'),
+        ]);
     }
 
     public static function activate(): void
@@ -111,26 +120,32 @@ final class Core
         global $wpdb;
         $charset = $wpdb->get_charset_collate();
 
-        $sql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}genform_forms (
+        $table_forms = $wpdb->prefix . 'genform_forms';
+        $sql_forms = "CREATE TABLE $table_forms (
             id bigint(20) NOT NULL AUTO_INCREMENT,
-            name varchar(255) NOT NULL,
-            data longtext NOT NULL,
-            settings longtext,
+            form_name varchar(255) NOT NULL,
+            form_data longtext NOT NULL,
+            form_settings longtext,
             status varchar(20) DEFAULT 'active',
             created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id)
-        ) $charset;
+        ) $charset;";
 
-        CREATE TABLE IF NOT EXISTS {$wpdb->prefix}genform_entries (
+        $table_entries = $wpdb->prefix . 'genform_entries';
+        $sql_entries = "CREATE TABLE $table_entries (
             id bigint(20) NOT NULL AUTO_INCREMENT,
             form_id bigint(20) NOT NULL,
             entry_data longtext NOT NULL,
-            ip varchar(100),
+            user_ip varchar(100),
+            user_agent varchar(255),
+            status varchar(20) DEFAULT 'unread',
             created_at datetime DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id)
         ) $charset;";
 
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-        dbDelta($sql);
+        dbDelta($sql_forms);
+        dbDelta($sql_entries);
     }
 }

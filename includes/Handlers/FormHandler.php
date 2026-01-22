@@ -6,12 +6,17 @@ namespace GenForm\Handlers;
 
 use GenForm\Integrations\Email;
 
+/**
+ * Class FormHandler
+ * Processes AJAX form submissions.
+ */
 final class FormHandler
 {
     public function __construct()
     {
         add_action('wp_ajax_genform_submit', [$this, 'handleSubmission']);
         add_action('wp_ajax_nopriv_genform_submit', [$this, 'handleSubmission']);
+        add_action('wp_ajax_genform_delete_entry', [$this, 'handleDeleteEntry']);
     }
 
     public function handleSubmission(): void
@@ -40,16 +45,18 @@ final class FormHandler
         $wpdb->insert("{$wpdb->prefix}genform_entries", [
             'form_id'    => $form_id,
             'entry_data' => wp_json_encode($entry_data),
-            'ip'         => $_SERVER['REMOTE_ADDR'] ?? '',
+            'user_ip'    => $_SERVER['REMOTE_ADDR'] ?? '',
+            'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? '',
         ]);
 
         $entry_id = $wpdb->insert_id;
 
+        // Handle Notifications
         Email::send($entry_id, $form_id, $entry_data);
 
-        $settings = json_decode($form->settings, true);
+        $settings = json_decode($form->form_settings, true);
         wp_send_json_success([
-            'message'  => $settings['success_message'] ?? __('Submitted!', 'genform'),
+            'message'  => $settings['success_message'] ?? __('Thank you for your submission.', 'genform'),
             'redirect' => $settings['redirect_url'] ?? '',
         ]);
     }
@@ -59,9 +66,31 @@ final class FormHandler
         $data = [];
         foreach ($_POST as $key => $value) {
             if (str_starts_with($key, 'gfm_')) {
-                $data[str_replace('gfm_', '', $key)] = sanitize_text_field(wp_unslash($value));
+                $raw_key = str_replace('gfm_', '', $key);
+                if (is_array($value)) {
+                    $data[$raw_key] = array_map('sanitize_text_field', $value);
+                } else {
+                    $data[$raw_key] = sanitize_text_field(wp_unslash($value));
+                }
             }
         }
         return $data;
+    }
+
+    public function handleDeleteEntry(): void
+    {
+        check_ajax_referer('genform_admin_nonce', 'nonce');
+
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => __('Unauthorized', 'genform')]);
+        }
+
+        $id = (int) ($_POST['entry_id'] ?? 0);
+        if ($id) {
+            global $wpdb;
+            $wpdb->delete($wpdb->prefix . 'genform_entries', ['id' => $id]);
+            wp_send_json_success();
+        }
+        wp_send_json_error();
     }
 }
