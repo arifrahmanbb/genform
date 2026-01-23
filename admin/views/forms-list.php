@@ -1,68 +1,77 @@
 <?php
-if (!defined('ABSPATH')) exit;
+/**
+ * View for all forms list
+ *
+ * @package GenForm
+ */
 
-if (!current_user_can('manage_options')) {
-	wp_die(__('Unauthorized.', 'genform'));
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+if ( ! current_user_can( 'manage_options' ) ) {
+	wp_die( esc_html__( 'Unauthorized.', 'genform' ) );
 }
 
 global $wpdb;
-$table = $wpdb->prefix . 'genform_forms';
-$e_table = $wpdb->prefix . 'genform_entries';
 
-$forms = $wpdb->get_results("SELECT f.*, (SELECT COUNT(*) FROM $e_table WHERE form_id = f.id) as entries_count FROM $table f ORDER BY f.created_at DESC");
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+$genform_forms = $wpdb->get_results(
+	"SELECT f.*, (SELECT COUNT(*) FROM {$wpdb->prefix}genform_entries WHERE form_id = f.id) as entries_count FROM {$wpdb->prefix}genform_forms f ORDER BY f.created_at DESC"
+);
 ?>
 
 <div class="wrap genform-admin-wrap">
 	<div class="gfm-header-flex">
-		<h1><?php _e('All Forms', 'genform'); ?></h1>
-		<a href="<?php echo admin_url('admin.php?page=genform-builder'); ?>" class="gfm-btn gfm-btn-primary"><?php _e('Add New Form', 'genform'); ?></a>
+		<h1><?php esc_html_e( 'All Forms', 'genform' ); ?></h1>
+		<a href="<?php echo esc_url( admin_url( 'admin.php?page=genform-builder' ) ); ?>" class="gfm-btn gfm-btn-primary"><?php esc_html_e( 'Add New Form', 'genform' ); ?></a>
 	</div>
 
 	<div class="gfm-card">
-		<?php if (empty($forms)): ?>
+		<?php if ( empty( $genform_forms ) ) : ?>
 			<div class="gfm-empty-state">
 				<span class="dashicons dashicons-forms"></span>
-				<p><?php _e('You haven\'t created any forms yet.', 'genform'); ?></p>
-				<a href="<?php echo admin_url('admin.php?page=genform-builder'); ?>" class="gfm-btn gfm-btn-outline"><?php _e('Create Your First Form', 'genform'); ?></a>
+				<p><?php esc_html_e( 'You haven\'t created any forms yet.', 'genform' ); ?></p>
+				<a href="<?php echo esc_url( admin_url( 'admin.php?page=genform-builder' ) ); ?>" class="gfm-btn gfm-btn-outline"><?php esc_html_e( 'Create Your First Form', 'genform' ); ?></a>
 			</div>
-		<?php else: ?>
+		<?php else : ?>
 			<table class="wp-list-table widefat fixed striped">
 				<thead>
 					<tr>
-						<th><?php _e('Form Name', 'genform'); ?></th>
-						<th width="250"><?php _e('Shortcode', 'genform'); ?></th>
-						<th width="100"><?php _e('Entries', 'genform'); ?></th>
-						<th><?php _e('Status', 'genform'); ?></th>
-						<th><?php _e('Created', 'genform'); ?></th>
-						<th width="150"><?php _e('Actions', 'genform'); ?></th>
+						<th><?php esc_html_e( 'Form Name', 'genform' ); ?></th>
+						<th width="250"><?php esc_html_e( 'Shortcode', 'genform' ); ?></th>
+						<th width="100"><?php esc_html_e( 'Entries', 'genform' ); ?></th>
+						<th><?php esc_html_e( 'Status', 'genform' ); ?></th>
+						<th><?php esc_html_e( 'Created', 'genform' ); ?></th>
+						<th width="150"><?php esc_html_e( 'Actions', 'genform' ); ?></th>
 					</tr>
 				</thead>
 				<tbody>
-					<?php foreach ($forms as $form): ?>
+					<?php foreach ( $genform_forms as $genform_form ) : ?>
 						<tr>
 							<td>
-								<strong><a href="<?php echo wp_nonce_url(admin_url('admin.php?page=genform-builder&action=edit&form_id=' . $form->id), 'genform_edit_form'); ?>"><?php echo esc_html($form->form_name); ?></a></strong>
+								<strong><a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=genform-builder&action=edit&form_id=' . $genform_form->id ), 'genform_edit_form' ) ); ?>"><?php echo esc_html( $genform_form->form_name ); ?></a></strong>
 							</td>
 							<td>
 								<div class="gfm-shortcode-copy">
-									<code>[genform id="<?php echo $form->id; ?>"]</code>
-									<button class="gfm-copy-btn dashicons dashicons-admin-page" data-code='[genform id="<?php echo $form->id; ?>"]'></button>
+									<code>[genform id="<?php echo esc_html( $genform_form->id ); ?>"]</code>
+									<button class="gfm-copy-btn dashicons dashicons-admin-page" data-code='[genform id="<?php echo esc_attr( $genform_form->id ); ?>"]'></button>
 								</div>
 							</td>
 							<td>
-								<a href="<?php echo wp_nonce_url(admin_url('admin.php?page=genform-entries&form_id=' . $form->id), 'genform_view_entries'); ?>" class="gfm-count-badge">
-									<?php echo $form->entries_count; ?>
+								<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=genform-entries&form_id=' . $genform_form->id ), 'genform_view_entries' ) ); ?>" class="gfm-count-badge">
+									<?php echo esc_html( $genform_form->entries_count ); ?>
 								</a>
 							</td>
 							<td>
-								<span class="gfm-status gfm-status-<?php echo esc_attr($form->status); ?>">
-									<?php echo ucfirst($form->status); ?>
+								<span class="gfm-status gfm-status-<?php echo esc_attr( $genform_form->status ); ?>">
+									<?php echo esc_html( ucfirst( $genform_form->status ) ); ?>
 								</span>
 							</td>
-							<td><?php echo date_i18n(get_option('date_format'), strtotime($form->created_at)); ?></td>
+							<td><?php echo esc_html( date_i18n( get_option( 'date_format' ), strtotime( $genform_form->created_at ) ) ); ?></td>
 							<td>
-								<a href="<?php echo wp_nonce_url(admin_url('admin.php?page=genform-builder&action=edit&form_id=' . $form->id), 'genform_edit_form'); ?>" class="button"><?php _e('Edit', 'genform'); ?></a>
-								<a href="<?php echo wp_nonce_url(admin_url('admin.php?page=genform&action=delete&form_id=' . $form->id), 'genform_delete_form'); ?>" class="button button-link-delete" onclick="return confirm('Really delete this form and all its entries?')"><?php _e('Delete', 'genform'); ?></a>
+								<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=genform-builder&action=edit&form_id=' . $genform_form->id ), 'genform_edit_form' ) ); ?>" class="button"><?php esc_html_e( 'Edit', 'genform' ); ?></a>
+								<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=genform&action=delete&form_id=' . $genform_form->id ), 'genform_delete_form' ) ); ?>" class="button button-link-delete" onclick="return confirm('Really delete this form and all its entries?')"><?php esc_html_e( 'Delete', 'genform' ); ?></a>
 							</td>
 						</tr>
 					<?php endforeach; ?>

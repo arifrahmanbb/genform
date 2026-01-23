@@ -1,8 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 namespace GenForm\Integrations;
+ 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 final class Block
 {
@@ -13,8 +15,8 @@ final class Block
 
     public function register(): void
     {
-        register_block_type('genform/form-selector', [
-            'editor_script' => 'genform-admin',
+        register_block_type('genform/form-block', [
+            'editor_script' => 'genform-block',
             'render_callback' => [$this, 'render'],
         ]);
     }

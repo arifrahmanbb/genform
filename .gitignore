@@ -2,11 +2,6 @@
 
 # Ignore node_modules and vendor (except for autoload.php)
 node_modules/
-vendor/
-!vendor/autoload.php
-
-# Ignore Composer files except composer.json
-composer.lock
 
 # Ignore build and log files
 *.log
@@ -32,17 +27,6 @@ Thumbs.db
 *.swp
 *.bak
 *.tmp
-
-# Ignore uploads and cache
-uploads/
-.cache/
-
-# Ignore WordPress core files (if present)
-wp-admin/
-wp-includes/
-wp-content/
-!wp-content/plugins/
-!wp-content/themes/
 
 # Ignore SQL dumps
 *.sql

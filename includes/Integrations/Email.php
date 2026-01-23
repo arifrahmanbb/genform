@@ -1,22 +1,34 @@
 <?php
 
-declare(strict_types=1);
 
 namespace GenForm\Integrations;
+ 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Class Email
  * Handles dynamic email notifications.
  */
-final class Email
-{
-    public static function send(int $entry_id, int $form_id, array $data): void
-    {
-        global $wpdb;
-        $form = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}genform_forms WHERE id = %d", $form_id));
-        if (!$form) return;
+final class Email {
 
-        $settings = json_decode($form->form_settings, true);
+	/**
+	 * Send email.
+	 *
+	 * @param int   $entry_id
+	 * @param int   $form_id
+	 * @param array $data
+	 */
+	public static function send( int $entry_id, int $form_id, array $data ): void {
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$form = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}genform_forms WHERE id = %d", $form_id ) );
+		if ( ! $form ) {
+			return;
+		}
+
+		$settings = json_decode( $form->form_settings, true );
 
         // Prep tags
         $tags = [

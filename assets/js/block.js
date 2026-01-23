@@ -12,7 +12,7 @@
     var PanelBody = components.PanelBody;
 
     blocks.registerBlockType('genform/form-block', {
-        title: 'GenForm',
+        title: genformBlockData?.i18n?.title || 'GenForm',
         icon: 'feedback',
         category: 'widgets',
         attributes: {
@@ -24,13 +24,14 @@
 
         edit: function (props) {
             var formId = props.attributes.formId;
+            var i18n = genformBlockData?.i18n || {};
 
             function onChangeFormId(newFormId) {
-                props.setAttributes({ formId: parseInt(newFormId) });
+                props.setAttributes({ formId: parseInt(newFormId) || 0 });
             }
 
             // Prepare form options
-            var formOptions = [{ label: 'Select a form', value: 0 }];
+            var formOptions = [{ label: i18n.selectDefault || 'Select a form', value: 0 }];
             if (genformBlockData && genformBlockData.forms) {
                 genformBlockData.forms.forEach(function (form) {
                     formOptions.push({
@@ -42,9 +43,9 @@
 
             return [
                 el(InspectorControls, {},
-                    el(PanelBody, { title: 'Form Settings', initialOpen: true },
+                    el(PanelBody, { title: i18n.formSettings || 'Form Settings', initialOpen: true },
                         el(SelectControl, {
-                            label: 'Select Form',
+                            label: i18n.selectForm || 'Select Form',
                             value: formId,
                             options: formOptions,
                             onChange: onChangeFormId
@@ -65,10 +66,10 @@
                             className: 'dashicons dashicons-feedback',
                             style: { fontSize: '48px', color: '#0073aa' }
                         }),
-                        el('h3', {}, 'GenForm'),
+                        el('h3', {}, i18n.title || 'GenForm'),
                         formId > 0
-                            ? el('p', {}, 'Form ID: ' + formId)
-                            : el('p', {}, 'Please select a form from the sidebar.')
+                            ? el('p', {}, (i18n.formIdLabel || 'Form ID: ') + formId)
+                            : el('p', {}, i18n.selectError || 'Please select a form from the sidebar.')
                     )
                 )
             ];

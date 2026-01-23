@@ -26,7 +26,8 @@ class GenFormBuilder {
             // Sync settings if they exist
             if (window.genformBuilder.initialSettings) {
                 const s = window.genformBuilder.initialSettings;
-                jQuery('#gfm-submit-text').val(s.submit_text || 'Submit');
+                const i18n = window.genformBuilder.i18n;
+                jQuery('#gfm-submit-text').val(s.submit_text || i18n.submit || 'Submit');
                 jQuery('#gfm-success-message').val(s.success_message || 'Thank you!');
                 jQuery('#gfm-redirect-url').val(s.redirect_url || '');
                 jQuery('#gfm-admin-email').val(s.admin_email || '');
@@ -86,8 +87,8 @@ class GenFormBuilder {
             css_class: '',
             default_value: '',
             options: this.isOptionField(type) ? [
-                { label: 'Option 1', value: 'option_1' },
-                { label: 'Option 2', value: 'option_2' }
+                { label: (window.genformBuilder?.i18n?.option || 'Option') + ' 1', value: 'option_1' },
+                { label: (window.genformBuilder?.i18n?.option || 'Option') + ' 2', value: 'option_2' }
             ] : []
         };
         this.fields.push(field);
@@ -95,19 +96,20 @@ class GenFormBuilder {
     }
 
     getDefaultLabel(type) {
+        const i18n = window.genformBuilder?.i18n || {};
         const labels = {
-            text: 'Text Field',
-            email: 'Email Address',
-            textarea: 'Paragraph Text',
-            select: 'Dropdown',
-            radio: 'Multiple Choice',
-            checkbox: 'Checkboxes',
-            number: 'Number',
-            date: 'Date',
-            url: 'Website',
-            tel: 'Phone'
+            text: i18n.text || 'Text Field',
+            email: i18n.email || 'Email Address',
+            textarea: i18n.textarea || 'Paragraph Text',
+            select: i18n.select || 'Dropdown',
+            radio: i18n.radio || 'Multiple Choice',
+            checkbox: i18n.checkbox || 'Checkboxes',
+            number: i18n.number || 'Number',
+            date: i18n.date || 'Date',
+            url: i18n.url || 'Website',
+            tel: i18n.tel || 'Phone'
         };
-        return labels[type] || 'New Field';
+        return labels[type] || i18n.newField || 'New Field';
     }
 
     isOptionField(type) {
@@ -139,14 +141,15 @@ class GenFormBuilder {
                     <span class="gfm-field-drag-handle dashicons dashicons-move"></span>
                     <span class="gfm-field-title"><strong>${field.label}</strong> <small>(${field.type})</small></span>
                     <div class="gfm-field-actions">
-                        <button type="button" class="gfm-edit-btn dashicons dashicons-admin-generic" title="Settings"></button>
-                        <button type="button" class="gfm-delete-btn dashicons dashicons-trash" title="Delete"></button>
+                        <button type="button" class="gfm-edit-btn dashicons dashicons-admin-generic" title="${window.genformBuilder?.i18n?.settings || 'Settings'}"></button>
+                        <button type="button" class="gfm-delete-btn dashicons dashicons-trash" title="${window.genformBuilder?.i18n?.delete || 'Delete'}"></button>
                     </div>
                 </div>
                 <div class="gfm-field-settings-panel" style="display:none;">
                     <div class="gfm-grid">
+                    <div class="gfm-grid">
                         <div class="gfm-col">
-                            <label>Label</label>
+                            <label>${window.genformBuilder?.i18n?.label || 'Label'}</label>
                             <input type="text" class="gfm-setter" data-prop="label" value="${field.label}">
                         </div>
                         <div class="gfm-col">
@@ -166,7 +169,7 @@ class GenFormBuilder {
                     </div>
                     <div class="gfm-grid">
                         <div class="gfm-col">
-                            <label><input type="checkbox" class="gfm-setter-check" data-prop="required" ${field.required ? 'checked' : ''}> Required</label>
+                            <label><input type="checkbox" class="gfm-setter-check" data-prop="required" ${field.required ? 'checked' : ''}> ${window.genformBuilder?.i18n?.required || 'Required'}</label>
                         </div>
                         <div class="gfm-col">
                             <label>CSS Class</label>
@@ -206,12 +209,12 @@ class GenFormBuilder {
         if (!this.isOptionField(field.type)) return '';
         return `
             <div class="gfm-options-setter">
-                <label>Options</label>
+                <label>${window.genformBuilder?.i18n?.options || 'Options'}</label>
                 <div class="gfm-options-list">
                     ${field.options.map((opt, i) => `
                         <div class="gfm-opt-row">
-                            <input type="text" class="gfm-opt-label" data-index="${i}" value="${opt.label}" placeholder="Label">
-                            <input type="text" class="gfm-opt-value" data-index="${i}" value="${opt.value}" placeholder="Value">
+                            <input type="text" class="gfm-opt-label" data-index="${i}" value="${opt.label}" placeholder="${window.genformBuilder?.i18n?.label || 'Label'}">
+                            <input type="text" class="gfm-opt-value" data-index="${i}" value="${opt.value}" placeholder="${window.genformBuilder?.i18n?.value || 'Value'}">
                         </div>
                     `).join('')}
                 </div>

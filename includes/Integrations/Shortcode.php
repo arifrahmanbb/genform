@@ -1,34 +1,44 @@
 <?php
 
-declare(strict_types=1);
 
 namespace GenForm\Integrations;
+ 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Class Shortcode
  */
-final class Shortcode
-{
-    public function __construct()
-    {
-        add_shortcode('genform', [$this, 'render']);
-    }
+final class Shortcode {
 
-    public function render(array $atts): string
-    {
-        $atts = shortcode_atts(['id' => 0], $atts, 'genform');
-        $id = (int) $atts['id'];
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		add_shortcode( 'genform', array( $this, 'render' ) );
+	}
 
-        if (!$id) {
-            return '<p>' . __('No form ID provided.', 'genform') . '</p>';
-        }
+	/**
+	 * Render shortcode.
+	 *
+	 * @param array $atts
+	 */
+	public function render( array $atts ): string {
+		$atts = shortcode_atts( array( 'id' => 0 ), $atts, 'genform' );
+		$id   = (int) $atts['id'];
 
-        global $wpdb;
-        $form = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}genform_forms WHERE id = %d AND status = 'active'", $id));
+		if ( ! $id ) {
+			return '<p>' . esc_html__( 'No form ID provided.', 'genform' ) . '</p>';
+		}
 
-        if (!$form) {
-            return '<p>' . __('Form not found.', 'genform') . '</p>';
-        }
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$form = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}genform_forms WHERE id = %d AND status = 'active'", $id ) );
+
+		if ( ! $form ) {
+			return '<p>' . esc_html__( 'Form not found.', 'genform' ) . '</p>';
+		}
 
         ob_start();
         $this->displayForm($form);

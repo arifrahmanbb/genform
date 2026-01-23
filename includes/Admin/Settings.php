@@ -1,8 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 namespace GenForm\Admin;
+ 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 final class Settings
 {
@@ -20,11 +22,11 @@ final class Settings
     {
         register_setting('genform_settings', 'genform_general', [$this, 'sanitize']);
 
-        add_settings_section('genform_main', __('General Settings', 'genform'), null, 'genform_settings');
+        add_settings_section('genform_main', esc_html__('General Settings', 'genform'), null, 'genform_settings');
 
         add_settings_field(
             'genform_recaptcha_site',
-            __('reCAPTCHA Site Key', 'genform'),
+            esc_html__('reCAPTCHA Site Key', 'genform'),
             fn() => $this->renderField('recaptcha_site_key'),
             'genform_settings',
             'genform_main'
@@ -42,7 +44,11 @@ final class Settings
     private function renderField(string $key): void
     {
         $options = get_option('genform_general', []);
-        $value   = esc_attr($options[$key] ?? '');
-        echo "<input type='text' name='genform_general[$key]' value='$value' class='regular-text' />";
+        $value   = $options[$key] ?? '';
+        printf(
+            '<input type="text" name="genform_general[%1$s]" value="%2$s" class="regular-text" />',
+            esc_attr($key),
+            esc_attr($value)
+        );
     }
 }
