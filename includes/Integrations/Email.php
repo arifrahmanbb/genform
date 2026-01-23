@@ -39,7 +39,12 @@ final class Email {
             '{all_fields}' => self::buildFieldsHtml($data),
         ];
 
-        // Process Admin Email
+        // Add field specific tags
+        foreach ($data as $key => $val) {
+            $tags["{field_{$key}}"] = is_array($val) ? implode(', ', $val) : (string)$val;
+        }
+
+        // Process Settings
         $to = $settings['admin_email'] ?: '{admin_email}';
         $to = str_replace(array_keys($tags), array_values($tags), $to);
 
@@ -51,6 +56,26 @@ final class Email {
         $body = wpautop($body);
 
         $headers = ['Content-Type: text/html; charset=UTF-8'];
+
+        // Get Global Defaults
+        $global_options = get_option('genform_general', []);
+
+        // From Header
+        $from_name  = !empty($settings['from_name']) ? $settings['from_name'] : ($global_options['from_name'] ?? get_bloginfo('name'));
+        $from_name  = str_replace(array_keys($tags), array_values($tags), $from_name);
+        
+        $from_email = !empty($settings['from_email']) ? $settings['from_email'] : ($global_options['from_email'] ?? get_bloginfo('admin_email'));
+        $from_email = str_replace(array_keys($tags), array_values($tags), $from_email);
+        
+        $headers[] = "From: {$from_name} <{$from_email}>";
+
+        // Reply-To Header
+        if (!empty($settings['reply_to'])) {
+            $reply_to = str_replace(array_keys($tags), array_values($tags), $settings['reply_to']);
+            if (is_email($reply_to)) {
+                $headers[] = "Reply-To: {$reply_to}";
+            }
+        }
 
         wp_mail($to, $subject, $body, $headers);
     }

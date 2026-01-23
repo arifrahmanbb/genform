@@ -25,7 +25,7 @@ if ( ! current_user_can( 'manage_options' ) ) {
     </div>
 
     <div class="gfm-card">
-	    <form method="post" action="options.php">
+	    <form method="post" action="options.php" class="genform-settings-form">
 		    <?php
 		    settings_fields( 'genform_settings' );
 		    do_settings_sections( 'genform_settings' );

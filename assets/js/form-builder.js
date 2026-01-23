@@ -18,6 +18,18 @@ class GenFormBuilder {
         this.loadInitialData();
         this.bindEvents();
         this.initSortable();
+        this.initConfirmationToggle();
+    }
+
+    initConfirmationToggle() {
+        const toggle = jQuery('#gfm-con-type');
+        const update = () => {
+            const val = toggle.val();
+            jQuery('.gfm-con-field').hide();
+            jQuery(`.gfm-con-${val}`).show();
+        };
+        toggle.on('change', update);
+        update();
     }
 
     loadInitialData() {
@@ -27,9 +39,19 @@ class GenFormBuilder {
                 const s = window.genformBuilder.initialSettings;
                 const i18n = window.genformBuilder.i18n;
                 jQuery('#gfm-submit-text').val(s.submit_text || i18n.submit || 'Submit');
-                jQuery('#gfm-success-message').val(s.success_message || 'Thank you!');
+                jQuery('#gfm-con-type').val(s.con_type || 'message');
+                jQuery('#gfm-success-message').val(s.success_message || '');
+                jQuery('#gfm-error-message').val(s.error_message || '');
                 jQuery('#gfm-redirect-url').val(s.redirect_url || '');
+                jQuery('#gfm-submit-align').val(s.submit_align || 'left');
+                jQuery('#gfm-honeypot').prop('checked', s.honeypot !== false);
+                jQuery('#gfm-base-font-size').val(s.base_font_size || '16');
+                jQuery('#gfm-base-font-weight').val(s.base_font_weight || '400');
+
                 jQuery('#gfm-admin-email').val(s.admin_email || '');
+                jQuery('#gfm-reply-to').val(s.reply_to || '');
+                jQuery('#gfm-from-name').val(s.from_name || '');
+                jQuery('#gfm-from-email').val(s.from_email || '');
                 jQuery('#gfm-email-subject').val(s.email_subject || '');
                 jQuery('#gfm-email-body').val(s.email_body || '');
             }
@@ -185,19 +207,6 @@ class GenFormBuilder {
                     </div>
                     <div class="gfm-grid">
                         <div class="gfm-col">
-                            <label>Typography (Font Size)</label>
-                            <div class="gfm-typo-group">
-                                <input type="number" class="gfm-setter" data-prop="font_size" value="${field.font_size}" min="8" max="72">
-                                <select class="gfm-setter" data-prop="font_weight">
-                                    <option value="300" ${field.font_weight == '300' ? 'selected' : ''}>Light</option>
-                                    <option value="400" ${field.font_weight == '400' ? 'selected' : ''}>Regular</option>
-                                    <option value="600" ${field.font_weight == '600' ? 'selected' : ''}>Semi-Bold</option>
-                                    <option value="700" ${field.font_weight == '700' ? 'selected' : ''}>Bold</option>
-                                </select>
-                            </div>
-                            <span class="gfm-setting-desc">Set the size and weight for this field.</span>
-                        </div>
-                        <div class="gfm-col">
                             <label>Field Width</label>
                             <div class="gfm-width-selector">
                                 <button type="button" class="gfm-width-btn ${field.width === '100' ? 'active' : ''}" data-width="100">100%</button>
@@ -206,13 +215,13 @@ class GenFormBuilder {
                             </div>
                             <span class="gfm-setting-desc">Control how much space the field takes.</span>
                         </div>
-                    </div>
-                    <div class="gfm-grid">
                         <div class="gfm-col">
                              <label>Custom CSS Class</label>
                              <input type="text" class="gfm-setter" data-prop="css_class" value="${field.css_class}">
                              <span class="gfm-setting-desc">Add custom classes for advanced styling.</span>
                         </div>
+                    </div>
+                    <div class="gfm-grid">
                         <div class="gfm-col">
                             <label style="margin-top: 15px;">
                                 <input type="checkbox" class="gfm-setter-check" data-prop="required" ${field.required ? 'checked' : ''}> 
@@ -262,9 +271,7 @@ class GenFormBuilder {
         // Options Events
         node.find('.gfm-add-opt-btn').on('click', () => {
             field.options.push({ label: 'New Option', value: 'new_option' });
-            this.render(); // Re-render to show new option
-            node.find('.gfm-field-settings-panel').show();
-            node.addClass('active');
+            this.updateOptionsUI(node, field);
         });
 
         node.on('input', '.gfm-opt-label', (e) => {
@@ -280,12 +287,27 @@ class GenFormBuilder {
         node.on('click', '.gfm-opt-remove', (e) => {
             const index = jQuery(e.currentTarget).data('index');
             field.options.splice(index, 1);
-            this.render();
-            node.find('.gfm-field-settings-panel').show();
-            node.addClass('active');
+            this.updateOptionsUI(node, field);
         });
 
         return node;
+    }
+
+    updateOptionsUI(node, field) {
+        const list = node.find('.gfm-options-list');
+        list.empty();
+        field.options.forEach((opt, i) => {
+            list.append(`
+                <div class="gfm-opt-row">
+                    <span class="dashicons dashicons-menu gfm-opt-drag"></span>
+                    <input type="text" class="gfm-opt-label" data-index="${i}" value="${opt.label}" placeholder="Label">
+                    <input type="text" class="gfm-opt-value" data-index="${i}" value="${opt.value}" placeholder="Value">
+                    <div class="gfm-opt-actions">
+                        <button type="button" class="gfm-opt-btn gfm-opt-remove" data-index="${i}" title="Remove"><span class="dashicons dashicons-no"></span></button>
+                    </div>
+                </div>
+            `);
+        });
     }
 
     renderOptionsSetter(field) {
@@ -313,9 +335,18 @@ class GenFormBuilder {
     save() {
         const settings = {
             submit_text: jQuery('#gfm-submit-text').val(),
+            con_type: jQuery('#gfm-con-type').val(),
             success_message: jQuery('#gfm-success-message').val(),
+            error_message: jQuery('#gfm-error-message').val(),
             redirect_url: jQuery('#gfm-redirect-url').val(),
+            submit_align: jQuery('#gfm-submit-align').val(),
+            honeypot: jQuery('#gfm-honeypot').is(':checked'),
+            base_font_size: jQuery('#gfm-base-font-size').val(),
+            base_font_weight: jQuery('#gfm-base-font-weight').val(),
             admin_email: jQuery('#gfm-admin-email').val(),
+            reply_to: jQuery('#gfm-reply-to').val(),
+            from_name: jQuery('#gfm-from-name').val(),
+            from_email: jQuery('#gfm-from-email').val(),
             email_subject: jQuery('#gfm-email-subject').val(),
             email_body: jQuery('#gfm-email-body').val()
         };

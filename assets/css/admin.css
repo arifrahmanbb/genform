@@ -353,18 +353,27 @@
 .gfm-col input[type="text"],
 .gfm-col input[type="url"],
 .gfm-col input[type="number"],
-.gfm-col select {
-    border-radius: 10px;
+.gfm-col select,
+.gfm-col textarea,
+.gfm-setting-row input[type="text"],
+.gfm-setting-row input[type="url"],
+.gfm-setting-row textarea {
+    border-radius: 8px;
     border: 1px solid var(--gfm-border);
-    padding: 12px 16px;
-    font-size: 14px;
+    padding: 8px 12px;
+    font-size: 13px;
     width: 100%;
     transition: all 0.2s;
     background: white;
+    box-sizing: border-box;
 }
 
 .gfm-col input:focus,
-.gfm-col select:focus {
+.gfm-col select:focus,
+.gfm-col textarea:focus,
+.gfm-setting-row input:focus,
+.gfm-setting-row select:focus,
+.gfm-setting-row textarea:focus {
     border-color: var(--gfm-primary);
     box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
     outline: none;
@@ -542,6 +551,85 @@
 .gfm-status-active {
     background: #ecfdf5;
     color: #059669;
+}
+
+/* Settings Page Modernization */
+.genform-settings-form table.form-table {
+    margin-top: 0;
+}
+
+.genform-settings-form .form-table th {
+    padding: 24px 10px 24px 0;
+    width: 240px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gfm-text);
+}
+
+.genform-settings-form .form-table td {
+    padding: 16px 0;
+}
+
+.genform-settings-form input[type="text"],
+.genform-settings-form input[type="email"],
+.genform-settings-form input[type="password"] {
+    background: #f8fafc;
+    border: 1px solid var(--gfm-border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+    width: 100%;
+    max-width: 450px;
+    transition: all 0.2s;
+}
+
+.genform-settings-form input:focus {
+    background: white;
+    border-color: var(--gfm-primary);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    outline: none;
+}
+
+.genform-settings-form .form-table h2 {
+    font-size: 18px;
+    font-weight: 800;
+    margin: 40px 0 10px 0;
+    color: var(--gfm-text);
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 12px;
+}
+
+.genform-settings-form .form-table tr:first-child h2 {
+    margin-top: 0;
+}
+
+.genform-settings-form .description {
+    font-size: 12px;
+    color: var(--gfm-text-muted);
+    margin-top: 8px;
+    font-style: italic;
+}
+
+.genform-settings-form .submit {
+    margin-top: 32px;
+    padding: 0;
+}
+
+.genform-settings-form .submit .button-primary {
+    background: var(--gfm-primary) !important;
+    border: none !important;
+    padding: 12px 32px !important;
+    height: auto !important;
+    font-weight: 700 !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2) !important;
+    transition: all 0.2s !important;
+}
+
+.genform-settings-form .submit .button-primary:hover {
+    background: var(--gfm-primary-dark) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.3) !important;
 }
 
 .gfm-status-inactive {

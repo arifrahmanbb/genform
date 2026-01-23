@@ -7,7 +7,19 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Frontend Form Template
  */
 ?>
-<div class="gfm-form-container" id="gfm-form-<?php echo esc_attr( $form->id ); ?>">
+<?php
+$genform_base_size   = esc_attr( $settings['base_font_size'] ?? '16' );
+$genform_base_weight = esc_attr( $settings['base_font_weight'] ?? '400' );
+$genform_btn_align   = esc_attr( $settings['submit_align'] ?? 'left' );
+
+$genform_btn_style = '';
+if ( 'center' === $genform_btn_align ) {
+	$genform_btn_style = 'text-align: center;';
+} elseif ( 'right' === $genform_btn_align ) {
+	$genform_btn_style = 'text-align: right;';
+}
+?>
+<div class="gfm-form-container" id="gfm-form-<?php echo esc_attr( $form->id ); ?>" style="--gfm-base-size: <?php echo $genform_base_size; ?>px; font-weight: <?php echo $genform_base_weight; ?>;">
 	<form class="gfm-form gfm-form-js" method="post" data-id="<?php echo esc_attr( $form->id ); ?>">
 		<input type="hidden" name="genform_id" value="<?php echo esc_attr( $form->id ); ?>">
 		<input type="hidden" name="genform_nonce" value="<?php echo esc_attr( $nonce ); ?>">
@@ -22,9 +34,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 				$genform_css_class   = esc_attr( $genform_field['css_class'] ?? '' );
 				$genform_default     = esc_attr( $genform_field['default_value'] ?? '' );
 				$genform_width       = esc_attr( $genform_field['width'] ?? '100' );
-				$genform_font_size   = esc_attr( $genform_field['font_size'] ?? '16' );
-				$genform_font_weight = esc_attr( $genform_field['font_weight'] ?? '400' );
-				$genform_style       = "font-size: {$genform_font_size}px; font-weight: {$genform_font_weight};";
 				?>
 				<div class="gfm-form-field gfm-w-<?php echo $genform_width; ?> <?php echo $genform_css_class; ?> gfm-type-<?php echo esc_attr( $genform_field['type'] ); ?>">
 					<?php if ( 'hidden' !== $genform_field['type'] ) : ?>
@@ -36,25 +45,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 						</label>
 					<?php endif; ?>
 
-					<div class="gfm-input-control" style="<?php echo esc_attr( $genform_style ); ?>">
+					<div class="gfm-input-control">
 						<?php
 						switch ( $genform_field['type'] ) {
 							case 'textarea':
 								printf(
-									'<textarea name="%1$s" class="gfm-textarea" rows="4" placeholder="%2$s" %3$s style="%4$s">%5$s</textarea>',
+									'<textarea name="%1$s" class="gfm-textarea" rows="4" placeholder="%2$s" %3$s>%4$s</textarea>',
 									esc_attr( $genform_name ),
 									esc_attr( $genform_placeholder ),
 									esc_attr( $genform_required ),
-									esc_attr( $genform_style ),
 									esc_textarea( $genform_default )
 								);
 								break;
 							case 'select':
 								printf(
-									'<select name="%1$s" class="gfm-select" %2$s style="%3$s">',
+									'<select name="%1$s" class="gfm-select" %2$s>',
 									esc_attr( $genform_name ),
-									esc_attr( $genform_required ),
-									esc_attr( $genform_style )
+									esc_attr( $genform_required )
 								);
 								if ( $genform_placeholder ) {
 									printf(
@@ -83,13 +90,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 										$genform_type       = $genform_field['type'];
 										$genform_input_name = ( 'checkbox' === $genform_type ) ? "{$genform_name}[]" : $genform_name;
 										printf(
-											'<label class="gfm-option-label" style="display:flex; align-items:center; gap:8px; font-size:14px; cursor:pointer; %6$s"><input type="%1$s" name="%2$s" value="%3$s" %4$s> %5$s</label>',
+											'<label class="gfm-option-label" style="display:flex; align-items:center; gap:8px; font-size:14px; cursor:pointer;"><input type="%1$s" name="%2$s" value="%3$s" %4$s> %5$s</label>',
 											esc_attr( $genform_type ),
 											esc_attr( $genform_input_name ),
 											esc_attr( $genform_opt['value'] ),
 											esc_attr( $genform_required ),
-											esc_html( $genform_opt['label'] ),
-											esc_attr( $genform_style )
+											esc_html( $genform_opt['label'] )
 										);
 									}
 									echo '</div>';
@@ -97,13 +103,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 								break;
 							default:
 								printf(
-									'<input type="%1$s" name="%2$s" class="gfm-input" placeholder="%3$s" value="%4$s" %5$s style="%6$s">',
+									'<input type="%1$s" name="%2$s" class="gfm-input" placeholder="%3$s" value="%4$s" %5$s>',
 									esc_attr( $genform_field['type'] ),
 									esc_attr( $genform_name ),
 									esc_attr( $genform_placeholder ),
 									esc_attr( $genform_default ),
-									esc_attr( $genform_required ),
-									esc_attr( $genform_style )
+									esc_attr( $genform_required )
 								);
 								break;
 						}
@@ -115,8 +120,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 		endif;
 		?>
 
-		<div class="gfm-submit-wrap">
-			<button type="submit" class="gfm-submit">
+		<div class="gfm-submit-wrap" style="<?php echo esc_attr( $genform_btn_style ); ?>">
+			<button type="submit" class="gfm-submit" style="<?php echo ( 'full' === $genform_btn_align ) ? 'width: 100%;' : 'width: auto; min-width: 160px;'; ?>">
 				<?php echo esc_html( $settings['submit_text'] ?? esc_html__( 'Submit', 'genform' ) ); ?>
 			</button>
 		</div>
