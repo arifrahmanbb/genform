@@ -53,6 +53,8 @@ final class Core {
 		add_action( 'admin_menu', array( $this, 'registerMenus' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueueAdminAssets' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueueFrontendAssets' ) );
+		add_action( 'wp_head', array( $this, 'injectDynamicStyles' ) );
+		add_action( 'admin_head', array( $this, 'injectDynamicStyles' ) );
 
 		$this->loadComponents();
 	}
@@ -222,6 +224,45 @@ final class Core {
 				),
 			)
 		);
+	}
+
+	/**
+	 * Inject dynamic styles based on settings.
+	 */
+	public function injectDynamicStyles(): void {
+		$options = get_option( 'genform_general', array() );
+		$primary = $options['primary_color'] ?? '#6366f1';
+
+		printf(
+			'<style>
+                :root { 
+                    --gfm-primary: %1$s !important; 
+                    --gfm-primary-dark: %2$s !important; 
+                }
+            </style>',
+			esc_attr( $primary ),
+			esc_attr( $this->adjustBrightness( $primary, -20 ) )
+		);
+	}
+
+	/**
+	 * Simple brightness adjustment for hex colors.
+	 */
+	private function adjustBrightness( string $hex, int $steps ): string {
+		$steps = max( -255, min( 255, $steps ) );
+		$hex   = str_replace( '#', '', $hex );
+		if ( 3 === strlen( $hex ) ) {
+			$hex = str_repeat( substr( $hex, 0, 1 ), 2 ) . str_repeat( substr( $hex, 1, 1 ), 2 ) . str_repeat( substr( $hex, 2, 1 ), 2 );
+		}
+		$r = hexdec( substr( $hex, 0, 2 ) );
+		$g = hexdec( substr( $hex, 2, 2 ) );
+		$b = hexdec( substr( $hex, 4, 2 ) );
+
+		$r = max( 0, min( 255, $r + $steps ) );
+		$g = max( 0, min( 255, $g + $steps ) );
+		$b = max( 0, min( 255, $b + $steps ) );
+
+		return '#' . str_pad( dechex( $r ), 2, '0', STR_PAD_LEFT ) . str_pad( dechex( $g ), 2, '0', STR_PAD_LEFT ) . str_pad( dechex( $b ), 2, '0', STR_PAD_LEFT );
 	}
 
 	/**

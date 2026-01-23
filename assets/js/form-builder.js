@@ -23,7 +23,6 @@ class GenFormBuilder {
     loadInitialData() {
         if (window.genformBuilder) {
             this.fields = window.genformBuilder.initialData?.fields || [];
-            // Sync settings if they exist
             if (window.genformBuilder.initialSettings) {
                 const s = window.genformBuilder.initialSettings;
                 const i18n = window.genformBuilder.i18n;
@@ -50,7 +49,6 @@ class GenFormBuilder {
 
         jQuery('#gfm-builder-form').on('submit', () => this.save());
 
-        // Tab switching
         jQuery('.gfm-tab-link').on('click', (e) => {
             const tab = jQuery(e.currentTarget).data('tab');
             this.switchTab(tab);
@@ -86,13 +84,20 @@ class GenFormBuilder {
             required: false,
             css_class: '',
             default_value: '',
+            width: '100',
+            font_size: '16',
+            font_weight: '400',
             options: this.isOptionField(type) ? [
-                { label: (window.genformBuilder?.i18n?.option || 'Option') + ' 1', value: 'option_1' },
-                { label: (window.genformBuilder?.i18n?.option || 'Option') + ' 2', value: 'option_2' }
+                { label: 'Option 1', value: 'option_1' },
+                { label: 'Option 2', value: 'option_2' }
             ] : []
         };
         this.fields.push(field);
         this.render();
+        // Open settings for new field
+        setTimeout(() => {
+            this.container.find(`[data-id="${field.id}"] .gfm-edit-btn`).click();
+        }, 100);
     }
 
     getDefaultLabel(type) {
@@ -135,45 +140,85 @@ class GenFormBuilder {
     }
 
     createFieldNode(field) {
+        field.label = field.label || '';
+        field.placeholder = field.placeholder || '';
+        field.default_value = field.default_value || '';
+        field.css_class = field.css_class || '';
+        field.width = field.width || '100';
+        field.font_size = field.font_size || '16';
+        field.font_weight = field.font_weight || '400';
+
         const node = jQuery(`
             <div class="gfm-field-node gfm-card" data-id="${field.id}">
                 <div class="gfm-field-header">
                     <span class="gfm-field-drag-handle dashicons dashicons-move"></span>
-                    <span class="gfm-field-title"><strong>${field.label}</strong> <small>(${field.type})</small></span>
+                    <span class="gfm-field-title"><strong>${field.label}</strong> <small>${field.type}</small></span>
                     <div class="gfm-field-actions">
-                        <button type="button" class="gfm-edit-btn dashicons dashicons-admin-generic" title="${window.genformBuilder?.i18n?.settings || 'Settings'}"></button>
-                        <button type="button" class="gfm-delete-btn dashicons dashicons-trash" title="${window.genformBuilder?.i18n?.delete || 'Delete'}"></button>
+                        <button type="button" class="gfm-edit-btn gfm-opt-btn dashicons dashicons-admin-generic" title="Settings"></button>
+                        <button type="button" class="gfm-delete-btn gfm-opt-btn gfm-delete-btn-hover dashicons dashicons-trash" title="Delete"></button>
                     </div>
                 </div>
                 <div class="gfm-field-settings-panel" style="display:none;">
                     <div class="gfm-grid">
-                    <div class="gfm-grid">
                         <div class="gfm-col">
-                            <label>${window.genformBuilder?.i18n?.label || 'Label'}</label>
+                            <label>Field Label</label>
                             <input type="text" class="gfm-setter" data-prop="label" value="${field.label}">
+                            <span class="gfm-setting-desc">The label shown above the input field.</span>
                         </div>
                         <div class="gfm-col">
-                            <label>Name (Meta Key)</label>
+                            <label>Meta Key (Name)</label>
                             <input type="text" class="gfm-setter" data-prop="name" value="${field.name}">
+                            <span class="gfm-setting-desc">Unique identifier used for entry storage.</span>
                         </div>
                     </div>
                     <div class="gfm-grid">
                         <div class="gfm-col">
-                            <label>Placeholder</label>
+                            <label>Placeholder Text</label>
                             <input type="text" class="gfm-setter" data-prop="placeholder" value="${field.placeholder}">
+                            <span class="gfm-setting-desc">Hint shown inside the empty field.</span>
                         </div>
                         <div class="gfm-col">
                             <label>Default Value</label>
                             <input type="text" class="gfm-setter" data-prop="default_value" value="${field.default_value}">
+                            <span class="gfm-setting-desc">Initial value when the form loads.</span>
                         </div>
                     </div>
                     <div class="gfm-grid">
                         <div class="gfm-col">
-                            <label><input type="checkbox" class="gfm-setter-check" data-prop="required" ${field.required ? 'checked' : ''}> ${window.genformBuilder?.i18n?.required || 'Required'}</label>
+                            <label>Typography (Font Size)</label>
+                            <div class="gfm-typo-group">
+                                <input type="number" class="gfm-setter" data-prop="font_size" value="${field.font_size}" min="8" max="72">
+                                <select class="gfm-setter" data-prop="font_weight">
+                                    <option value="300" ${field.font_weight == '300' ? 'selected' : ''}>Light</option>
+                                    <option value="400" ${field.font_weight == '400' ? 'selected' : ''}>Regular</option>
+                                    <option value="600" ${field.font_weight == '600' ? 'selected' : ''}>Semi-Bold</option>
+                                    <option value="700" ${field.font_weight == '700' ? 'selected' : ''}>Bold</option>
+                                </select>
+                            </div>
+                            <span class="gfm-setting-desc">Set the size and weight for this field.</span>
                         </div>
                         <div class="gfm-col">
-                            <label>CSS Class</label>
-                            <input type="text" class="gfm-setter" data-prop="css_class" value="${field.css_class}">
+                            <label>Field Width</label>
+                            <div class="gfm-width-selector">
+                                <button type="button" class="gfm-width-btn ${field.width === '100' ? 'active' : ''}" data-width="100">100%</button>
+                                <button type="button" class="gfm-width-btn ${field.width === '50' ? 'active' : ''}" data-width="50">50%</button>
+                                <button type="button" class="gfm-width-btn ${field.width === '33' ? 'active' : ''}" data-width="33">33%</button>
+                            </div>
+                            <span class="gfm-setting-desc">Control how much space the field takes.</span>
+                        </div>
+                    </div>
+                    <div class="gfm-grid">
+                        <div class="gfm-col">
+                             <label>Custom CSS Class</label>
+                             <input type="text" class="gfm-setter" data-prop="css_class" value="${field.css_class}">
+                             <span class="gfm-setting-desc">Add custom classes for advanced styling.</span>
+                        </div>
+                        <div class="gfm-col">
+                            <label style="margin-top: 15px;">
+                                <input type="checkbox" class="gfm-setter-check" data-prop="required" ${field.required ? 'checked' : ''}> 
+                                <strong>Required Field</strong>
+                            </label>
+                            <span class="gfm-setting-desc">Mark this field as mandatory for submission.</span>
                         </div>
                     </div>
                     ${this.renderOptionsSetter(field)}
@@ -182,16 +227,28 @@ class GenFormBuilder {
         `);
 
         // Events
-        node.find('.gfm-edit-btn').on('click', () => {
+        node.find('.gfm-width-btn').on('click', (e) => {
+            const btn = jQuery(e.currentTarget);
+            const w = btn.data('width').toString();
+            field.width = w;
+            node.find('.gfm-width-btn').removeClass('active');
+            btn.addClass('active');
+        });
+
+        node.find('.gfm-edit-btn').on('click', (e) => {
+            e.stopPropagation();
+            node.toggleClass('active');
             node.find('.gfm-field-settings-panel').slideToggle();
         });
 
         node.find('.gfm-delete-btn').on('click', () => {
-            this.fields = this.fields.filter(f => f.id !== field.id);
-            node.fadeOut(() => this.render());
+            if (confirm('Delete this field?')) {
+                this.fields = this.fields.filter(f => f.id !== field.id);
+                node.fadeOut(() => this.render());
+            }
         });
 
-        node.find('.gfm-setter').on('input', (e) => {
+        node.find('.gfm-setter').on('input change', (e) => {
             const prop = jQuery(e.target).data('prop');
             field[prop] = e.target.value;
             if (prop === 'label') node.find('.gfm-field-title strong').text(field.label);
@@ -202,6 +259,32 @@ class GenFormBuilder {
             field[prop] = e.target.checked;
         });
 
+        // Options Events
+        node.find('.gfm-add-opt-btn').on('click', () => {
+            field.options.push({ label: 'New Option', value: 'new_option' });
+            this.render(); // Re-render to show new option
+            node.find('.gfm-field-settings-panel').show();
+            node.addClass('active');
+        });
+
+        node.on('input', '.gfm-opt-label', (e) => {
+            const index = jQuery(e.target).data('index');
+            field.options[index].label = e.target.value;
+        });
+
+        node.on('input', '.gfm-opt-value', (e) => {
+            const index = jQuery(e.target).data('index');
+            field.options[index].value = e.target.value;
+        });
+
+        node.on('click', '.gfm-opt-remove', (e) => {
+            const index = jQuery(e.currentTarget).data('index');
+            field.options.splice(index, 1);
+            this.render();
+            node.find('.gfm-field-settings-panel').show();
+            node.addClass('active');
+        });
+
         return node;
     }
 
@@ -209,15 +292,20 @@ class GenFormBuilder {
         if (!this.isOptionField(field.type)) return '';
         return `
             <div class="gfm-options-setter">
-                <label>${window.genformBuilder?.i18n?.options || 'Options'}</label>
+                <h4>Field Options</h4>
                 <div class="gfm-options-list">
                     ${field.options.map((opt, i) => `
                         <div class="gfm-opt-row">
-                            <input type="text" class="gfm-opt-label" data-index="${i}" value="${opt.label}" placeholder="${window.genformBuilder?.i18n?.label || 'Label'}">
-                            <input type="text" class="gfm-opt-value" data-index="${i}" value="${opt.value}" placeholder="${window.genformBuilder?.i18n?.value || 'Value'}">
+                            <span class="dashicons dashicons-menu gfm-opt-drag"></span>
+                            <input type="text" class="gfm-opt-label" data-index="${i}" value="${opt.label}" placeholder="Label">
+                            <input type="text" class="gfm-opt-value" data-index="${i}" value="${opt.value}" placeholder="Value">
+                            <div class="gfm-opt-actions">
+                                <button type="button" class="gfm-opt-btn gfm-opt-remove" data-index="${i}" title="Remove"><span class="dashicons dashicons-no"></span></button>
+                            </div>
                         </div>
                     `).join('')}
                 </div>
+                <button type="button" class="gfm-add-opt-btn"><span class="dashicons dashicons-plus"></span> Add New Option</button>
             </div>
         `;
     }

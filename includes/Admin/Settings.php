@@ -31,6 +31,14 @@ final class Settings
             'genform_settings',
             'genform_main'
         );
+
+        add_settings_field(
+            'genform_primary_color',
+            esc_html__('Primary Color', 'genform'),
+            fn() => $this->renderColorField('primary_color'),
+            'genform_settings',
+            'genform_main'
+        );
     }
 
     public function sanitize(array $input): array
@@ -38,6 +46,7 @@ final class Settings
         return [
             'recaptcha_site_key'   => sanitize_text_field($input['recaptcha_site_key'] ?? ''),
             'recaptcha_secret_key' => sanitize_text_field($input['recaptcha_secret_key'] ?? ''),
+            'primary_color'        => sanitize_hex_color($input['primary_color'] ?? '#6366f1'),
         ];
     }
 
@@ -47,6 +56,17 @@ final class Settings
         $value   = $options[$key] ?? '';
         printf(
             '<input type="text" name="genform_general[%1$s]" value="%2$s" class="regular-text" />',
+            esc_attr($key),
+            esc_attr($value)
+        );
+    }
+
+    private function renderColorField(string $key): void
+    {
+        $options = get_option('genform_general', []);
+        $value   = $options[$key] ?? '#6366f1';
+        printf(
+            '<input type="color" name="genform_general[%1$s]" value="%2$s" style="height:40px; width:60px; padding:2px; border:1px solid #ccc; cursor:pointer;" />',
             esc_attr($key),
             esc_attr($value)
         );

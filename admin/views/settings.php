@@ -19,14 +19,18 @@ if ( ! current_user_can( 'manage_options' ) ) {
 }
 ?>
 
-<div class="wrap genform-settings-wrap">
-	<h1><?php esc_html_e( 'GenForm Settings', 'genform' ); ?></h1>
+<div class="genform-admin-wrap">
+    <div class="gfm-builder-header-main">
+	    <h1><?php esc_html_e( 'GenForm Settings', 'genform' ); ?></h1>
+    </div>
 
-	<form method="post" action="options.php">
-		<?php
-		settings_fields( 'genform_settings' );
-		do_settings_sections( 'genform_settings' );
-		submit_button();
-		?>
-	</form>
+    <div class="gfm-card">
+	    <form method="post" action="options.php">
+		    <?php
+		    settings_fields( 'genform_settings' );
+		    do_settings_sections( 'genform_settings' );
+		    submit_button();
+		    ?>
+	    </form>
+    </div>
 </div>
