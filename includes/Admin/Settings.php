@@ -23,12 +23,17 @@ final class Settings
         register_setting('genform_settings', 'genform_general', [$this, 'sanitize']);
 
         // Main Section
-        add_settings_section('genform_main', esc_html__('General Settings', 'genform'), null, 'genform_settings');
+        add_settings_section(
+            'genform_main', 
+            esc_html__('General Configuration', 'genform'), 
+            fn() => print('<p class="gfm-section-desc">' . esc_html__('Configure your primary branding and security keys here.', 'genform') . '</p>'),
+            'genform_settings'
+        );
 
         add_settings_field(
             'genform_recaptcha_site',
             esc_html__('reCAPTCHA Site Key', 'genform'),
-            fn() => $this->renderField('recaptcha_site_key', esc_html__('Your Google reCAPTCHA v2 site key.', 'genform')),
+            fn() => $this->renderField('recaptcha_site_key', esc_html__('Enter your Google reCAPTCHA v2 (Checkbox) site key to protect your forms from bots.', 'genform')),
             'genform_settings',
             'genform_main'
         );
@@ -36,45 +41,55 @@ final class Settings
         add_settings_field(
             'genform_recaptcha_secret',
             esc_html__('reCAPTCHA Secret Key', 'genform'),
-            fn() => $this->renderField('recaptcha_secret_key', esc_html__('Your Google reCAPTCHA v2 secret key.', 'genform')),
+            fn() => $this->renderField('recaptcha_secret_key', esc_html__('The secret key is required for server-side verification. Keep this private.', 'genform')),
             'genform_settings',
             'genform_main'
         );
 
         add_settings_field(
             'genform_primary_color',
-            esc_html__('Primary Color', 'genform'),
-            fn() => $this->renderColorField('primary_color'),
+            esc_html__('Brand Primary Color', 'genform'),
+            fn() => $this->renderColorField('primary_color', esc_html__('Choose the main accent color for your buttons and active fields across all forms.', 'genform')),
             'genform_settings',
             'genform_main'
         );
 
         // Email Section
-        add_settings_section('genform_email_sec', esc_html__('Email Settings', 'genform'), null, 'genform_settings');
+        add_settings_section(
+            'genform_email_sec', 
+            esc_html__('Default Email Identity', 'genform'), 
+            fn() => print('<p class="gfm-section-desc">' . esc_html__('These settings act as global fallbacks. If a specific form does not have a "From" name or email set in the builder, these will be used automatically.', 'genform') . '</p>'),
+            'genform_settings'
+        );
 
         add_settings_field(
             'genform_from_name',
-            esc_html__('Global From Name', 'genform'),
-            fn() => $this->renderField('from_name', esc_html__('Default sender name if not set in form.', 'genform')),
+            esc_html__('Global Sender Name', 'genform'),
+            fn() => $this->renderField('from_name', esc_html__('e.g. Your Business Name', 'genform')),
             'genform_settings',
             'genform_email_sec'
         );
 
         add_settings_field(
             'genform_from_email',
-            esc_html__('Global From Email', 'genform'),
-            fn() => $this->renderField('from_email', esc_html__('Default sender email if not set in form.', 'genform')),
+            esc_html__('Global Sender Email', 'genform'),
+            fn() => $this->renderField('from_email', esc_html__('e.g. support@yourdomain.com', 'genform')),
             'genform_settings',
             'genform_email_sec'
         );
 
         // Advanced Section
-        add_settings_section('genform_advanced', esc_html__('Advanced Options', 'genform'), null, 'genform_settings');
+        add_settings_section(
+            'genform_advanced', 
+            esc_html__('Advanced & Performance', 'genform'), 
+            fn() => print('<p class="gfm-section-desc">' . esc_html__('Optimize how the plugin interacts with your site theme.', 'genform') . '</p>'),
+            'genform_settings'
+        );
 
         add_settings_field(
             'genform_disable_assets',
-            esc_html__('Disable Assets', 'genform'),
-            fn() => $this->renderCheckboxField('disable_assets', esc_html__('Don\'t load CSS/JS on the frontend (advanced users only).', 'genform')),
+            esc_html__('Optimization Mode', 'genform'),
+            fn() => $this->renderCheckboxField('disable_assets', esc_html__('Don\'t load default CSS/JS. Enable this only if you want to provide your own custom styling and scripts for the forms.', 'genform')),
             'genform_settings',
             'genform_advanced'
         );
@@ -118,7 +133,7 @@ final class Settings
         );
     }
 
-    private function renderColorField(string $key): void
+    private function renderColorField(string $key, string $desc = ''): void
     {
         $options = get_option('genform_general', []);
         $value   = $options[$key] ?? '#6366f1';
@@ -127,5 +142,8 @@ final class Settings
             esc_attr($key),
             esc_attr($value)
         );
+        if ($desc) {
+            printf('<p class="description">%s</p>', esc_html($desc));
+        }
     }
 }

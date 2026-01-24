@@ -599,6 +599,14 @@
     padding-bottom: 12px;
 }
 
+.genform-settings-form .gfm-section-desc {
+    font-size: 14px;
+    color: var(--gfm-text-muted);
+    margin: 0px 0 25px 0;
+    line-height: 1.6;
+    max-width: 700px;
+}
+
 .genform-settings-form .form-table tr:first-child h2 {
     margin-top: 0;
 }

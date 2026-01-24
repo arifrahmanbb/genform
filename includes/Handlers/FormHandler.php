@@ -31,7 +31,7 @@ final class FormHandler {
 		$nonce   = isset( $_POST['genform_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['genform_nonce'] ) ) : '';
 
 		if ( ! $form_id || ! wp_verify_nonce( $nonce, "genform_submit_$form_id" ) ) {
-			wp_send_json_error( array( 'message' => esc_html__( 'Security check failed.', 'genform' ) ) );
+			$this->send_error( esc_html__( 'Security check failed.', 'genform' ), $form_id );
 		}
 
 		$this->process( $form_id );
@@ -46,7 +46,7 @@ final class FormHandler {
 		$form = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}genform_forms WHERE id = %d", $form_id ) );
 
 		if ( ! $form ) {
-			wp_send_json_error( array( 'message' => esc_html__( 'Form not found.', 'genform' ) ) );
+			$this->send_error( esc_html__( 'Form not found.', 'genform' ) );
 		}
 
 		$entry_data = $this->get_sanitized_data();
@@ -68,12 +68,33 @@ final class FormHandler {
 		Email::send( $entry_id, $form_id, $entry_data );
 
 		$settings = json_decode( $form->form_settings, true );
-		wp_send_json_success(
-			array(
-				'message'  => $settings['success_message'] ?? esc_html__( 'Thank you for your submission.', 'genform' ),
-				'redirect' => $settings['redirect_url'] ?? '',
-			)
+		$res_data = array(
+			'message' => $settings['success_message'] ?? esc_html__( 'Thank you for your submission.', 'genform' ),
 		);
+
+		if ( isset( $settings['con_type'] ) && 'redirect' === $settings['con_type'] && ! empty( $settings['redirect_url'] ) ) {
+			$res_data['redirect'] = esc_url_raw( $settings['redirect_url'] );
+		}
+
+		wp_send_json_success( $res_data );
+	}
+
+	/**
+	 * Send error response.
+	 */
+	private function send_error( string $default_msg, int $form_id = 0 ): void {
+		$message = $default_msg;
+		if ( $form_id ) {
+			global $wpdb;
+			$form = $wpdb->get_row( $wpdb->prepare( "SELECT form_settings FROM {$wpdb->prefix}genform_forms WHERE id = %d", $form_id ) );
+			if ( $form ) {
+				$settings = json_decode( $form->form_settings, true );
+				if ( ! empty( $settings['error_message'] ) ) {
+					$message = $settings['error_message'];
+				}
+			}
+		}
+		wp_send_json_error( array( 'message' => $message ) );
 	}
 
 	/**
