@@ -14,7 +14,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use GenForm\Admin\Builder;
 use GenForm\Admin\Settings;
+use GenForm\Admin\EntriesTable;
 use GenForm\Handlers\FormHandler;
+use GenForm\Handlers\ExportHandler;
 use GenForm\Integrations\Block;
 use GenForm\Integrations\Shortcode;
 
@@ -50,11 +52,10 @@ final class Core {
 	 * Initialize.
 	 */
 	private function init(): void {
+		add_action( 'admin_init', array( self::class, 'activate' ) );
 		add_action( 'admin_menu', array( $this, 'registerMenus' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueueAdminAssets' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueueFrontendAssets' ) );
-		add_action( 'wp_head', array( $this, 'injectDynamicStyles' ) );
-		add_action( 'admin_head', array( $this, 'injectDynamicStyles' ) );
 
 		$this->loadComponents();
 	}
@@ -66,6 +67,7 @@ final class Core {
 		new Builder();
 		new Settings();
 		new FormHandler();
+		new ExportHandler();
 		new Block();
 		new Shortcode();
 	}
@@ -151,10 +153,11 @@ final class Core {
 		}
 
 		wp_enqueue_style( 'genform-admin', GENFORM_URL . 'assets/css/admin.css', array(), GENFORM_VERSION );
+		wp_add_inline_style( 'genform-admin', $this->getDynamicStylesCss() );
 		wp_enqueue_script(
 			'genform-admin',
 			GENFORM_URL . 'assets/js/admin.js',
-			array( 'jquery' ),
+			array( 'jquery', 'wp-lists', 'common' ),
 			GENFORM_VERSION,
 			array(
 				'strategy'  => 'defer',
@@ -229,20 +232,15 @@ final class Core {
 	/**
 	 * Inject dynamic styles based on settings.
 	 */
-	public function injectDynamicStyles(): void {
+	/**
+	 * Get dynamic CSS based on settings.
+	 */
+	private function getDynamicStylesCss(): string {
 		$options = get_option( 'genform_general', array() );
 		$primary = $options['primary_color'] ?? '#6366f1';
+		$dark    = $this->adjustBrightness( $primary, -20 );
 
-		printf(
-			'<style>
-                :root { 
-                    --gfm-primary: %1$s !important; 
-                    --gfm-primary-dark: %2$s !important; 
-                }
-            </style>',
-			esc_attr( $primary ),
-			esc_attr( $this->adjustBrightness( $primary, -20 ) )
-		);
+		return ":root { --gfm-primary: {$primary} !important; --gfm-primary-dark: {$dark} !important; }";
 	}
 
 	/**
@@ -270,6 +268,7 @@ final class Core {
 	 */
 	public function enqueueFrontendAssets(): void {
 		wp_enqueue_style( 'genform-frontend', GENFORM_URL . 'assets/css/frontend.css', array(), GENFORM_VERSION );
+		wp_add_inline_style( 'genform-frontend', $this->getDynamicStylesCss() );
 		wp_enqueue_script(
 			'genform-frontend',
 			GENFORM_URL . 'assets/js/frontend.js',
@@ -309,11 +308,12 @@ final class Core {
             PRIMARY KEY (id)
         ) $charset;";
 
-		$table_entries = $wpdb->prefix . 'genform_entries';
-		$sql_entries   = "CREATE TABLE $table_entries (
+        $table_entries = $wpdb->prefix . 'genform_entries';
+        $sql_entries   = "CREATE TABLE $table_entries (
             id bigint(20) NOT NULL AUTO_INCREMENT,
             form_id bigint(20) NOT NULL,
             entry_data longtext NOT NULL,
+            entry_metadata longtext,
             user_ip varchar(100),
             user_agent varchar(255),
             status varchar(20) DEFAULT 'unread',

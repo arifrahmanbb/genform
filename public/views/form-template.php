@@ -12,14 +12,10 @@ $genform_base_size   = esc_attr( $settings['base_font_size'] ?? '16' );
 $genform_base_weight = esc_attr( $settings['base_font_weight'] ?? '400' );
 $genform_btn_align   = esc_attr( $settings['submit_align'] ?? 'left' );
 
-$genform_btn_style = '';
-if ( 'center' === $genform_btn_align ) {
-	$genform_btn_style = 'text-align: center;';
-} elseif ( 'right' === $genform_btn_align ) {
-	$genform_btn_style = 'text-align: right;';
-}
+// Container Style Variable
+$genform_vars = "--gfm-base-size: {$genform_base_size}px; font-weight: {$genform_base_weight};";
 ?>
-<div class="gfm-form-container" id="gfm-form-<?php echo esc_attr( $form->id ); ?>" style="--gfm-base-size: <?php echo $genform_base_size; ?>px; font-weight: <?php echo $genform_base_weight; ?>;">
+<div class="gfm-form-container" id="gfm-form-<?php echo esc_attr( $form->id ); ?>" style="<?php echo esc_attr( $genform_vars ); ?>">
 	<form class="gfm-form gfm-form-js" method="post" data-id="<?php echo esc_attr( $form->id ); ?>">
 		<input type="hidden" name="genform_id" value="<?php echo esc_attr( $form->id ); ?>">
 		<input type="hidden" name="genform_nonce" value="<?php echo esc_attr( $nonce ); ?>">
@@ -40,7 +36,7 @@ if ( 'center' === $genform_btn_align ) {
 						<label class="gfm-label">
 							<?php echo esc_html( $genform_field['label'] ); ?>
 							<?php if ( $genform_required ) : ?>
-								<span class="gfm-required-mark" style="color:#ef4444;">*</span>
+								<span class="gfm-required-mark">*</span>
 							<?php endif; ?>
 						</label>
 					<?php endif; ?>
@@ -85,12 +81,12 @@ if ( 'center' === $genform_btn_align ) {
 							case 'radio':
 							case 'checkbox':
 								if ( ! empty( $genform_field['options'] ) ) {
-									echo '<div class="gfm-options-group" style="display:flex; gap:15px; flex-wrap:wrap; margin-top:5px;">';
+									echo '<div class="gfm-options-group">';
 									foreach ( $genform_field['options'] as $genform_opt ) {
 										$genform_type       = $genform_field['type'];
 										$genform_input_name = ( 'checkbox' === $genform_type ) ? "{$genform_name}[]" : $genform_name;
 										printf(
-											'<label class="gfm-option-label" style="display:flex; align-items:center; gap:8px; font-size:14px; cursor:pointer;"><input type="%1$s" name="%2$s" value="%3$s" %4$s> %5$s</label>',
+											'<label class="gfm-option-label"><input type="%1$s" name="%2$s" value="%3$s" %4$s> %5$s</label>',
 											esc_attr( $genform_type ),
 											esc_attr( $genform_input_name ),
 											esc_attr( $genform_opt['value'] ),
@@ -120,8 +116,8 @@ if ( 'center' === $genform_btn_align ) {
 		endif;
 		?>
 
-		<div class="gfm-submit-wrap" style="<?php echo esc_attr( $genform_btn_style ); ?>">
-			<button type="submit" class="gfm-submit" style="<?php echo ( 'full' === $genform_btn_align ) ? 'width: 100%;' : 'width: auto; min-width: 160px;'; ?>">
+		<div class="gfm-submit-wrap gfm-align-<?php echo esc_attr( $genform_btn_align ); ?>">
+			<button type="submit" class="gfm-submit <?php echo ( 'full' === $genform_btn_align ) ? 'gfm-btn-full' : 'gfm-btn-auto'; ?>">
 				<?php echo esc_html( $settings['submit_text'] ?? esc_html__( 'Submit', 'genform' ) ); ?>
 			</button>
 		</div>

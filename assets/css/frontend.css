@@ -111,3 +111,49 @@
   color: #991b1b;
   border: 1px solid #fecaca;
 }
+
+/* Utilities & Logic Styles */
+.gfm-required-mark {
+  color: #ef4444;
+  margin-left: 4px;
+}
+
+.gfm-options-group {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.gfm-option-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.gfm-option-label input {
+  margin: 0;
+}
+
+.gfm-align-left {
+  text-align: left;
+}
+
+.gfm-align-center {
+  text-align: center;
+}
+
+.gfm-align-right {
+  text-align: right;
+}
+
+.gfm-btn-full {
+  width: 100% !important;
+}
+
+.gfm-btn-auto {
+  width: auto !important;
+  min-width: 160px;
+}
