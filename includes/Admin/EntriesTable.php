@@ -194,16 +194,21 @@ class EntriesTable extends \WP_List_Table {
 
 	/**
 	 * Entry Preview Column.
+	 * Shows only the first field's value (e.g., user's name).
 	 */
 	public function column_entry_preview( $item ) {
 		$data = json_decode( $item->entry_data, true );
-		if ( empty( $data ) ) {
+		if ( empty( $data ) || ! is_array( $data ) ) {
 			return '—';
 		}
 
+		// Get the first field's value only.
 		$first_value = reset( $data );
+		
+		// Handle arrays (checkboxes, multi-select).
 		$display_val = is_array( $first_value ) ? implode( ', ', $first_value ) : $first_value;
 		
+		// Trim to 10 words for cleaner display.
 		return esc_html( wp_trim_words( $display_val, 10 ) );
 	}
 

@@ -14,9 +14,17 @@
 			e.preventDefault();
 			const $btn = $(this);
 			const data = $btn.data('payload');
-			const metadata = $btn.data('metadata') || {};
+			const metadataRaw = $btn.data('metadata') || '{}';
 			const $row = $btn.closest('tr');
 			const entryId = $row.find('input[name="entry[]"]').val();
+
+			// Parse metadata.
+			let metadata = {};
+			try {
+				metadata = typeof metadataRaw === 'string' ? JSON.parse(metadataRaw) : metadataRaw;
+			} catch (e) {
+				metadata = {};
+			}
 
 			// 1. Update Modal Header.
 			$('.gfm-modal-header h3').text(`${genform.i18n.entry_details || 'Entry Details'} - #${entryId}`);
@@ -30,16 +38,24 @@
 			}
 			html += '</table>';
 
-			// 3. System Information Section (Moved data from table here).
+			// 3. System Information Section (IP, Browser, OS, Source URL moved here).
 			html += '<div class="gfm-system-info-box">';
 			html += '<div class="gfm-modal-section-title">' + (genform.i18n.system_info || 'System Information') + '</div>';
 			html += '<div class="gfm-system-grid">';
 
-			// Device & IP.
-			html += `<div class="gfm-system-row"><span class="dashicons dashicons-desktop"></span> <span>Device: <strong>${metadata.browser || 'Unknown'}</strong> on <strong>${metadata.os || 'Unknown'}</strong></span></div>`;
-			html += `<div class="gfm-system-row"><span class="dashicons dashicons-networking"></span> <span>IP Address: <code>${metadata.ip || 'Unknown'}</code></span></div>`;
+			// IP Address.
+			if (metadata.ip) {
+				html += `<div class="gfm-system-row"><span class="dashicons dashicons-networking"></span> <span>IP Address: <code>${metadata.ip}</code></span></div>`;
+			}
 
-			// Source.
+			// Browser & OS.
+			if (metadata.browser || metadata.os) {
+				const browser = metadata.browser || 'Unknown';
+				const os = metadata.os || 'Unknown';
+				html += `<div class="gfm-system-row"><span class="dashicons dashicons-desktop"></span> <span>Device: <strong>${browser}</strong> on <strong>${os}</strong></span></div>`;
+			}
+
+			// Source URL.
 			if (metadata.url) {
 				html += `<div class="gfm-system-row"><span class="dashicons dashicons-admin-links"></span> <span>Source: <a href="${metadata.url}" target="_blank" class="gfm-source-link">${metadata.url}</a></span></div>`;
 			}
