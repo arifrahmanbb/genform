@@ -1,0 +1,75 @@
+@use '../abstracts' as *;
+
+/**
+ * Global Settings Page Styles
+ */
+
+#gfm-tab-settings,
+#gfm-tab-notifications {
+    .gfm-card {
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+.genform-settings-form {
+    table.form-table {
+        margin-top: 0;
+    }
+
+    .form-table th {
+        padding: 24px 10px 24px 0;
+        width: 240px;
+        font-size: 14px;
+        font-weight: 700;
+        color: $text-main;
+    }
+
+    .form-table td {
+        padding: 16px 0;
+    }
+
+    .form-table h2 {
+        font-size: 18px;
+        font-weight: 800;
+        margin: 40px 0 10px 0;
+        color: $text-main;
+        border-bottom: 2px solid #f1f5f9;
+        padding-bottom: 12px;
+    }
+
+    .gfm-section-desc {
+        font-size: 14px;
+        color: $text-muted;
+        margin: 0px 0 25px 0;
+        line-height: 1.6;
+        max-width: 700px;
+    }
+
+    .form-table tr:first-child h2 {
+        margin-top: 0;
+    }
+
+    .submit {
+        margin-top: 32px;
+        padding: 0;
+
+        .button-primary {
+            background: $primary !important;
+            border: none !important;
+            padding: 12px 32px !important;
+            height: auto !important;
+            font-weight: 700 !important;
+            border-radius: 10px !important;
+            box-shadow: 0 4px 12px rgba($primary, 0.2) !important;
+            @include transition;
+
+            &:hover {
+                background: $primary-dark !important;
+                transform: translateY(-1px) !important;
+                box-shadow: 0 6px 16px rgba($primary, 0.3) !important;
+            }
+        }
+    }
+}

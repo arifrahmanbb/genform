@@ -1,0 +1,10 @@
+@use '../abstracts' as *;
+
+.gfm-card {
+    @include card;
+    margin-bottom: 24px;
+
+    &:hover {
+        box-shadow: $shadow-md;
+    }
+}

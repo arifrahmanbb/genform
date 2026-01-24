@@ -1,0 +1,95 @@
+@use '../abstracts' as *;
+
+// Specific styles for the Entry Details Modal content
+
+.gfm-details-table {
+    width: 100%;
+    border-collapse: separate;
+    margin-bottom: 35px;
+    border: 1px solid #f1f5f9;
+    border-radius: 8px;
+    overflow: hidden;
+
+    tr:nth-child(even) {
+        background: #f8fafc;
+    }
+
+    th,
+    td {
+        padding: 14px 20px;
+        font-size: 14px;
+        text-align: left;
+    }
+
+    .gfm-label-col {
+        width: 35%;
+        font-weight: 600;
+        color: $text-muted;
+        border-right: 1px solid #f1f5f9;
+    }
+}
+
+.gfm-system-info-box {
+    background: #f8fafc;
+    border: 1px solid $border;
+    border-radius: 10px;
+    padding: 20px;
+
+    .gfm-system-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .gfm-system-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 13px;
+        color: #475569;
+
+        .dashicons {
+            color: $text-muted;
+            font-size: 18px;
+        }
+
+        code {
+            background: #e2e8f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+    }
+}
+
+.gfm-source-link {
+    color: $primary;
+    text-decoration: none;
+    word-break: break-all;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.gfm-pro-marketing-row {
+    margin-top: 15px;
+    padding: 12px 15px;
+    background: $white;
+    border: 1px dashed $border-dark;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .gfm-blurred-text {
+        filter: blur(4px);
+        opacity: 0.5;
+        user-select: none;
+    }
+
+    .gfm-pro-lock-badge {
+        @include badge(#92400e);
+        background: #fbbf24;
+        margin-left: auto;
+    }
+}

@@ -2,15 +2,12 @@
  * GenForm Frontend Styles
  *
  * Public-facing form styling.
- * Uses direct values for spacing, fonts, radius, etc.
- * Only semantic colors use variables.
- *
+ * 
  * @package GenForm
  * @since 1.0.0
  */
 
-@import 'variables';
-@import 'mixins';
+@use 'abstracts' as *;
 
 // ========================================
 // Form Wrapper & Container
@@ -22,7 +19,7 @@
 }
 
 .gfm-form {
-  background: #fff;
+  background: $white;
   padding: 32px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -54,7 +51,7 @@
 }
 
 .gfm-required {
-  color: #d63638;
+  color: $danger;
   margin-left: 2px;
 }
 
@@ -238,11 +235,11 @@
     .gfm-input,
     .gfm-textarea,
     .gfm-select {
-      border-color: #d63638;
+      border-color: $danger;
       background-color: rgba(214, 54, 56, 0.02);
 
       &:focus {
-        @include gfm-focus-styles(#d63638);
+        @include gfm-focus-styles($danger);
       }
     }
   }
@@ -250,7 +247,7 @@
   .gfm-error-message {
     margin-top: 5px;
     font-size: 13px;
-    color: #d63638;
+    color: $danger;
     display: flex;
     align-items: center;
     gap: 4px;

@@ -1,0 +1,19 @@
+@use '../abstracts' as *;
+
+.genform-admin-wrap {
+    background: $bg;
+    padding: 32px;
+    font-family: 'Inter', -apple-system, sans-serif;
+    color: $text-main;
+}
+
+.gfm-header-flex {
+    @include flex-between;
+    margin-bottom: 25px;
+
+    h1 {
+        font-size: 24px;
+        font-weight: 700;
+        margin: 0;
+    }
+}

@@ -1,0 +1,171 @@
+/**
+ * GenForm SCSS Mixins
+ */
+@use 'variables' as vars;
+
+// ========================================
+// 1. Common Utility Mixins
+// ========================================
+
+@mixin flex-center($direction: row) {
+    display: flex;
+    flex-direction: $direction;
+    align-items: center;
+    justify-content: center;
+}
+
+@mixin flex-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+@mixin transition($prop: all, $time: 0.2s, $ease: ease-in-out) {
+    transition: $prop $time $ease;
+}
+
+@mixin visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+// ========================================
+// 2. Premium Admin Mixins
+// ========================================
+
+@mixin card {
+    background: vars.$white;
+    border-radius: vars.$radius;
+    padding: 24px;
+    box-shadow: vars.$shadow-sm;
+    border: 1px solid vars.$border;
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+@mixin input-field {
+    border-radius: 8px;
+    border: 1px solid vars.$border;
+    padding: 8px 12px;
+    font-size: 13px;
+    width: 100%;
+    transition: all 0.2s;
+    background: vars.$white;
+    
+    &:focus {
+        border-color: vars.$primary;
+        box-shadow: 0 0 0 4px rgba(vars.$primary, 0.1);
+        outline: none;
+    }
+}
+
+@mixin input-focus {
+    border-color: vars.$primary;
+    box-shadow: 0 0 0 4px rgba(vars.$primary, 0.1);
+    outline: none;
+}
+
+@mixin badge($color) {
+    padding: 4px 8px;
+    border-radius: vars.$radius-sm;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    background: rgba($color, 0.1);
+    color: $color;
+}
+
+// ========================================
+// 3. Frontend / Legacy Mixins (GFM Prefixed)
+// ========================================
+
+@mixin gfm-flex-row-center {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+@mixin gfm-flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+@mixin gfm-focus-styles($color: vars.$gfm-color-brand, $offset: 1px) {
+    outline: none;
+    border-color: $color;
+    box-shadow: 0 0 0 $offset $color;
+}
+
+@mixin gfm-btn-primary {
+    background: vars.$gfm-color-brand;
+    color: #fff;
+    padding: 12px 32px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out;
+
+    &:hover {
+        background: vars.$gfm-color-brand-dark;
+    }
+
+    &:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+}
+
+@mixin gfm-alert($bg-color, $text-color, $border-color) {
+    padding: 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    background: $bg-color;
+    color: $text-color;
+    border: 1px solid $border-color;
+}
+
+@mixin gfm-alert-success {
+    @include gfm-alert(vars.$gfm-color-success, vars.$gfm-color-success-text, vars.$gfm-color-success-border);
+}
+
+@mixin gfm-alert-error {
+    @include gfm-alert(vars.$gfm-color-error, vars.$gfm-color-error-text, vars.$gfm-color-error-border);
+}
+
+@mixin gfm-form-input-base {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+    transition: border-color 0.2s ease-in-out;
+
+    &:focus {
+        @include gfm-focus-styles;
+    }
+}
+
+@mixin gfm-absolute-cover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+// Responsive
+@mixin gfm-mobile-only {
+    @media (max-width: (vars.$gfm-bp-md - 1)) {
+        @content;
+    }
+}

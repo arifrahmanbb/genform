@@ -1,0 +1,78 @@
+/**
+ * GenForm Design Tokens
+ * 
+ * All variables for colors, typography, spacing and shadows.
+ */
+
+// ========================================
+// 1. Core Brand Colors (Premium Admin)
+// ========================================
+$primary: #6366f1;
+$primary-dark: #4f46e5;
+$primary-light: #f5f3ff;
+
+// ========================================
+// 2. Legacy/Frontend Brand (WP Style)
+// ========================================
+$gfm-color-brand: #0073aa;
+$gfm-color-brand-dark: #005a87;
+
+// ========================================
+// 3. Status & Semantic Colors
+// ========================================
+$success: #10b981;
+$danger: #ef4444;
+$warning: #f59e0b;
+$info: #3b82f6;
+
+// Semantic mapping for frontend
+$gfm-color-success: #d4edda;
+$gfm-color-success-text: #155724;
+$gfm-color-success-border: #c3e6cb;
+
+$gfm-color-error: #f8d7da;
+$gfm-color-error-text: #721c24;
+$gfm-color-error-border: #f5c6cb;
+
+$gfm-color-warning: #fff3cd;
+$gfm-color-warning-text: #856404;
+$gfm-color-warning-border: #ffeaa7;
+
+$gfm-color-info: #cfe2ff;
+$gfm-color-info-text: #084298;
+$gfm-color-info-border: #b6d4fe;
+
+// ========================================
+// 4. Neutral Palette
+// ========================================
+$white: #ffffff;
+$bg: #f8fafc;
+$text-main: #1e293b;
+$text-muted: #64748b;
+$border: #e2e8f0;
+$border-dark: #cbd5e1;
+
+// Semantic mapping for frontend
+$gfm-color-text: #333;
+$gfm-color-text-secondary: #666;
+
+// ========================================
+// 5. Breakpoints
+// ========================================
+$gfm-bp-sm: 576px;
+$gfm-bp-md: 768px;
+$gfm-bp-lg: 992px;
+$gfm-bp-xl: 1200px;
+$gfm-bp-xxl: 1400px;
+
+// ========================================
+// 6. Layout Tokens
+// ========================================
+$radius: 12px;
+$radius-sm: 6px;
+$radius-lg: 16px;
+
+$shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);

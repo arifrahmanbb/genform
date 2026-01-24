@@ -1,17 +1,23 @@
 /**
  * GenForm Admin Styles
- *
- * Main SCSS entry point for admin styles. Imports shared variables and mixins first,
- * then specific admin stylesheets for maintainability and consistency.
- *
- * @package GenForm
- * @since 1.0.0
+ * Final modular entry point using Sass @use.
  */
 
-// Import shared utilities first
-@import "variables";
-@import "mixins";
+// 1. Abstracts (Variables, Mixins)
+@use 'abstracts';
 
-// Import admin stylesheets
-@import "admin/core";
-@import "admin/from-builder";
+// 2. Base (Reset, Typography)
+@use 'layout/wrapper';
+@use 'layout/forms';
+
+// 3. Components
+@use 'components/cards';
+@use 'components/buttons';
+@use 'components/modals';
+@use 'components/status';
+@use 'components/table'; // Added table component
+
+// 4. Pages
+@use 'pages/form-builder';
+@use 'pages/entries';
+@use 'pages/settings';

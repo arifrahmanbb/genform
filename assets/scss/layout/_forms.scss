@@ -1,0 +1,98 @@
+@use '../abstracts' as *;
+
+/**
+ * Global Admin Form Elements
+ * Ensures all inputs within the plugin admin area have a consistent SaaS UI.
+ */
+
+.genform-admin-wrap {
+    
+    // Global Label Styling for consistent spacing
+    label {
+        display: block !important;
+        margin-bottom: 10px !important; // Increased gap and forced override
+        font-size: 13px !important;
+        font-weight: 700 !important;
+        color: $text-main !important;
+        line-height: 1.4 !important;
+    }
+
+    // Broad styling for all textual inputs to ensure SaaS consistency
+    input[type="text"],
+    input[type="email"],
+    input[type="url"],
+    input[type="number"],
+    input[type="password"],
+    input[type="tel"],
+    input[type="date"],
+    input[type="search"],
+    select,
+    textarea {
+        @include input-field;
+        box-sizing: border-box;
+        margin: 0;
+        max-width: 100%; // Prevent overflow
+    }
+
+    // Specific class-based overrides for WP elements
+    input.widefat, 
+    textarea.widefat {
+        @include input-field;
+        width: 100%;
+    }
+
+    // Form buttons (Save, Cancel, etc.)
+    .gfm-btn {
+        // Handled in components/_buttons.scss
+    }
+
+    // Standard setting rows container
+    .gfm-setting-row {
+        margin-bottom: 28px;
+
+        label {
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .description,
+        .gfm-setting-desc {
+            font-size: 12px;
+            color: $text-muted;
+            margin-top: 8px;
+            font-style: italic;
+            display: block;
+            line-height: 1.5;
+        }
+
+        // Standard inputs within rows should usually be full width
+        input[type="text"],
+        input[type="email"],
+        input[type="url"],
+        input[type="number"],
+        input[type="password"],
+        input[type="tel"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+        }
+    }
+
+    // Grid System Alignment
+    .gfm-grid {
+        display: grid; // Ensure it's a grid if not already
+        gap: 24px;
+        
+        .gfm-col {
+            display: flex;
+            flex-direction: column;
+            gap: 10px; // Modern gap for reliable spacing inside columns
+
+            // Inputs inside grid columns should also be full width of the column
+            input, select, textarea {
+                width: 100%;
+            }
+        }
+    }
+}

@@ -233,10 +233,11 @@ class EntriesTable extends \WP_List_Table {
 		
 		if ( $form_row && $form_row->form_data ) {
 			$form_config = json_decode( $form_row->form_data, true );
-			if ( is_array( $form_config ) ) {
-				foreach ( $form_config as $field ) {
-					if ( isset( $field['id'], $field['label'] ) && isset( $entries_data[ $field['id'] ] ) ) {
-						$readable_data[ $field['label'] ] = $entries_data[ $field['id'] ];
+			if ( isset( $form_config['fields'] ) && is_array( $form_config['fields'] ) ) {
+				foreach ( $form_config['fields'] as $field ) {
+					$field_name = sanitize_title( $field['name'] ?? '' );
+					if ( $field_name && isset( $field['label'] ) && isset( $entries_data[ $field_name ] ) ) {
+						$readable_data[ $field['label'] ] = $entries_data[ $field_name ];
 					}
 				}
 			}

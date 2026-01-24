@@ -1,0 +1,48 @@
+@use 'sass:color';
+@use '../abstracts' as *;
+
+.gfm-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    border: 1px solid transparent;
+    @include transition;
+    box-shadow: $shadow-sm;
+
+    &-primary {
+        background: $primary;
+        color: $white !important;
+
+        &:hover {
+            background: $primary-dark;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba($primary, 0.3);
+        }
+    }
+
+    &-outline {
+        background: $white;
+        border-color: $border;
+        color: $text-main !important;
+
+        &:hover {
+            background: $bg;
+            border-color: $border-dark;
+        }
+    }
+
+    &-secondary-style {
+        background: $primary-light;
+        color: $primary !important;
+        border: 1px solid transparent;
+
+        &:hover {
+            background: color.scale($primary-light, $lightness: -2%);
+        }
+    }
+}

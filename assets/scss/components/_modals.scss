@@ -1,0 +1,65 @@
+@use '../abstracts' as *;
+
+.gfm-modal {
+    position: fixed;
+    z-index: 99999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba($text-main, 0.4);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    &-content {
+        background: $white;
+        width: 700px;
+        max-width: 95%;
+        border-radius: $radius;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        overflow: hidden;
+    }
+
+    &-header {
+        background: #fcfdfe;
+        padding: 20px 25px;
+        border-bottom: 1px solid $border;
+        @include flex-between;
+
+        h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+        }
+    }
+
+    &-body {
+        padding: 30px;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+
+    &-section-title {
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: $text-muted;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #f1f5f9;
+        padding-bottom: 8px;
+    }
+}
+
+.gfm-close-modal {
+    cursor: pointer;
+    font-size: 24px;
+    color: $text-muted;
+    @include transition(color);
+
+    &:hover {
+        color: $text-main;
+    }
+}

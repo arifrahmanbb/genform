@@ -1,0 +1,369 @@
+@use '../abstracts' as *;
+
+/**
+ * Form Builder Page Styles
+ */
+
+.gfm-builder-header-main {
+    @include flex-between;
+    margin-bottom: 32px;
+
+    h1 {
+        font-size: 28px;
+        font-weight: 800;
+        margin: 0;
+        background: linear-gradient(135deg, $primary, #a855f7);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+}
+
+.gfm-builder-tabs {
+    display: flex;
+    gap: 4px;
+    background: #f1f5f9;
+    padding: 6px;
+    border-radius: 14px;
+}
+
+.gfm-tab-link {
+    background: transparent;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    color: $text-muted;
+    @include transition;
+
+    &.active {
+        background: $white;
+        color: $primary;
+        box-shadow: $shadow-sm;
+    }
+}
+
+.gfm-builder-top {
+    @include flex-between;
+    align-items: stretch;
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.gfm-name-card {
+    flex: 1;
+    margin-bottom: 0;
+    padding: 20px 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: $text-muted;
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 0.05em;
+    }
+
+    input {
+        font-size: 18px;
+        font-weight: 600;
+        border: none !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        background: transparent !important;
+
+        &:focus {
+            outline: none;
+        }
+    }
+}
+
+.gfm-builder-layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 32px;
+}
+
+.gfm-sidebar .gfm-card {
+    position: sticky;
+    top: 64px;
+}
+
+.gfm-field-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.gfm-add-field {
+    @include flex-center;
+    flex-direction: column;
+    gap: 8px;
+    background: $white;
+    border: 1px solid $border;
+    padding: 16px 8px;
+    border-radius: $radius;
+    text-align: center;
+    cursor: pointer;
+    @include transition;
+    font-weight: 500;
+    font-size: 12px;
+
+    .dashicons {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        color: $primary;
+    }
+
+    &:hover {
+        border-color: $primary;
+        background: $primary-light;
+        transform: translateY(-2px);
+        box-shadow: $shadow-sm;
+    }
+}
+
+.gfm-canvas {
+    background: #fcfcfd;
+    border: 2px dashed #e2e8f0;
+    border-radius: $radius-lg;
+    min-height: 600px;
+    padding: 32px;
+
+    .gfm-empty-canvas {
+        @include flex-center;
+        flex-direction: column;
+        height: 100%;
+        color: $text-muted;
+
+        .dashicons {
+            font-size: 48px;
+            width: 48px;
+            height: 48px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+    }
+}
+
+.gfm-field-node {
+    margin-bottom: 20px;
+    border: 1px solid $border;
+    overflow: hidden;
+    border-radius: $radius;
+    @include transition(all, 0.3s, cubic-bezier(0.4, 0, 0.2, 1));
+
+    &:hover {
+        border-color: $primary;
+        transform: translateY(-2px);
+        box-shadow: $shadow-lg;
+    }
+
+    &.active {
+        border-color: $primary;
+        box-shadow: $shadow-xl;
+    }
+}
+
+.gfm-field-header {
+    background: $white;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+}
+
+.gfm-field-drag-handle {
+    cursor: move;
+    margin-right: 20px;
+    color: #94a3b8;
+    @include flex-center;
+    width: 36px;
+    height: 36px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    @include transition;
+
+    &:hover {
+        color: $primary;
+        background: #eef2ff;
+    }
+}
+
+.gfm-field-title {
+    flex: 1;
+
+    strong {
+        font-size: 16px;
+        color: $text-main;
+        font-weight: 700;
+    }
+
+    small {
+        color: $text-muted;
+        font-weight: 600;
+        margin-left: 12px;
+        background: #f1f5f9;
+        padding: 3px 10px;
+        border-radius: 6px;
+        text-transform: uppercase;
+        font-size: 10px;
+        letter-spacing: 0.05em;
+    }
+}
+
+.gfm-field-actions {
+    display: flex;
+    gap: 10px;
+
+    button {
+        background: #f8fafc;
+        border: 1px solid $border;
+        cursor: pointer;
+        color: $text-muted;
+        @include transition;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        @include flex-center;
+    }
+
+    .gfm-delete-btn:hover {
+        color: $danger;
+        background: #fef2f2;
+        border-color: #fecaca;
+    }
+
+    .gfm-edit-btn:hover {
+        color: $primary;
+        background: $primary-light;
+        border-color: #ddd6fe;
+    }
+}
+
+.gfm-field-node.active .gfm-edit-btn {
+    color: $primary;
+    background: $primary-light;
+    border-color: #ddd6fe;
+}
+
+.gfm-field-settings-panel {
+    background: #f8fafc;
+    border-top: 1px solid $border;
+    padding: 32px;
+}
+
+.gfm-options-setter {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px dashed #e2e8f0;
+
+    h4 {
+        font-size: 13px;
+        text-transform: uppercase;
+        color: $text-main;
+        margin: 0 0 20px 0;
+        letter-spacing: 0.1em;
+        font-weight: 800;
+    }
+}
+
+.gfm-opt-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: $white;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid $border;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+
+    input {
+        background: #f8fafc !important;
+        @include transition;
+
+        &:focus {
+            background: $white !important;
+        }
+    }
+}
+
+.gfm-opt-drag {
+    color: #94a3b8;
+    cursor: move;
+}
+
+.gfm-opt-btn {
+    border: none;
+    background: #f1f5f9;
+    color: $text-muted;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    @include flex-center;
+    @include transition;
+
+    &:hover {
+        background: $primary;
+        color: $white;
+    }
+
+    &.gfm-opt-remove:hover {
+        background: $danger;
+    }
+}
+
+.gfm-add-opt-btn {
+    margin-top: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    color: $primary;
+    background: $white;
+    border: 2px dashed $primary;
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    @include transition;
+    @include flex-center;
+    gap: 10px;
+
+    &:hover {
+        background: $primary-light;
+        border-style: solid;
+        transform: translateY(-1px);
+    }
+}
+
+.gfm-width-selector {
+    display: flex;
+    gap: 4px;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 10px;
+}
+
+.gfm-width-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    @include transition;
+
+    &.active {
+        background: $white;
+        color: $primary;
+        box-shadow: $shadow-sm;
+    }
+}

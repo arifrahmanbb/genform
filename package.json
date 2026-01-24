@@ -1,0 +1,13 @@
+{
+    "name": "genform",
+    "version": "1.0.0",
+    "description": "WordPress Form Builder Plugin",
+    "scripts": {
+    "watch": "sass --watch assets/scss:assets/css --style compressed --no-source-map",
+    "build": "sass assets/scss:assets/css --style compressed",
+    "dev": "sass --watch assets/scss:assets/css --style expanded --source-map"
+    },
+    "devDependencies": {
+        "sass": "^1.69.0"
+    }
+}

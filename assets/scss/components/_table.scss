@@ -1,0 +1,82 @@
+@use '../abstracts' as *;
+
+.genform-admin-wrap .wp-list-table {
+    border: 1px solid $border;
+    border-radius: $radius-sm;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 10px;
+
+    thead th {
+        background: #fcfdfe;
+        border-bottom: 1px solid $border;
+        padding: 16px 12px; // Increased padding
+        font-weight: 600;
+        color: $text-muted;
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 0.05em;
+        border-right: none; // No vertical borders
+    }
+
+    tbody td {
+        padding: 20px 12px; // Increased row padding for better readability
+        border-bottom: 1px solid #f1f5f9; // Minimalist horizontal border
+        vertical-align: middle;
+        border-right: none;
+    }
+
+    tbody tr:hover {
+        background-color: #f9fafb !important;
+    }
+}
+
+.gfm-id-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+// Stylized 'Unread' status indicator (10px blue dot)
+.gfm-unread-dot-badge {
+    width: 10px;
+    height: 10px;
+    background: $primary;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 3px rgba($primary, 0.15);
+}
+
+.gfm-table-actions {
+    display: flex;
+    gap: 8px;
+}
+
+// Responsive action icons with soft hover states
+.gfm-action-icon {
+    @include flex-center;
+    width: 32px;
+    height: 32px;
+    border-radius: $radius-sm;
+    background: #f8fafc;
+    border: 1px solid $border;
+    color: $text-muted !important;
+    @include transition;
+    text-decoration: none !important;
+
+    &:hover {
+        border-color: $primary;
+        color: $primary !important;
+        background: $primary-light; // Soft background color
+        transform: translateY(-1px);
+    }
+
+    .dashicons {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+    }
+}
