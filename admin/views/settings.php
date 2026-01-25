@@ -1,36 +1,33 @@
 <?php
 /**
- * Admin View: Settings
+ * Admin View: General Settings
  *
- * Displays the plugin settings page.
+ * Provides a clean wrapper for the WordPress Settings API implementation.
  *
  * @package GenForm
- * @since 1.0.0
  */
 
-// Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Check user capabilities.
 if ( ! current_user_can( 'manage_options' ) ) {
-	wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'genform' ) );
+	wp_die( esc_html__( 'Unauthorized.', 'genform' ) );
 }
 ?>
 
 <div class="genform-admin-wrap">
-    <div class="gfm-builder-header-main">
-	    <h1><?php esc_html_e( 'GenForm Settings', 'genform' ); ?></h1>
-    </div>
+	<div class="gfm-builder-header-main">
+		<h1><?php esc_html_e( 'GenForm Settings', 'genform' ); ?></h1>
+	</div>
 
-    <div class="gfm-card">
-	    <form method="post" action="options.php" class="genform-settings-form">
-		    <?php
-		    settings_fields( 'genform_settings' );
-		    do_settings_sections( 'genform_settings' );
-		    submit_button();
-		    ?>
-	    </form>
-    </div>
+	<div class="gfm-card">
+		<form method="post" action="options.php">
+			<?php
+			settings_fields( 'genform_settings' );
+			do_settings_sections( 'genform_settings' );
+			submit_button();
+			?>
+		</form>
+	</div>
 </div>

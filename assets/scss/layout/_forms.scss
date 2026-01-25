@@ -6,15 +6,19 @@
  */
 
 .genform-admin-wrap {
-    
+    font-family: $font-main;
+    font-size: $size-base;
+    color: $text-main;
+
     // Global Label Styling for consistent spacing
     label {
         display: block !important;
-        margin-bottom: 10px !important; // Increased gap and forced override
+        margin-bottom: $space-xs !important;
         font-size: 13px !important;
-        font-weight: 700 !important;
+        font-weight: 600 !important;
         color: $text-main !important;
-        line-height: 1.4 !important;
+        line-height: $input-height !important; // Align with input height for better rhythm if needed, but usually we want it above
+        line-height: 1.5 !important;
     }
 
     // Broad styling for all textual inputs to ensure SaaS consistency
@@ -26,12 +30,19 @@
     input[type="tel"],
     input[type="date"],
     input[type="search"],
-    select,
-    textarea {
+    select {
         @include input-field;
         box-sizing: border-box;
         margin: 0;
-        max-width: 100%; // Prevent overflow
+        max-width: 100%;
+    }
+
+    textarea {
+        @include input-field;
+        height: auto;
+        min-height: 120px;
+        line-height: 1.6;
+        resize: vertical;
     }
 
     // Specific class-based overrides for WP elements
@@ -41,53 +52,37 @@
         width: 100%;
     }
 
-    // Form buttons (Save, Cancel, etc.)
-    .gfm-btn {
-        // Handled in components/_buttons.scss
-    }
-
     // Standard setting rows container
     .gfm-setting-row {
-        margin-bottom: 28px;
+        margin-bottom: $space-lg;
 
         label {
             font-size: 14px;
-            margin-bottom: 10px;
+            margin-bottom: $space-xs;
         }
 
         .description,
         .gfm-setting-desc {
             font-size: 12px;
             color: $text-muted;
-            margin-top: 8px;
+            margin-top: $space-xs;
             font-style: italic;
             display: block;
-            line-height: 1.5;
-        }
-
-        // Standard inputs within rows should usually be full width
-        input[type="text"],
-        input[type="email"],
-        input[type="url"],
-        input[type="number"],
-        input[type="password"],
-        input[type="tel"],
-        input[type="date"],
-        select,
-        textarea {
-            width: 100%;
+            line-height: 1.6;
         }
     }
 
     // Grid System Alignment
     .gfm-grid {
-        display: grid; // Ensure it's a grid if not already
-        gap: 24px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: $space-md;
+        margin-bottom: $space-md;
         
         .gfm-col {
             display: flex;
             flex-direction: column;
-            gap: 10px; // Modern gap for reliable spacing inside columns
+            gap: 0; // Handled by label margin or description margin
 
             // Inputs inside grid columns should also be full width of the column
             input, select, textarea {

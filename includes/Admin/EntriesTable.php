@@ -1,6 +1,8 @@
 <?php
 /**
- * Entries Table Class.
+ * Entries List Table Handler
+ *
+ * Implements the WP_List_Table for displaying form submissions.
  *
  * @package GenForm
  */
@@ -15,13 +17,10 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
 
-/**
- * Class EntriesTable.
- */
 class EntriesTable extends \WP_List_Table {
 
 	/**
-	 * Constructor.
+	 * Setup singular and plural names and AJAX capability.
 	 */
 	public function __construct() {
 		parent::__construct(
@@ -34,98 +33,85 @@ class EntriesTable extends \WP_List_Table {
 	}
 
 	/**
-	 * Prepare table items.
+	 * Prepare the list items, including querying for data and preparing pagination.
 	 */
 	public function prepare_items() {
 		global $wpdb;
-
 		$per_page     = 20;
 		$current_page = $this->get_pagenum();
 		$offset       = ( $current_page - 1 ) * $per_page;
+		$t_e          = "{$wpdb->prefix}genform_entries";
+		$t_f          = "{$wpdb->prefix}genform_forms";
 
-		$table_entries = $wpdb->prefix . 'genform_entries';
-		$table_forms   = $wpdb->prefix . 'genform_forms';
-
-		$query = "SELECT e.*, f.form_name 
-                  FROM $table_entries e 
-                  LEFT JOIN $table_forms f ON e.form_id = f.id";
-
+		$query = "SELECT e.*, f.form_name FROM $t_e e LEFT JOIN $t_f f ON e.form_id = f.id";
 		$where = array();
-		
-		// Status filtering.
-		$status = isset( $_GET['status'] ) ? sanitize_text_field( wp_unslash( $_GET['status'] ) ) : '';
-		if ( 'trash' === $status ) {
+
+		// Handle filtering by status (trash vs active).
+		$status = $_GET['status'] ?? '';
+		if ( $status === 'trash' ) {
 			$where[] = "e.status = 'trash'";
-		} elseif ( 'unread' === $status ) {
+		} elseif ( $status === 'unread' ) {
 			$where[] = "e.status = 'unread'";
 		} else {
 			$where[] = "e.status != 'trash'";
 		}
 
-		// Filter by form.
-		$form_id = isset( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : 0;
+		// Filter by specific Form ID.
+		$form_id = absint( $_GET['form_id'] ?? 0 );
 		if ( $form_id ) {
 			$where[] = $wpdb->prepare( 'e.form_id = %d', $form_id );
 		}
 
-		// Search.
-		$search = isset( $_REQUEST['s'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['s'] ) ) : '';
-		if ( $search ) {
-			$where[] = $wpdb->prepare( 'e.entry_data LIKE %s', '%' . $wpdb->esc_like( $search ) . '%' );
+		// Search input.
+		$s = sanitize_text_field( $_REQUEST['s'] ?? '' );
+		if ( $s ) {
+			$where[] = $wpdb->prepare( 'e.entry_data LIKE %s', '%' . $wpdb->esc_like( $s ) . '%' );
 		}
 
 		if ( ! empty( $where ) ) {
 			$query .= ' WHERE ' . implode( ' AND ', $where );
 		}
 
-		// Ordering.
-		$orderby = isset( $_GET['orderby'] ) ? sanitize_sql_orderby( $_GET['orderby'] ) : 'created_at';
-		$order   = isset( $_GET['order'] ) && 'asc' === strtolower( $_GET['order'] ) ? 'ASC' : 'DESC';
+		// Sorting.
+		$orderby = sanitize_sql_orderby( $_GET['orderby'] ?? 'created_at' );
+		$order   = ( strtolower( $_GET['order'] ?? '' ) === 'asc' ) ? 'ASC' : 'DESC';
 		$query  .= " ORDER BY $orderby $order";
 
-		// Pagination.
-		$total_items = $wpdb->get_var( "SELECT COUNT(e.id) FROM $table_entries e WHERE " . ( ! empty( $where ) ? implode( ' AND ', $where ) : '1=1' ) );
-		$query      .= $wpdb->prepare( ' LIMIT %d OFFSET %d', $per_page, $offset );
+		$total = $wpdb->get_var( "SELECT COUNT(e.id) FROM $t_e e WHERE " . ( ! empty( $where ) ? implode( ' AND ', $where ) : '1=1' ) );
+		$query .= $wpdb->prepare( ' LIMIT %d OFFSET %d', $per_page, $offset );
 
 		$this->items = $wpdb->get_results( $query );
 
 		$this->set_pagination_args(
 			array(
-				'total_items' => $total_items,
+				'total_items' => $total,
 				'per_page'    => $per_page,
 			)
 		);
 
-		$columns  = $this->get_columns();
-		$hidden   = array();
-		$sortable = $this->get_sortable_columns();
-		$this->_column_headers = array( $columns, $hidden, $sortable );
+		$this->_column_headers = array( $this->get_columns(), array(), $this->get_sortable_columns() );
 	}
 
 	/**
-	 * Get table status views.
+	 * Generate row status links (All, Unread, Trash).
 	 */
 	protected function get_views() {
 		global $wpdb;
-		$table = $wpdb->prefix . 'genform_entries';
+		$t   = "{$wpdb->prefix}genform_entries";
+		$all = $wpdb->get_var( "SELECT COUNT(id) FROM $t WHERE status != 'trash'" );
+		$unr = $wpdb->get_var( "SELECT COUNT(id) FROM $t WHERE status = 'unread'" );
+		$trs = $wpdb->get_var( "SELECT COUNT(id) FROM $t WHERE status = 'trash'" );
+		$cur = $_GET['status'] ?? '';
 
-		$all_count    = $wpdb->get_var( "SELECT COUNT(id) FROM $table WHERE status != 'trash'" );
-		$unread_count = $wpdb->get_var( "SELECT COUNT(id) FROM $table WHERE status = 'unread'" );
-		$trash_count  = $wpdb->get_var( "SELECT COUNT(id) FROM $table WHERE status = 'trash'" );
-
-		$current = isset( $_GET['status'] ) ? sanitize_text_field( wp_unslash( $_GET['status'] ) ) : '';
-
-		$views = array(
-			'all'    => sprintf( '<a href="%s" class="%s">%s <span class="count">(%d)</span></a>', admin_url( 'admin.php?page=genform-entries' ), ( '' === $current ? 'current' : '' ), esc_html__( 'All', 'genform' ), $all_count ),
-			'unread' => sprintf( '<a href="%s" class="%s">%s <span class="count">(%d)</span></a>', admin_url( 'admin.php?page=genform-entries&status=unread' ), ( 'unread' === $current ? 'current' : '' ), esc_html__( 'Unread', 'genform' ), $unread_count ),
-			'trash'  => sprintf( '<a href="%s" class="%s">%s <span class="count">(%d)</span></a>', admin_url( 'admin.php?page=genform-entries&status=trash' ), ( 'trash' === $current ? 'current' : '' ), esc_html__( 'Trash', 'genform' ), $trash_count ),
+		return array(
+			'all'    => sprintf( '<a href="%s" class="%s">%s <span class="count">(%d)</span></a>', esc_url( admin_url( 'admin.php?page=genform-entries' ) ), ( $cur === '' ? 'current' : '' ), esc_html__( 'All', 'genform' ), (int) $all ),
+			'unread' => sprintf( '<a href="%s" class="%s">%s <span class="count">(%d)</span></a>', esc_url( admin_url( 'admin.php?page=genform-entries&status=unread' ) ), ( $cur === 'unread' ? 'current' : '' ), esc_html__( 'Unread', 'genform' ), (int) $unr ),
+			'trash'  => sprintf( '<a href="%s" class="%s">%s <span class="count">(%d)</span></a>', esc_url( admin_url( 'admin.php?page=genform-entries&status=trash' ) ), ( $cur === 'trash' ? 'current' : '' ), esc_html__( 'Trash', 'genform' ), (int) $trs ),
 		);
-
-		return $views;
 	}
-	
+
 	/**
-	 * Define columns.
+	 * Defines columns for the table.
 	 */
 	public function get_columns() {
 		return array(
@@ -139,7 +125,7 @@ class EntriesTable extends \WP_List_Table {
 	}
 
 	/**
-	 * Sortable columns.
+	 * Configures sortable columns.
 	 */
 	public function get_sortable_columns() {
 		return array(
@@ -149,166 +135,139 @@ class EntriesTable extends \WP_List_Table {
 	}
 
 	/**
-	 * Bulk actions.
+	 * Configures bulk action options.
 	 */
 	public function get_bulk_actions() {
-		$status = isset( $_GET['status'] ) ? sanitize_text_field( wp_unslash( $_GET['status'] ) ) : '';
-
-		if ( 'trash' === $status ) {
+		if ( ( $_GET['status'] ?? '' ) === 'trash' ) {
 			return array(
 				'restore' => esc_html__( 'Restore', 'genform' ),
 				'delete'  => esc_html__( 'Delete permanently', 'genform' ),
 			);
 		}
-
-		return array(
-			'trash' => esc_html__( 'Move to Trash', 'genform' ),
-		);
+		return array( 'trash' => esc_html__( 'Move to Trash', 'genform' ) );
 	}
 
-	/**
-	 * Checkbox column.
-	 */
 	public function column_cb( $item ) {
-		return sprintf( '<input type="checkbox" name="entry[]" value="%s" />', $item->id );
+		return sprintf( '<input type="checkbox" name="entry[]" value="%s" />', esc_attr( $item->id ) );
 	}
 
 	/**
-	 * ID Column.
+	 * Renders the ID and status indicator column.
 	 */
 	public function column_id( $item ) {
-		$unread_dot = ( 'unread' === $item->status ) ? '<span class="gfm-unread-dot-badge"></span>' : '';
-		return sprintf( 
-			'<div class="gfm-id-cell">%s <span class="gfm-muted-id">#%d</span></div>', 
-			$unread_dot,
-			$item->id
+		return sprintf(
+			'<div class="gfm-id-cell">%s<span class="gfm-muted-id">#%d</span></div>',
+			( $item->status === 'unread' ? '<span class="gfm-unread-dot-badge"></span>' : '' ),
+			(int) $item->id
 		);
 	}
 
-	/**
-	 * Form Name Column.
-	 */
 	public function column_form_name( $item ) {
-		return sprintf( '<strong>%s</strong>', esc_html( $item->form_name ?: __( 'Deleted Form', 'genform' ) ) );
+		return sprintf( '<strong>%s</strong>', esc_html( $item->form_name ?: esc_html__( 'Deleted Form', 'genform' ) ) );
 	}
 
 	/**
-	 * Entry Preview Column.
-	 * Shows only the first field's value (e.g., user's name).
+	 * Displays a snippet of the submission data.
 	 */
 	public function column_entry_preview( $item ) {
-		$data = json_decode( $item->entry_data, true );
-		if ( empty( $data ) || ! is_array( $data ) ) {
+		$d = json_decode( $item->entry_data, true );
+		if ( empty( $d ) || ! is_array( $d ) ) {
 			return '—';
 		}
+		$first_val = reset( $d );
+		$display_val = is_array( $first_val ) ? implode( ', ', $first_val ) : $first_val;
 
-		// Get the first field's value only.
-		$first_value = reset( $data );
-		
-		// Handle arrays (checkboxes, multi-select).
-		$display_val = is_array( $first_value ) ? implode( ', ', $first_value ) : $first_value;
-		
-		// Trim to 10 words for cleaner display.
 		return esc_html( wp_trim_words( $display_val, 10 ) );
 	}
 
-	/**
-	 * Date Column.
-	 */
 	public function column_created_at( $item ) {
-		$timestamp = strtotime( $item->created_at );
-		return esc_html( date_i18n( get_option( 'date_format' ), $timestamp ) );
+		return esc_html( date_i18n( get_option( 'date_format' ), strtotime( $item->created_at ) ) );
 	}
 
 	/**
-	 * Actions Column.
+	 * Renders action row buttons (View, Trash, Restore, Delete).
 	 */
 	public function column_actions( $item ) {
-		$is_trash = ( 'trash' === $item->status );
-		$entries_data = json_decode( $item->entry_data, true ) ?: array();
-		
+		$d_e = json_decode( $item->entry_data, true ) ?: array();
 		global $wpdb;
-		$form_row = $wpdb->get_row( $wpdb->prepare( "SELECT form_data FROM {$wpdb->prefix}genform_forms WHERE id = %d", $item->form_id ) );
-		$readable_data = array();
-		
-		if ( $form_row && $form_row->form_data ) {
-			$form_config = json_decode( $form_row->form_data, true );
-			if ( isset( $form_config['fields'] ) && is_array( $form_config['fields'] ) ) {
-				foreach ( $form_config['fields'] as $field ) {
-					$field_name = sanitize_title( $field['name'] ?? '' );
-					if ( $field_name && isset( $field['label'] ) && isset( $entries_data[ $field_name ] ) ) {
-						$readable_data[ $field['label'] ] = $entries_data[ $field_name ];
+		$row = $wpdb->get_row( $wpdb->prepare( "SELECT form_data FROM {$wpdb->prefix}genform_forms WHERE id = %d", $item->form_id ) );
+		$r_d = array();
+
+		// Attempt to map data back to user-friendly field labels.
+		if ( $row && $row->form_data ) {
+			$cfg = json_decode( $row->form_data, true );
+			if ( isset( $cfg['fields'] ) && is_array( $cfg['fields'] ) ) {
+				foreach ( $cfg['fields'] as $f ) {
+					$n = sanitize_title( $f['name'] ?? '' );
+					if ( $n && isset( $f['label'], $d_e[ $n ] ) ) {
+						$r_d[ $f['label'] ] = $d_e[ $n ];
 					}
 				}
 			}
 		}
 
-		if ( empty( $readable_data ) ) {
-			foreach ( $entries_data as $k => $v ) {
-				$label = ucwords( str_replace( array( '_', '-' ), ' ', $k ) );
-				$readable_data[ $label ] = $v;
+		if ( empty( $r_d ) ) {
+			foreach ( $d_e as $k => $v ) {
+				$r_d[ ucwords( str_replace( array( '_', '-' ), ' ', $k ) ) ] = $v;
 			}
 		}
 
-		if ( $is_trash ) {
+		if ( $item->status === 'trash' ) {
 			return sprintf(
-				'<div class="gfm-table-actions">
-					<a href="%s" class="gfm-action-icon" title="%s"><span class="dashicons dashicons-undo"></span></a>
-					<a href="#" class="gfm-action-icon gfm-delete-entry-permanent" data-id="%d" title="%s"><span class="dashicons dashicons-trash"></span></a>
-				</div>',
-				wp_nonce_url( admin_url( 'admin.php?page=genform-entries&status=trash&action=restore&entry=' . $item->id ), 'bulk-entries' ),
+				'<div class="gfm-table-actions"><a href="%1$s" class="gfm-action-icon" title="%2$s"><span class="dashicons dashicons-undo"></span></a><a href="#" class="gfm-action-icon gfm-delete-entry-permanent" data-id="%3$d" title="%4$s"><span class="dashicons dashicons-trash"></span></a></div>',
+				esc_url( wp_nonce_url( admin_url( 'admin.php?page=genform-entries&status=trash&action=restore&entry=' . $item->id ), 'bulk-entries' ) ),
 				esc_attr__( 'Restore', 'genform' ),
-				$item->id,
+				(int) $item->id,
 				esc_attr__( 'Delete Permanently', 'genform' )
 			);
 		}
 
 		return sprintf(
-			'<div class="gfm-table-actions">
-				<a href="#" class="gfm-view-entry gfm-action-icon" data-payload=\'%s\' data-metadata=\'%s\' title="%s"><span class="dashicons dashicons-visibility"></span></a>
-				<a href="%s" class="gfm-action-icon gfm-action-trash-simple" title="%s"><span class="dashicons dashicons-trash"></span></a>
-			</div>',
-			esc_attr( wp_json_encode( $readable_data ) ),
+			'<div class="gfm-table-actions"><a href="#" class="gfm-view-entry gfm-action-icon" data-payload=\'%1$s\' data-metadata=\'%2$s\' title="%3$s"><span class="dashicons dashicons-visibility"></span></a><a href="%4$s" class="gfm-action-icon gfm-action-trash-simple" title="%5$s"><span class="dashicons dashicons-trash"></span></a></div>',
+			esc_attr( wp_json_encode( $r_d ) ),
 			esc_attr( $item->entry_metadata ?: '{}' ),
 			esc_attr__( 'View details', 'genform' ),
-			wp_nonce_url( admin_url( 'admin.php?page=genform-entries&action=trash&entry=' . $item->id ), 'bulk-entries' ),
+			esc_url( wp_nonce_url( admin_url( 'admin.php?page=genform-entries&action=trash&entry=' . $item->id ), 'bulk-entries' ) ),
 			esc_attr__( 'Move to Trash', 'genform' )
 		);
 	}
 
-    /**
-	 * Extra table navigation.
+	/**
+	 * Renders form selection filters in the table header.
 	 */
-    public function extra_tablenav( $which ) {
-        if ( 'top' !== $which ) return;
-        global $wpdb;
-        $forms = $wpdb->get_results( "SELECT id, form_name FROM {$wpdb->prefix}genform_forms ORDER BY form_name ASC" );
-        $current = isset( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : 0;
-        ?>
-        <div class="alignleft actions">
-            <select name="form_id" id="filter-by-form">
-                <option value="0"><?php esc_html_e( 'All Forms', 'genform' ); ?></option>
-                <?php foreach ( $forms as $form ) : ?>
-                    <option value="<?php echo esc_attr( $form->id ); ?>" <?php selected( $current, $form->id ); ?>><?php echo esc_html( $form->form_name ); ?></option>
-                <?php endforeach; ?>
-            </select>
-            <input type="submit" name="filter_action" id="post-query-submit" class="button" value="<?php esc_attr_e( 'Filter', 'genform' ); ?>">
-        </div>
-        <?php
-    }
+	public function extra_tablenav( $which ) {
+		if ( 'top' !== $which ) {
+			return;
+		}
+		global $wpdb;
+		$fs  = $wpdb->get_results( "SELECT id, form_name FROM {$wpdb->prefix}genform_forms ORDER BY form_name ASC" );
+		$cur = absint( $_GET['form_id'] ?? 0 );
+		?>
+		<div class="alignleft actions">
+			<select name="form_id" id="filter-by-form">
+				<option value="0"><?php esc_html_e( 'All Forms', 'genform' ); ?></option>
+				<?php foreach ( $fs as $f ) : ?>
+					<option value="<?php echo esc_attr( $f->id ); ?>" <?php selected( $cur, $f->id ); ?>><?php echo esc_html( $f->form_name ); ?></option>
+				<?php endforeach; ?>
+			</select>
+			<input type="submit" name="filter_action" id="post-query-submit" class="button" value="<?php esc_attr_e( 'Filter', 'genform' ); ?>">
+		</div>
+		<?php
+	}
 
-    /**
-	 * No items message.
+	/**
+	 * Renders the empty list placeholder.
 	 */
-    public function no_items() {
-        ?>
-        <div class="gfm-empty-state">
-            <span class="dashicons dashicons-database"></span>
-            <p><?php esc_html_e( 'No entries found.', 'genform' ); ?></p>
-            <a href="<?php echo esc_url( admin_url( 'admin.php?page=genform-builder' ) ); ?>" class="button button-primary">
-                <?php esc_html_e( 'Create a New Form', 'genform' ); ?>
-            </a>
-        </div>
-        <?php
-    }
+	public function no_items() {
+		?>
+		<div class="gfm-empty-state">
+			<span class="dashicons dashicons-database"></span>
+			<h2><?php esc_html_e( 'No submissions yet', 'genform' ); ?></h2>
+			<p><?php esc_html_e( 'Once people start filling out your forms, they will appear here.', 'genform' ); ?></p>
+			<a href="<?php echo esc_url( admin_url( 'admin.php?page=genform-builder' ) ); ?>" class="gfm-btn gfm-btn-primary">
+				<?php esc_html_e( 'Add New Form', 'genform' ); ?>
+			</a>
+		</div>
+		<?php
+	}
 }

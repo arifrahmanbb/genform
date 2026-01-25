@@ -1,4 +1,11 @@
 <?php
+/**
+ * AJAX Form Submission Handler
+ *
+ * Processes frontend form submissions and administrative entry actions.
+ *
+ * @package GenForm
+ */
 
 namespace GenForm\Handlers;
 
@@ -9,14 +16,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 use GenForm\Integrations\Email;
 use GenForm\Utils\DetectionHelper;
 
-/**
- * Class FormHandler
- * Processes AJAX form submissions.
- */
 final class FormHandler {
 
 	/**
-	 * Constructor.
+	 * Setup hooks for AJAX actions.
 	 */
 	public function __construct() {
 		add_action( 'wp_ajax_genform_submit', array( $this, 'handleSubmission' ) );
@@ -27,200 +30,166 @@ final class FormHandler {
 	}
 
 	/**
-	 * Handle form submission.
+	 * Verified entry point for AJAX submissions.
 	 */
 	public function handleSubmission(): void {
-		$form_id = isset( $_POST['genform_id'] ) ? absint( wp_unslash( $_POST['genform_id'] ) ) : 0;
-		$nonce   = isset( $_POST['genform_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['genform_nonce'] ) ) : '';
-
-		if ( ! $form_id || ! wp_verify_nonce( $nonce, "genform_submit_$form_id" ) ) {
-			$this->send_error( esc_html__( 'Security check failed.', 'genform' ), $form_id );
+		$id = absint( $_POST['genform_id'] ?? 0 );
+		if ( ! $id || ! wp_verify_nonce( $_POST['genform_nonce'] ?? '', "genform_submit_$id" ) ) {
+			$this->send_err( esc_html__( 'Security check failed.', 'genform' ), $id );
 		}
-
-		$this->process( $form_id );
+		$this->process( $id );
 	}
 
 	/**
-	 * Process the form data.
+	 * Core processing logic: sanitization, storage, and notification.
 	 */
-	private function process( int $form_id ): void {
+	private function process( int $id ): void {
 		global $wpdb;
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$form = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}genform_forms WHERE id = %d", $form_id ) );
+		$form = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}genform_forms WHERE id = %d", $id ) );
 
 		if ( ! $form ) {
-			$this->send_error( esc_html__( 'Form not found.', 'genform' ) );
+			$this->send_err( esc_html__( 'Form not found.', 'genform' ) );
 		}
 
-		$entry_data = $this->get_sanitized_data();
-		$device_info = DetectionHelper::getInfo();
-
-		$metadata = array(
-			'browser' => $device_info['browser'],
-			'os'      => $device_info['os'],
-			'ip'      => isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '',
-			'url'     => isset( $_SERVER['HTTP_REFERER'] ) ? esc_url_raw( wp_unslash( $_SERVER['HTTP_REFERER'] ) ) : '',
+		$data = $this->get_sanitized_data();
+		$dev  = DetectionHelper::getInfo();
+		$meta = array(
+			'browser' => $dev['browser'],
+			'os'      => $dev['os'],
+			'ip'      => $_SERVER['REMOTE_ADDR'] ?? '',
+			'url'     => $_SERVER['HTTP_REFERER'] ?? '',
 		);
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		// Persist the entry.
 		$wpdb->insert(
 			"{$wpdb->prefix}genform_entries",
 			array(
-				'form_id'        => $form_id,
-				'entry_data'     => wp_json_encode( $entry_data ),
-				'entry_metadata' => wp_json_encode( $metadata ),
-				'user_ip'        => $metadata['ip'],
-				'user_agent'     => isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '',
+				'form_id'        => $id,
+				'entry_data'     => wp_json_encode( $data ),
+				'entry_metadata' => wp_json_encode( $meta ),
+				'user_ip'        => $meta['ip'],
+				'user_agent'     => $_SERVER['HTTP_USER_AGENT'] ?? '',
 			)
 		);
 
-		$entry_id = $wpdb->insert_id;
+		// Send email notification.
+		Email::send( $wpdb->insert_id, $id, $data );
 
-		// Handle Notifications.
-		Email::send( $entry_id, $form_id, $entry_data );
-
-		$settings = json_decode( $form->form_settings, true );
-		$res_data = array(
-			'message' => $settings['success_message'] ?? esc_html__( 'Thank you for your submission.', 'genform' ),
+		$sets = json_decode( $form->form_settings, true );
+		$res  = array(
+			'message' => $sets['success_message'] ?? esc_html__( 'Thank you for your submission.', 'genform' ),
 		);
 
-		if ( isset( $settings['con_type'] ) && 'redirect' === $settings['con_type'] && ! empty( $settings['redirect_url'] ) ) {
-			$res_data['redirect'] = esc_url_raw( $settings['redirect_url'] );
+		if ( ( $sets['con_type'] ?? '' ) === 'redirect' && ! empty( $sets['redirect_url'] ) ) {
+			$res['redirect'] = esc_url_raw( $sets['redirect_url'] );
 		}
 
-		wp_send_json_success( $res_data );
+		wp_send_json_success( $res );
 	}
 
 	/**
-	 * Send error response.
+	 * Centralized error response helper.
 	 */
-	private function send_error( string $default_msg, int $form_id = 0 ): void {
-		$message = $default_msg;
-		if ( $form_id ) {
+	private function send_err( string $m, int $id = 0 ): void {
+		if ( $id ) {
 			global $wpdb;
-			$form = $wpdb->get_row( $wpdb->prepare( "SELECT form_settings FROM {$wpdb->prefix}genform_forms WHERE id = %d", $form_id ) );
-			if ( $form ) {
-				$settings = json_decode( $form->form_settings, true );
-				if ( ! empty( $settings['error_message'] ) ) {
-					$message = $settings['error_message'];
+			$f = $wpdb->get_row( $wpdb->prepare( "SELECT form_settings FROM {$wpdb->prefix}genform_forms WHERE id = %d", $id ) );
+			if ( $f ) {
+				$s = json_decode( $f->form_settings, true );
+				if ( ! empty( $s['error_message'] ) ) {
+					$m = $s['error_message'];
 				}
 			}
 		}
-		wp_send_json_error( array( 'message' => $message ) );
+		wp_send_json_error( array( 'message' => $m ) );
 	}
 
 	/**
-	 * Sanitize submitted form data.
+	 * Iterates over $_POST to collect and sanitize form keys.
 	 */
 	private function get_sanitized_data(): array {
-		$data = array();
-		// Nonce already verified in handleSubmission.
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		foreach ( $_POST as $key => $value ) {
-			if ( str_starts_with( $key, 'gfm_' ) ) {
-				$raw_key = str_replace( 'gfm_', '', $key );
-				if ( is_array( $value ) ) {
-					$data[ $raw_key ] = array_map( 'sanitize_text_field', wp_unslash( $value ) );
-				} else {
-					$data[ $raw_key ] = sanitize_text_field( wp_unslash( $value ) );
-				}
+		$d = array();
+		foreach ( $_POST as $k => $v ) {
+			if ( str_starts_with( $k, 'gfm_' ) ) {
+				$rk       = str_replace( 'gfm_', '', $k );
+				$d[ $rk ] = is_array( $v ) ? array_map( 'sanitize_text_field', wp_unslash( $v ) ) : sanitize_text_field( wp_unslash( $v ) );
 			}
 		}
-		return $data;
+		return $d;
 	}
 
 	/**
-	 * Handle entry deletion.
+	 * Admin AJAX handler for single entry deletion.
 	 */
 	public function handleDeleteEntry(): void {
 		check_ajax_referer( 'genform_admin_nonce', 'nonce' );
-
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( array( 'message' => esc_html__( 'Unauthorized', 'genform' ) ) );
 		}
-
-		$id = isset( $_POST['entry_id'] ) ? absint( wp_unslash( $_POST['entry_id'] ) ) : 0;
+		$id = absint( $_POST['entry_id'] ?? 0 );
 		if ( $id ) {
 			global $wpdb;
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->delete( $wpdb->prefix . 'genform_entries', array( 'id' => $id ) );
+			$wpdb->delete( "{$wpdb->prefix}genform_entries", array( 'id' => $id ) );
 			wp_send_json_success();
 		}
 		wp_send_json_error();
 	}
 
 	/**
-	 * Process Bulk Actions.
+	 * Handles bulk operations from the entries list table.
 	 */
 	public function processBulkActions(): void {
-		if ( ! isset( $_GET['page'] ) || 'genform-entries' !== $_GET['page'] ) {
+		if ( ( $_GET['page'] ?? '' ) !== 'genform-entries' ) {
 			return;
 		}
-
-		$action = '';
-		if ( isset( $_GET['action'] ) && -1 !== $_GET['action'] ) {
-			$action = sanitize_text_field( wp_unslash( $_GET['action'] ) );
-		} elseif ( isset( $_GET['action2'] ) && -1 !== $_GET['action2'] ) {
-			$action = sanitize_text_field( wp_unslash( $_GET['action2'] ) );
-		}
-
-		if ( ! in_array( $action, array( 'trash', 'restore', 'delete' ) ) ) {
+		$act = $_GET['action'] ?? $_GET['action2'] ?? '';
+		if ( ! in_array( $act, array( 'trash', 'restore', 'delete' ) ) ) {
 			return;
 		}
-
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
-
 		check_admin_referer( 'bulk-entries' );
 
-		$entry_ids = isset( $_GET['entry'] ) ? array_map( 'absint', (array) $_GET['entry'] ) : array();
-
-		if ( ! empty( $entry_ids ) ) {
+		$ids = array_map( 'absint', (array) ( $_GET['entry'] ?? array() ) );
+		if ( ! empty( $ids ) ) {
 			global $wpdb;
-			$ids_placeholders = implode( ',', array_fill( 0, count( $entry_ids ), '%d' ) );
-			$table = $wpdb->prefix . 'genform_entries';
-			
-			$status_to_msg = '';
+			$t   = "{$wpdb->prefix}genform_entries";
+			$ps  = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+			$msg = '';
 
-			if ( 'trash' === $action ) {
-				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-				$wpdb->query( $wpdb->prepare( "UPDATE $table SET status = 'trash' WHERE id IN ($ids_placeholders)", ...$entry_ids ) );
-				$status_to_msg = 'trashed';
-			} elseif ( 'restore' === $action ) {
-				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-				$wpdb->query( $wpdb->prepare( "UPDATE $table SET status = 'read' WHERE id IN ($ids_placeholders)", ...$entry_ids ) );
-				$status_to_msg = 'restored';
-			} elseif ( 'delete' === $action ) {
-				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-				$wpdb->query( $wpdb->prepare( "DELETE FROM $table WHERE id IN ($ids_placeholders)", ...$entry_ids ) );
-				$status_to_msg = 'deleted';
+			if ( $act === 'trash' ) {
+				$wpdb->query( $wpdb->prepare( "UPDATE $t SET status = 'trash' WHERE id IN ($ps)", ...$ids ) );
+				$msg = 'trashed';
+			} elseif ( $act === 'restore' ) {
+				$wpdb->query( $wpdb->prepare( "UPDATE $t SET status = 'read' WHERE id IN ($ps)", ...$ids ) );
+				$msg = 'restored';
+			} elseif ( $act === 'delete' ) {
+				$wpdb->query( $wpdb->prepare( "DELETE FROM $t WHERE id IN ($ps)", ...$ids ) );
+				$msg = 'deleted';
 			}
 
-			$redirect = add_query_arg( array( $status_to_msg => count( $entry_ids ) ), admin_url( 'admin.php?page=genform-entries' ) );
-			if ( 'restore' === $action || 'delete' === $action ) {
-				$redirect = add_query_arg( 'status', 'trash', $redirect );
+			$re = add_query_arg( array( $msg => count( $ids ) ), admin_url( 'admin.php?page=genform-entries' ) );
+			if ( $act !== 'trash' ) {
+				$re = add_query_arg( 'status', 'trash', $re );
 			}
-			wp_safe_redirect( $redirect );
+			wp_safe_redirect( $re );
 			exit;
 		}
 	}
 
 	/**
-	 * Mark entry as read.
+	 * Administrative toggle for marking a submission as read.
 	 */
 	public function handleMarkAsRead(): void {
 		check_ajax_referer( 'genform_admin_nonce', 'nonce' );
-
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error();
 		}
-
-		$id = isset( $_POST['entry_id'] ) ? absint( wp_unslash( $_POST['entry_id'] ) ) : 0;
+		$id = absint( $_POST['entry_id'] ?? 0 );
 		if ( $id ) {
 			global $wpdb;
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->update( $wpdb->prefix . 'genform_entries', array( 'status' => 'read' ), array( 'id' => $id ) );
+			$wpdb->update( "{$wpdb->prefix}genform_entries", array( 'status' => 'read' ), array( 'id' => $id ) );
 			wp_send_json_success();
 		}
 		wp_send_json_error();

@@ -50,18 +50,27 @@
 }
 
 @mixin input-field {
-    border-radius: 8px;
+    border-radius: vars.$radius-sm;
     border: 1px solid vars.$border;
-    padding: 8px 12px;
-    font-size: 13px;
+    padding: vars.$input-padding;
+    font-size: vars.$size-base;
+    line-height: normal;
+    height: vars.$input-height;
     width: 100%;
-    transition: all 0.2s;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     background: vars.$white;
+    color: vars.$text-main;
     
+    &::placeholder {
+        color: vars.$text-muted;
+        opacity: 0.7;
+    }
+
     &:focus {
         border-color: vars.$primary;
-        box-shadow: 0 0 0 4px rgba(vars.$primary, 0.1);
+        box-shadow: 0 0 0 4px rgba(vars.$primary, 0.12);
         outline: none;
+        background: vars.$white;
     }
 }
 

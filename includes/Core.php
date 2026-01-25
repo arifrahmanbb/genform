@@ -1,10 +1,12 @@
 <?php
 /**
- * Core Class for GenForm
+ * Core Plugin Class
+ *
+ * This class handles the initialization of the plugin, including menus,
+ * assets enqueuing, and component loading.
  *
  * @package GenForm
  */
-
 
 namespace GenForm;
 
@@ -20,48 +22,141 @@ use GenForm\Handlers\ExportHandler;
 use GenForm\Integrations\Block;
 use GenForm\Integrations\Shortcode;
 
-/**
- * Core Class for GenForm
- */
 final class Core {
 
 	/**
-	 * Singleton instance.
-	 *
-	 * @var self|null
+	 * Unique instance of the class.
 	 */
 	private static ?self $instance = null;
 
 	/**
-	 * Constructor.
+	 * Private constructor to enforce Singleton pattern.
 	 */
 	private function __construct() {
 		$this->init();
 	}
 
 	/**
-	 * Get instance.
-	 *
-	 * @return self
+	 * Get the singleton instance.
 	 */
 	public static function instance(): self {
 		return self::$instance ??= new self();
 	}
 
 	/**
-	 * Initialize.
+	 * Initialize WordPress hooks.
 	 */
 	private function init(): void {
 		add_action( 'admin_init', array( self::class, 'activate' ) );
 		add_action( 'admin_menu', array( $this, 'registerMenus' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueueAdminAssets' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueueFrontendAssets' ) );
+		add_action( 'wp_dashboard_setup', array( $this, 'registerDashboardWidget' ) );
+		add_action( 'admin_bar_menu', array( $this, 'addAdminBarMenu' ), 999 );
 
 		$this->loadComponents();
 	}
 
 	/**
-	 * Load components.
+	 * Add short links to the WordPress Admin Bar.
+	 */
+	public function addAdminBarMenu( $wp_admin_bar ): void {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		$wp_admin_bar->add_node(
+			array(
+				'id'    => 'genform',
+				'title' => '<span class="ab-icon dashicons dashicons-feedback"></span> GenForm',
+				'href'  => admin_url( 'admin.php?page=genform' ),
+			)
+		);
+
+		$wp_admin_bar->add_node(
+			array(
+				'id'     => 'genform-new',
+				'parent' => 'genform',
+				'title'  => esc_html__( 'Add New Form', 'genform' ),
+				'href'   => admin_url( 'admin.php?page=genform-builder' ),
+			)
+		);
+
+		$wp_admin_bar->add_node(
+			array(
+				'id'     => 'genform-entries',
+				'parent' => 'genform',
+				'title'  => esc_html__( 'View Entries', 'genform' ),
+				'href'   => admin_url( 'admin.php?page=genform-entries' ),
+			)
+		);
+	}
+
+	/**
+	 * Register the Dashboard Summary Widget.
+	 */
+	public function registerDashboardWidget(): void {
+		wp_add_dashboard_widget(
+			'genform_dashboard_widget',
+			esc_html__( 'GenForm Overview', 'genform' ),
+			array( $this, 'renderDashboardWidget' )
+		);
+	}
+
+	/**
+	 * Render the content of the Dashboard Widget.
+	 */
+	public function renderDashboardWidget(): void {
+		global $wpdb;
+		$t_f = "{$wpdb->prefix}genform_forms";
+		$t_e = "{$wpdb->prefix}genform_entries";
+
+		$f_c = $wpdb->get_var( "SELECT COUNT(*) FROM $t_f" );
+		$e_c = $wpdb->get_var( "SELECT COUNT(*) FROM $t_e" );
+		$r_e = $wpdb->get_results( "SELECT e.*, f.form_name FROM $t_e e LEFT JOIN $t_f f ON e.form_id = f.id ORDER BY e.created_at DESC LIMIT 5" );
+		?>
+		<div class="gfm-dashboard-widget">
+			<div class="gfm-db-stats">
+				<div class="stat">
+					<strong><?php echo esc_html( $f_c ); ?></strong>
+					<span><?php esc_html_e( 'Total Forms', 'genform' ); ?></span>
+				</div>
+				<div class="stat">
+					<strong><?php echo esc_html( $e_c ); ?></strong>
+					<span><?php esc_html_e( 'Total Entries', 'genform' ); ?></span>
+				</div>
+			</div>
+
+			<h4><?php esc_html_e( 'Recent Entries', 'genform' ); ?></h4>
+
+			<?php if ( empty( $r_e ) ) : ?>
+				<p><?php esc_html_e( 'No entries yet.', 'genform' ); ?></p>
+			<?php else : ?>
+				<ul>
+					<?php foreach ( $r_e as $e ) : ?>
+						<li>
+							<div class="entry-info">
+								<strong><?php echo esc_html( $e->form_name ?: esc_html__( 'Deleted Form', 'genform' ) ); ?></strong>
+								<span>- <?php echo esc_html( date_i18n( get_option( 'date_format' ), strtotime( $e->created_at ) ) ); ?></span>
+							</div>
+							<a href="<?php echo esc_url( admin_url( "admin.php?page=genform-entries&form_id={$e->form_id}" ) ); ?>" class="gfm-view-link">
+								<?php esc_html_e( 'View', 'genform' ); ?>
+							</a>
+						</li>
+					<?php endforeach; ?>
+				</ul>
+				<p class="gfm-db-footer">
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=genform-entries' ) ); ?>" class="button">
+						<?php esc_html_e( 'All Entries', 'genform' ); ?>
+					</a>
+				</p>
+			<?php endif; ?>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Instantiate plugin sub-components.
 	 */
 	private function loadComponents(): void {
 		new Builder();
@@ -73,12 +168,12 @@ final class Core {
 	}
 
 	/**
-	 * Register menus.
+	 * Register the main admin menu and submenus.
 	 */
 	public function registerMenus(): void {
 		add_menu_page(
 			esc_html__( 'GenForm', 'genform' ),
-			esc_html__( 'GenForm', 'genform' ),
+			'GenForm',
 			'manage_options',
 			'genform',
 			array( $this, 'renderFormsList' ),
@@ -92,27 +187,19 @@ final class Core {
 		add_submenu_page( 'genform', esc_html__( 'Settings', 'genform' ), esc_html__( 'Settings', 'genform' ), 'manage_options', 'genform-settings', array( Settings::class, 'render' ) );
 	}
 
-	/**
-	 * Render forms list.
-	 */
 	public function renderFormsList(): void {
 		include GENFORM_PATH . 'admin/views/forms-list.php';
 	}
 
-	/**
-	 * Render entries list.
-	 */
 	public function renderEntries(): void {
 		include GENFORM_PATH . 'admin/views/entries-list.php';
 	}
 
 	/**
-	 * Enqueue admin assets.
-	 *
-	 * @param string $hook The current hook.
+	 * Enqueue styles and scripts for the admin area.
 	 */
 	public function enqueueAdminAssets( string $hook ): void {
-		// Register block script separately so it can be used by register_block_type
+		// Register the block editor script separately.
 		wp_register_script(
 			'genform-block',
 			GENFORM_URL . 'assets/js/block.js',
@@ -122,21 +209,17 @@ final class Core {
 		);
 
 		global $wpdb;
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$forms = $wpdb->get_results( "SELECT id, form_name FROM {$wpdb->prefix}genform_forms WHERE status = 'active'" );
-		$form_options = array();
-		foreach ( $forms as $form ) {
-			$form_options[] = array(
-				'label' => $form->form_name,
-				'value' => (int) $form->id,
-			);
+		$options = array();
+		foreach ( $forms as $f ) {
+			$options[] = array( 'label' => $f->form_name, 'value' => (int) $f->id );
 		}
 
 		wp_localize_script(
 			'genform-block',
 			'genformBlockData',
 			array(
-				'forms' => $form_options,
+				'forms' => $options,
 				'i18n'  => array(
 					'title'         => esc_html__( 'GenForm', 'genform' ),
 					'selectForm'    => esc_html__( 'Select Form', 'genform' ),
@@ -154,37 +237,13 @@ final class Core {
 
 		wp_enqueue_style( 'genform-admin', GENFORM_URL . 'assets/css/admin.css', array(), GENFORM_VERSION );
 		wp_add_inline_style( 'genform-admin', $this->getDynamicStylesCss() );
-		wp_enqueue_script(
-			'genform-admin',
-			GENFORM_URL . 'assets/js/admin.js',
-			array( 'jquery', 'wp-lists', 'common' ),
-			GENFORM_VERSION,
-			array(
-				'strategy'  => 'defer',
-				'in_footer' => true,
-			)
-		);
+		wp_enqueue_script( 'genform-admin', GENFORM_URL . 'assets/js/admin.js', array( 'jquery', 'wp-lists', 'common' ), GENFORM_VERSION, array( 'strategy' => 'defer', 'in_footer' => true ) );
 
 		if ( str_contains( $hook, 'genform-builder' ) ) {
 			wp_enqueue_script( 'jquery-ui-sortable' );
-			wp_enqueue_script(
-				'genform-builder',
-				GENFORM_URL . 'assets/js/form-builder.js',
-				array( 'jquery', 'jquery-ui-sortable' ),
-				GENFORM_VERSION,
-				array(
-					'strategy'  => 'defer',
-					'in_footer' => true,
-				)
-			);
+			wp_enqueue_script( 'genform-builder', GENFORM_URL . 'assets/js/form-builder.js', array( 'jquery', 'jquery-ui-sortable' ), GENFORM_VERSION, array( 'strategy' => 'defer', 'in_footer' => true ) );
 
-			// Nonce not required for simple GET asset localization in admin.
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$id = isset( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : 0;
-			global $wpdb;
-
-			// Direct database query for asset localization.
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$id   = isset( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : 0;
 			$form = $id ? $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}genform_forms WHERE id = %d", $id ) ) : null;
 
 			wp_localize_script(
@@ -205,12 +264,8 @@ final class Core {
 						'url'      => esc_html__( 'Website', 'genform' ),
 						'tel'      => esc_html__( 'Phone', 'genform' ),
 						'newField' => esc_html__( 'New Field', 'genform' ),
-						'option'   => esc_html__( 'Option', 'genform' ),
-						'value'    => esc_html__( 'Value', 'genform' ),
-						'label'    => esc_html__( 'Label', 'genform' ),
 						'required' => esc_html__( 'Required', 'genform' ),
-						'settings' => esc_html__( 'Settings', 'genform' ),
-						'delete'   => esc_html__( 'Delete', 'genform' ),
+						'label'    => esc_html__( 'Label', 'genform' ),
 					),
 				)
 			);
@@ -224,27 +279,24 @@ final class Core {
 				'nonce'    => wp_create_nonce( 'genform_admin_nonce' ),
 				'i18n'     => array(
 					'confirm_delete' => esc_html__( 'Are you sure?', 'genform' ),
+					'entry_details'  => esc_html__( 'Entry Details', 'genform' ),
 				),
 			)
 		);
 	}
 
 	/**
-	 * Inject dynamic styles based on settings.
-	 */
-	/**
-	 * Get dynamic CSS based on settings.
+	 * Get CSS for custom branding based on global settings.
 	 */
 	private function getDynamicStylesCss(): string {
-		$options = get_option( 'genform_general', array() );
-		$primary = $options['primary_color'] ?? '#6366f1';
-		$dark    = $this->adjustBrightness( $primary, -20 );
-
-		return ":root { --gfm-primary: {$primary} !important; --gfm-primary-dark: {$dark} !important; }";
+		$opts = get_option( 'genform_general', array() );
+		$p    = $opts['primary_color'] ?? '#6366f1';
+		$d    = $this->adjustBrightness( $p, -20 );
+		return ":root{--gfm-primary:{$p}!important;--gfm-primary-dark:{$d}!important}";
 	}
 
 	/**
-	 * Simple brightness adjustment for hex colors.
+	 * Helper function to adjust brightness of hex colors for dynamic styling.
 	 */
 	private function adjustBrightness( string $hex, int $steps ): string {
 		$steps = max( -255, min( 255, $steps ) );
@@ -252,77 +304,34 @@ final class Core {
 		if ( 3 === strlen( $hex ) ) {
 			$hex = str_repeat( substr( $hex, 0, 1 ), 2 ) . str_repeat( substr( $hex, 1, 1 ), 2 ) . str_repeat( substr( $hex, 2, 1 ), 2 );
 		}
-		$r = hexdec( substr( $hex, 0, 2 ) );
-		$g = hexdec( substr( $hex, 2, 2 ) );
-		$b = hexdec( substr( $hex, 4, 2 ) );
-
-		$r = max( 0, min( 255, $r + $steps ) );
-		$g = max( 0, min( 255, $g + $steps ) );
-		$b = max( 0, min( 255, $b + $steps ) );
-
+		$r = max( 0, min( 255, hexdec( substr( $hex, 0, 2 ) ) + $steps ) );
+		$g = max( 0, min( 255, hexdec( substr( $hex, 2, 2 ) ) + $steps ) );
+		$b = max( 0, min( 255, hexdec( substr( $hex, 4, 2 ) ) + $steps ) );
 		return '#' . str_pad( dechex( $r ), 2, '0', STR_PAD_LEFT ) . str_pad( dechex( $g ), 2, '0', STR_PAD_LEFT ) . str_pad( dechex( $b ), 2, '0', STR_PAD_LEFT );
 	}
 
 	/**
-	 * Enqueue frontend assets.
+	 * Enqueue assets for the site front end.
 	 */
 	public function enqueueFrontendAssets(): void {
 		wp_enqueue_style( 'genform-frontend', GENFORM_URL . 'assets/css/frontend.css', array(), GENFORM_VERSION );
 		wp_add_inline_style( 'genform-frontend', $this->getDynamicStylesCss() );
-		wp_enqueue_script(
-			'genform-frontend',
-			GENFORM_URL . 'assets/js/frontend.js',
-			array( 'jquery' ),
-			GENFORM_VERSION,
-			array(
-				'strategy'  => 'defer',
-				'in_footer' => true,
-			)
-		);
-
-		wp_localize_script(
-			'genform-frontend',
-			'genform',
-			array(
-				'ajax_url' => admin_url( 'admin-ajax.php' ),
-			)
-		);
+		wp_enqueue_script( 'genform-frontend', GENFORM_URL . 'assets/js/frontend.js', array( 'jquery' ), GENFORM_VERSION, array( 'strategy' => 'defer', 'in_footer' => true ) );
+		wp_localize_script( 'genform-frontend', 'genform', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 	}
 
 	/**
-	 * Activation hook.
+	 * Run required installation procedures (table creation).
 	 */
 	public static function activate(): void {
 		global $wpdb;
-		$charset = $wpdb->get_charset_collate();
-
-		$table_forms = $wpdb->prefix . 'genform_forms';
-		$sql_forms   = "CREATE TABLE $table_forms (
-            id bigint(20) NOT NULL AUTO_INCREMENT,
-            form_name varchar(255) NOT NULL,
-            form_data longtext NOT NULL,
-            form_settings longtext,
-            status varchar(20) DEFAULT 'active',
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            PRIMARY KEY (id)
-        ) $charset;";
-
-        $table_entries = $wpdb->prefix . 'genform_entries';
-        $sql_entries   = "CREATE TABLE $table_entries (
-            id bigint(20) NOT NULL AUTO_INCREMENT,
-            form_id bigint(20) NOT NULL,
-            entry_data longtext NOT NULL,
-            entry_metadata longtext,
-            user_ip varchar(100),
-            user_agent varchar(255),
-            status varchar(20) DEFAULT 'unread',
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (id)
-        ) $charset;";
-
+		$c   = $wpdb->get_charset_collate();
+		$t_f = "{$wpdb->prefix}genform_forms";
+		$s_f = "CREATE TABLE $t_f (id bigint(20) NOT NULL AUTO_INCREMENT,form_name varchar(255) NOT NULL,form_data longtext NOT NULL,form_settings longtext,status varchar(20) DEFAULT 'active',created_at datetime DEFAULT CURRENT_TIMESTAMP,updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,PRIMARY KEY (id)) $c;";
+		$t_e = "{$wpdb->prefix}genform_entries";
+		$s_e = "CREATE TABLE $t_e (id bigint(20) NOT NULL AUTO_INCREMENT,form_id bigint(20) NOT NULL,entry_data longtext NOT NULL,entry_metadata longtext,user_ip varchar(100),user_agent varchar(255),status varchar(20) DEFAULT 'unread',created_at datetime DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY (id)) $c;";
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-		dbDelta( $sql_forms );
-		dbDelta( $sql_entries );
+		dbDelta( $s_f );
+		dbDelta( $s_e );
 	}
 }

@@ -1,6 +1,8 @@
 <?php
 /**
- * Export Handler for GenForm
+ * Data Export Manager
+ *
+ * Facilitates the generation and download of form submission data in CSV format.
  *
  * @package GenForm
  */
@@ -11,24 +13,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/**
- * Class ExportHandler
- * Handles CSV export of form entries.
- */
 final class ExportHandler {
 
 	/**
-	 * Constructor.
+	 * Register the initialization hook for export detection.
 	 */
 	public function __construct() {
 		add_action( 'admin_init', array( $this, 'handleExport' ) );
 	}
 
 	/**
-	 * Handle CSV export request.
+	 * Entry point to detect and authorize CSV export requests.
 	 */
 	public function handleExport(): void {
-		if ( ! isset( $_GET['action'] ) || 'genform_export' !== $_GET['action'] ) {
+		if ( ( $_GET['action'] ?? '' ) !== 'genform_export' ) {
 			return;
 		}
 
@@ -36,109 +34,81 @@ final class ExportHandler {
 			wp_die( esc_html__( 'Unauthorized.', 'genform' ) );
 		}
 
-		$nonce   = isset( $_GET['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ) : '';
-		$form_id = isset( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : 0;
-
-		if ( ! wp_verify_nonce( $nonce, 'genform_export_entries' ) ) {
+		if ( ! wp_verify_nonce( $_GET['_wpnonce'] ?? '', 'genform_export_entries' ) ) {
 			wp_die( esc_html__( 'Security check failed.', 'genform' ) );
 		}
 
-		$this->downloadCsv( $form_id );
+		$this->downloadCsv( absint( $_GET['form_id'] ?? 0 ) );
 	}
 
 	/**
-	 * Download entries as CSV.
-	 *
-	 * @param int $form_id The form ID to export.
+	 * Generates and streams the CSV file to the browser.
 	 */
-	private function downloadCsv( int $form_id ): void {
+	private function downloadCsv( int $id ): void {
 		global $wpdb;
-
-		// 1. Determine Headers first (Scan initial entries or form schema).
-		// For robustness, we scan a small chunk of entries to build the initial header list.
-		// However, to be 100% accurate, we would scan all. To be memory efficient, we scan in the first pass.
-		
 		$headers = array();
-		$where_clause = $form_id ? $wpdb->prepare( 'WHERE form_id = %d', $form_id ) : '';
-		
-		// Get a sample to build headers (or use the first 100).
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$sample_entries = $wpdb->get_col( "SELECT entry_data FROM {$wpdb->prefix}genform_entries $where_clause LIMIT 100" );
-		
-		foreach ( $sample_entries as $e_json ) {
-			$e_data = json_decode( $e_json, true );
-			if ( is_array( $e_data ) ) {
-				foreach ( array_keys( $e_data ) as $key ) {
-					if ( ! in_array( $key, $headers, true ) ) {
-						$headers[] = $key;
+		$w       = $id ? $wpdb->prepare( 'WHERE form_id = %d', $id ) : '';
+
+		// Sample the first 100 entries to dynamically build a column list.
+		$samples = $wpdb->get_col( "SELECT entry_data FROM {$wpdb->prefix}genform_entries $w LIMIT 100" );
+		foreach ( $samples as $j ) {
+			$d = json_decode( $j, true );
+			if ( is_array( $d ) ) {
+				foreach ( array_keys( $d ) as $k ) {
+					if ( ! in_array( $k, $headers, true ) ) {
+						$headers[] = $k;
 					}
 				}
 			}
 		}
 
-		// Prepare File & Headers.
-		$filename = $form_id ? "genform-entries-form-{$form_id}.csv" : 'genform-all-entries.csv';
-		
-		header( 'Content-Type: text/csv; charset=utf-8' );
-		header( 'Content-Disposition: attachment; filename=' . $filename );
-		header( 'Pragma: no-cache' );
-		header( 'Expires: 0' );
+		$f = $id ? "genform-entries-$id.csv" : 'genform-all-entries.csv';
 
-		$output = fopen( 'php://output', 'w' );
-		
-		// UTF-8 BOM for Excel.
-		fprintf( $output, chr( 0xEF ) . chr( 0xBB ) . chr( 0xBF ) );
+		// Set download headers.
+		header( 'Content-Type: text/csv' );
+		header( 'Content-Disposition: attachment; filename=' . $f );
 
-		// CSV Vertical Headers (Final displayed labels).
-		$display_headers = array_map( fn( $k ) => ucwords( str_replace( '_', ' ', $k ) ), $headers );
-		$display_headers[] = esc_html__( 'IP Address', 'genform' );
-		$display_headers[] = esc_html__( 'Date', 'genform' );
-		
-		fputcsv( $output, $display_headers );
+		$o = fopen( 'php://output', 'w' );
+		// Add UTF-8 Byte Order Mark for Excel compatibility.
+		fprintf( $o, chr( 0xEF ) . chr( 0xBB ) . chr( 0xBF ) );
 
-		// 2. Stream Entries in Chunks (Memory Efficient).
+		// Format headers for display.
+		$dh = array_map( fn( $k ) => ucwords( str_replace( '_', ' ', $k ) ), $headers );
+		$dh[] = esc_html__( 'IP Address', 'genform' );
+		$dh[] = esc_html__( 'Date', 'genform' );
+
+		fputcsv( $o, $dh );
+
 		$offset = 0;
 		$limit  = 500;
-		
-		while ( true ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$chunk = $wpdb->get_results( 
-				$wpdb->prepare( 
-					"SELECT entry_data, user_ip, created_at FROM {$wpdb->prefix}genform_entries $where_clause ORDER BY created_at DESC LIMIT %d OFFSET %d",
-					$limit,
-					$offset
-				)
-			);
 
+		// Process rows in batches to manage memory overhead.
+		while ( true ) {
+			$chunk = $wpdb->get_results( $wpdb->prepare( "SELECT entry_data, user_ip, created_at FROM {$wpdb->prefix}genform_entries $w ORDER BY created_at DESC LIMIT %d OFFSET %d", $limit, $offset ) );
 			if ( empty( $chunk ) ) {
 				break;
 			}
 
-			foreach ( $chunk as $entry ) {
-				$data = json_decode( $entry->entry_data, true );
-				$row  = array();
-
-				foreach ( $headers as $key ) {
-					$val = $data[ $key ] ?? '';
-					$row[] = is_array( $val ) ? implode( ', ', $val ) : $val;
+			foreach ( $chunk as $e ) {
+				$d = json_decode( $e->entry_data, true );
+				$r = array();
+				foreach ( $headers as $k ) {
+					$v   = $d[ $k ] ?? '';
+					$r[] = is_array( $v ) ? implode( ', ', $v ) : $v;
 				}
-
-				$row[] = $entry->user_ip;
-				$row[] = $entry->created_at;
-
-				fputcsv( $output, $row );
+				$r[] = $e->user_ip;
+				$r[] = $e->created_at;
+				fputcsv( $o, $r );
 			}
 
 			$offset += $limit;
-			
-			// Flush the output buffer to free up memory.
 			if ( ob_get_level() > 0 ) {
 				ob_flush();
 			}
 			flush();
 		}
 
-		fclose( $output );
+		fclose( $o );
 		exit;
 	}
 }

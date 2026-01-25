@@ -1,110 +1,95 @@
 <?php
+/**
+ * Frontend View: Form Template
+ *
+ * This file is processed for every [genform] shortcode and handles dynamic field generation.
+ *
+ * @package GenForm
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/**
- * Frontend Form Template
- */
+$bsize   = esc_attr( $settings['base_font_size'] ?? '16' );
+$bweight = esc_attr( $settings['base_font_weight'] ?? '400' );
+$balign  = esc_attr( $settings['submit_align'] ?? 'left' );
 ?>
-<?php
-$genform_base_size   = esc_attr( $settings['base_font_size'] ?? '16' );
-$genform_base_weight = esc_attr( $settings['base_font_weight'] ?? '400' );
-$genform_btn_align   = esc_attr( $settings['submit_align'] ?? 'left' );
 
-// Container Style Variable
-$genform_vars = "--gfm-base-size: {$genform_base_size}px; font-weight: {$genform_base_weight};";
-?>
-<div class="gfm-form-container" id="gfm-form-<?php echo esc_attr( $form->id ); ?>" style="<?php echo esc_attr( $genform_vars ); ?>">
-	<form class="gfm-form gfm-form-js" method="post" data-id="<?php echo esc_attr( $form->id ); ?>">
+<div class="gfm-form-container" id="gfm-form-<?php echo esc_attr( $form->id ); ?>" data-size="<?php echo esc_attr( $bsize ); ?>" data-weight="<?php echo esc_attr( $bweight ); ?>">
+	<form class="gfm-form gfm-form-js" data-id="<?php echo esc_attr( $form->id ); ?>">
 		<input type="hidden" name="genform_id" value="<?php echo esc_attr( $form->id ); ?>">
 		<input type="hidden" name="genform_nonce" value="<?php echo esc_attr( $nonce ); ?>">
 		<input type="hidden" name="action" value="genform_submit">
 
 		<?php
 		if ( ! empty( $data['fields'] ) ) :
-			foreach ( $data['fields'] as $genform_field ) :
-				$genform_name        = 'gfm_' . sanitize_title( $genform_field['name'] );
-				$genform_placeholder = esc_attr( $genform_field['placeholder'] ?? '' );
-				$genform_required    = ! empty( $genform_field['required'] ) ? 'required' : '';
-				$genform_css_class   = esc_attr( $genform_field['css_class'] ?? '' );
-				$genform_default     = esc_attr( $genform_field['default_value'] ?? '' );
-				$genform_width       = esc_attr( $genform_field['width'] ?? '100' );
+			foreach ( $data['fields'] as $f ) :
+				$n   = 'gfm_' . sanitize_title( $f['name'] );
+				$ph  = esc_attr( $f['placeholder'] ?? '' );
+				$req = ! empty( $f['required'] ) ? 'required' : '';
+				$w   = esc_attr( $f['width'] ?? '100' );
 				?>
-				<div class="gfm-form-field gfm-w-<?php echo $genform_width; ?> <?php echo $genform_css_class; ?> gfm-type-<?php echo esc_attr( $genform_field['type'] ); ?>">
-					<?php if ( 'hidden' !== $genform_field['type'] ) : ?>
+				<div class="gfm-form-field gfm-w-<?php echo esc_attr( $w ); ?> <?php echo esc_attr( $f['css_class'] ?? '' ); ?> gfm-type-<?php echo esc_attr( $f['type'] ); ?>">
+					<?php if ( $f['type'] !== 'hidden' ) : ?>
 						<label class="gfm-label">
-							<?php echo esc_html( $genform_field['label'] ); ?>
-							<?php if ( $genform_required ) : ?>
-								<span class="gfm-required-mark">*</span>
-							<?php endif; ?>
+							<?php echo esc_html( $f['label'] ); ?>
+							<?php if ( $req ) echo '<span class="gfm-required-mark">*</span>'; ?>
 						</label>
 					<?php endif; ?>
 
 					<div class="gfm-input-control">
 						<?php
-						switch ( $genform_field['type'] ) {
+						switch ( $f['type'] ) {
 							case 'textarea':
 								printf(
 									'<textarea name="%1$s" class="gfm-textarea" rows="4" placeholder="%2$s" %3$s>%4$s</textarea>',
-									esc_attr( $genform_name ),
-									esc_attr( $genform_placeholder ),
-									esc_attr( $genform_required ),
-									esc_textarea( $genform_default )
+									esc_attr( $n ),
+									$ph,
+									$req,
+									esc_textarea( $f['default_value'] ?? '' )
 								);
 								break;
+
 							case 'select':
-								printf(
-									'<select name="%1$s" class="gfm-select" %2$s>',
-									esc_attr( $genform_name ),
-									esc_attr( $genform_required )
-								);
-								if ( $genform_placeholder ) {
-									printf(
-										'<option value="" disabled selected>%s</option>',
-										esc_html( $genform_placeholder )
-									);
+								printf( '<select name="%1$s" class="gfm-select" %2$s>', esc_attr( $n ), $req );
+								if ( $ph ) {
+									printf( '<option value="" disabled selected>%s</option>', esc_html( $ph ) );
 								}
-								if ( ! empty( $genform_field['options'] ) ) {
-									foreach ( $genform_field['options'] as $genform_opt ) {
-										$genform_sel = ( $genform_default === $genform_opt['value'] ) ? 'selected' : '';
-										printf(
-											'<option value="%1$s" %2$s>%3$s</option>',
-											esc_attr( $genform_opt['value'] ),
-											esc_attr( $genform_sel ),
-											esc_html( $genform_opt['label'] )
-										);
+								if ( ! empty( $f['options'] ) ) {
+									foreach ( $f['options'] as $o ) {
+										printf( '<option value="%1$s" %2$s>%3$s</option>', esc_attr( $o['value'] ), selected( $f['default_value'] ?? '', $o['value'], false ), esc_html( $o['label'] ) );
 									}
 								}
 								echo '</select>';
 								break;
+
 							case 'radio':
 							case 'checkbox':
-								if ( ! empty( $genform_field['options'] ) ) {
+								if ( ! empty( $f['options'] ) ) {
 									echo '<div class="gfm-options-group">';
-									foreach ( $genform_field['options'] as $genform_opt ) {
-										$genform_type       = $genform_field['type'];
-										$genform_input_name = ( 'checkbox' === $genform_type ) ? "{$genform_name}[]" : $genform_name;
+									foreach ( $f['options'] as $o ) {
 										printf(
 											'<label class="gfm-option-label"><input type="%1$s" name="%2$s" value="%3$s" %4$s> %5$s</label>',
-											esc_attr( $genform_type ),
-											esc_attr( $genform_input_name ),
-											esc_attr( $genform_opt['value'] ),
-											esc_attr( $genform_required ),
-											esc_html( $genform_opt['label'] )
+											esc_attr( $f['type'] ),
+											( $f['type'] === 'checkbox' ? esc_attr( "{$n}[]" ) : esc_attr( $n ) ),
+											esc_attr( $o['value'] ),
+											$req,
+											esc_html( $o['label'] )
 										);
 									}
 									echo '</div>';
 								}
 								break;
+
 							default:
 								printf(
 									'<input type="%1$s" name="%2$s" class="gfm-input" placeholder="%3$s" value="%4$s" %5$s>',
-									esc_attr( $genform_field['type'] ),
-									esc_attr( $genform_name ),
-									esc_attr( $genform_placeholder ),
-									esc_attr( $genform_default ),
-									esc_attr( $genform_required )
+									esc_attr( $f['type'] ),
+									esc_attr( $n ),
+									$ph,
+									esc_attr( $f['default_value'] ?? '' ),
+									$req
 								);
 								break;
 						}
@@ -116,12 +101,12 @@ $genform_vars = "--gfm-base-size: {$genform_base_size}px; font-weight: {$genform
 		endif;
 		?>
 
-		<div class="gfm-submit-wrap gfm-align-<?php echo esc_attr( $genform_btn_align ); ?>">
-			<button type="submit" class="gfm-submit <?php echo ( 'full' === $genform_btn_align ) ? 'gfm-btn-full' : 'gfm-btn-auto'; ?>">
+		<div class="gfm-submit-wrap gfm-align-<?php echo esc_attr( $balign ); ?>">
+			<button type="submit" class="gfm-submit <?php echo ( $balign === 'full' ? 'gfm-btn-full' : 'gfm-btn-auto' ); ?>">
 				<?php echo esc_html( $settings['submit_text'] ?? esc_html__( 'Submit', 'genform' ) ); ?>
 			</button>
 		</div>
 
-		<div class="gfm-message" style="display:none;"></div>
+		<div class="gfm-message gfm-hidden"></div>
 	</form>
 </div>

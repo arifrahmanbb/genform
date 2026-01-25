@@ -42,9 +42,24 @@
     .gfm-section-desc {
         font-size: 14px;
         color: $text-muted;
-        margin: 0px 0 25px 0;
+        margin: 0px 0 $space-md 0;
         line-height: 1.6;
         max-width: 700px;
+    }
+
+    .gfm-color-picker {
+        height: 44px;
+        width: 64px;
+        padding: 4px;
+        border: 1px solid $border;
+        border-radius: $radius-sm;
+        cursor: pointer;
+        background: $white;
+        @include transition;
+
+        &:hover {
+            border-color: $border-dark;
+        }
     }
 
     .form-table tr:first-child h2 {

@@ -2,14 +2,14 @@
 
 .genform-admin-wrap {
     background: $bg;
-    padding: 32px;
-    font-family: 'Inter', -apple-system, sans-serif;
+    padding: $space-lg;
+    font-family: $font-main;
     color: $text-main;
 }
 
 .gfm-header-flex {
     @include flex-between;
-    margin-bottom: 25px;
+    margin-bottom: $space-md;
 
     h1 {
         font-size: 24px;
@@ -17,3 +17,9 @@
         margin: 0;
     }
 }
+
+// Utils
+.gfm-hidden {
+    display: none !important;
+}
+

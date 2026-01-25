@@ -93,3 +93,49 @@
         margin-left: auto;
     }
 }
+.gfm-empty-state {
+    padding: $space-xl 20px;
+    text-align: center;
+
+    .dashicons {
+        font-size: 64px;
+        width: 64px;
+        height: 64px;
+        color: $border-dark;
+        margin-bottom: $space-md;
+        display: inline-block;
+    }
+
+    h2 {
+        margin: 0 0 $space-xs 0;
+        font-size: 20px;
+        font-weight: 700;
+        color: $text-main;
+    }
+
+    p {
+        color: $text-muted;
+        margin-bottom: $space-lg;
+        font-size: 15px;
+    }
+}
+
+.gfm-header-flex {
+    @include flex-between;
+    margin-bottom: $space-md;
+
+    h1 {
+        margin: 0;
+    }
+
+    .gfm-actions {
+        display: flex;
+        gap: $space-sm;
+    }
+}
+
+.gfm-btn-secondary-style {
+    .dashicons {
+        margin-right: 6px;
+    }
+}

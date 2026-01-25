@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Plugin Name: GenForm - Drag & Drop Form Builder
  * Plugin URI: https://wordpress.org/plugins/genform/
@@ -15,30 +14,30 @@
  * Requires PHP: 8.3
  */
 
-if (!defined('ABSPATH')) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Load Composer Autoloader
-if (file_exists(__DIR__ . '/vendor/autoload.php')) {
+// Load Composer Autoloader if available.
+if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 	require_once __DIR__ . '/vendor/autoload.php';
 }
 
 /**
- * Constants
+ * Define plugin constants.
  */
-define('GENFORM_VERSION', '1.0.0');
-define('GENFORM_PATH', plugin_dir_path(__FILE__));
-define('GENFORM_URL', plugin_dir_url(__FILE__));
+define( 'GENFORM_VERSION', '1.0.0' );
+define( 'GENFORM_PATH', plugin_dir_path( __FILE__ ) );
+define( 'GENFORM_URL', plugin_dir_url( __FILE__ ) );
 
 /**
- * Activation Hook
+ * Handle plugin activation logic.
  */
-register_activation_hook(__FILE__, [GenForm\Core::class, 'activate']);
+register_activation_hook( __FILE__, array( 'GenForm\\Core', 'activate' ) );
 
 /**
- * Initialize Plugin
+ * Load the core plugin engine.
  */
-add_action('plugins_loaded', function () {
+add_action( 'plugins_loaded', function () {
 	GenForm\Core::instance();
-});
+} );

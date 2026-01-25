@@ -13,6 +13,7 @@
 // 3. Components
 @use 'components/cards';
 @use 'components/buttons';
+@use 'components/dashboard'; // New dashboard widget styles
 @use 'components/modals';
 @use 'components/status';
 @use 'components/table'; // Added table component
