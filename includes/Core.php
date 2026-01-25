@@ -109,38 +109,39 @@ final class Core {
 	 */
 	public function renderDashboardWidget(): void {
 		global $wpdb;
-		$t_f = "{$wpdb->prefix}genform_forms";
-		$t_e = "{$wpdb->prefix}genform_entries";
 
-		$f_c = $wpdb->get_var( "SELECT COUNT(*) FROM $t_f" );
-		$e_c = $wpdb->get_var( "SELECT COUNT(*) FROM $t_e" );
-		$r_e = $wpdb->get_results( "SELECT e.*, f.form_name FROM $t_e e LEFT JOIN $t_f f ON e.form_id = f.id ORDER BY e.created_at DESC LIMIT 5" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$forms_count   = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}genform_forms" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$entries_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}genform_entries" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$recent_entries = $wpdb->get_results( "SELECT e.*, f.form_name FROM {$wpdb->prefix}genform_entries e LEFT JOIN {$wpdb->prefix}genform_forms f ON e.form_id = f.id ORDER BY e.created_at DESC LIMIT 5" );
 		?>
 		<div class="gfm-dashboard-widget">
 			<div class="gfm-db-stats">
 				<div class="stat">
-					<strong><?php echo esc_html( $f_c ); ?></strong>
+					<strong><?php echo esc_html( $forms_count ); ?></strong>
 					<span><?php esc_html_e( 'Total Forms', 'genform' ); ?></span>
 				</div>
 				<div class="stat">
-					<strong><?php echo esc_html( $e_c ); ?></strong>
+					<strong><?php echo esc_html( $entries_count ); ?></strong>
 					<span><?php esc_html_e( 'Total Entries', 'genform' ); ?></span>
 				</div>
 			</div>
 
 			<h4><?php esc_html_e( 'Recent Entries', 'genform' ); ?></h4>
 
-			<?php if ( empty( $r_e ) ) : ?>
+			<?php if ( empty( $recent_entries ) ) : ?>
 				<p><?php esc_html_e( 'No entries yet.', 'genform' ); ?></p>
 			<?php else : ?>
 				<ul>
-					<?php foreach ( $r_e as $e ) : ?>
+					<?php foreach ( $recent_entries as $genform_e ) : ?>
 						<li>
 							<div class="entry-info">
-								<strong><?php echo esc_html( $e->form_name ?: esc_html__( 'Deleted Form', 'genform' ) ); ?></strong>
-								<span>- <?php echo esc_html( date_i18n( get_option( 'date_format' ), strtotime( $e->created_at ) ) ); ?></span>
+								<strong><?php echo esc_html( $genform_e->form_name ?: esc_html__( 'Deleted Form', 'genform' ) ); ?></strong>
+								<span>- <?php echo esc_html( date_i18n( get_option( 'date_format' ), strtotime( $genform_e->created_at ) ) ); ?></span>
 							</div>
-							<a href="<?php echo esc_url( admin_url( "admin.php?page=genform-entries&form_id={$e->form_id}" ) ); ?>" class="gfm-view-link">
+							<a href="<?php echo esc_url( admin_url( "admin.php?page=genform-entries&form_id={$genform_e->form_id}" ) ); ?>" class="gfm-view-link">
 								<?php esc_html_e( 'View', 'genform' ); ?>
 							</a>
 						</li>
@@ -249,6 +250,7 @@ final class Core {
 		);
 
 		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$forms = $wpdb->get_results( "SELECT id, form_name FROM {$wpdb->prefix}genform_forms WHERE status = 'active'" );
 		$options = array();
 		foreach ( $forms as $f ) {
@@ -283,15 +285,17 @@ final class Core {
 			wp_enqueue_script( 'jquery-ui-sortable' );
 			wp_enqueue_script( 'genform-builder', GENFORM_URL . 'assets/js/form-builder.js', array( 'jquery-ui-sortable' ), GENFORM_VERSION, array( 'strategy' => 'defer', 'in_footer' => true ) );
 
-			$id   = isset( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : 0;
-			$form = $id ? $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}genform_forms WHERE id = %d", $id ) ) : null;
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$genform_requested_id = isset( $_GET['form_id'] ) ? absint( wp_unslash( $_GET['form_id'] ) ) : 0;
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$genform_form_data = $genform_requested_id ? $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}genform_forms WHERE id = %d", $genform_requested_id ) ) : null;
 
 			wp_localize_script(
 				'genform-builder',
 				'genformBuilder',
 				array(
-					'initialData'     => $form ? json_decode( $form->form_data, true ) : null,
-					'initialSettings' => $form ? json_decode( $form->form_settings, true ) : null,
+					'initialData'     => $genform_form_data ? json_decode( $genform_form_data->form_data, true ) : null,
+					'initialSettings' => $genform_form_data ? json_decode( $genform_form_data->form_settings, true ) : null,
 					'i18n'            => array(
 						'text'     => esc_html__( 'Text Field', 'genform' ),
 						'email'    => esc_html__( 'Email Address', 'genform' ),

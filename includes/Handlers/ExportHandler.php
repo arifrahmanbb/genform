@@ -26,7 +26,8 @@ final class ExportHandler {
 	 * Entry point to detect and authorize CSV export requests.
 	 */
 	public function handleExport(): void {
-		if ( ( $_GET['action'] ?? '' ) !== 'genform_export' ) {
+		$action = isset( $_GET['action'] ) ? sanitize_text_field( wp_unslash( $_GET['action'] ) ) : '';
+		if ( 'genform_export' !== $action ) {
 			return;
 		}
 
@@ -34,11 +35,14 @@ final class ExportHandler {
 			wp_die( esc_html__( 'Unauthorized.', 'genform' ) );
 		}
 
-		if ( ! wp_verify_nonce( $_GET['_wpnonce'] ?? '', 'genform_export_entries' ) ) {
+		$nonce = isset( $_GET['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ) : '';
+		if ( ! wp_verify_nonce( $nonce, 'genform_export_entries' ) ) {
 			wp_die( esc_html__( 'Security check failed.', 'genform' ) );
 		}
 
-		$this->downloadCsv( absint( $_GET['form_id'] ?? 0 ) );
+		// Safe to access after nonce verification.
+		$form_id = isset( $_GET['form_id'] ) ? absint( wp_unslash( $_GET['form_id'] ) ) : 0;
+		$this->downloadCsv( $form_id );
 	}
 
 	/**
@@ -47,10 +51,17 @@ final class ExportHandler {
 	private function downloadCsv( int $id ): void {
 		global $wpdb;
 		$headers = array();
-		$w       = $id ? $wpdb->prepare( 'WHERE form_id = %d', $id ) : '';
+		$table   = $wpdb->prefix . 'genform_entries';
 
 		// Sample the first 100 entries to dynamically build a column list.
-		$samples = $wpdb->get_col( "SELECT entry_data FROM {$wpdb->prefix}genform_entries $w LIMIT 100" );
+		if ( $id ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$samples = $wpdb->get_col( $wpdb->prepare( "SELECT entry_data FROM {$wpdb->prefix}genform_entries WHERE form_id = %d LIMIT 100", $id ) );
+		} else {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$samples = $wpdb->get_col( "SELECT entry_data FROM {$wpdb->prefix}genform_entries LIMIT 100" );
+		}
+
 		foreach ( $samples as $j ) {
 			$d = json_decode( $j, true );
 			if ( is_array( $d ) ) {
@@ -68,7 +79,12 @@ final class ExportHandler {
 		header( 'Content-Type: text/csv' );
 		header( 'Content-Disposition: attachment; filename=' . $f );
 
+		// For streaming to output, fopen is generally permitted if WP_Filesystem isn't applicable for streams.
 		$o = fopen( 'php://output', 'w' );
+		if ( ! $o ) {
+			wp_die( esc_html__( 'Failed to open output stream.', 'genform' ) );
+		}
+
 		// Add UTF-8 Byte Order Mark for Excel compatibility.
 		fprintf( $o, chr( 0xEF ) . chr( 0xBB ) . chr( 0xBF ) );
 
@@ -84,7 +100,14 @@ final class ExportHandler {
 
 		// Process rows in batches to manage memory overhead.
 		while ( true ) {
-			$chunk = $wpdb->get_results( $wpdb->prepare( "SELECT entry_data, user_ip, created_at FROM {$wpdb->prefix}genform_entries $w ORDER BY created_at DESC LIMIT %d OFFSET %d", $limit, $offset ) );
+			if ( $id ) {
+				$query = $wpdb->prepare( "SELECT entry_data, user_ip, created_at FROM {$wpdb->prefix}genform_entries WHERE form_id = %d ORDER BY created_at DESC LIMIT %d OFFSET %d", $id, $limit, $offset );
+			} else {
+				$query = $wpdb->prepare( "SELECT entry_data, user_ip, created_at FROM {$wpdb->prefix}genform_entries ORDER BY created_at DESC LIMIT %d OFFSET %d", $limit, $offset );
+			}
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			$chunk = $wpdb->get_results( $query );
 			if ( empty( $chunk ) ) {
 				break;
 			}
@@ -108,6 +131,7 @@ final class ExportHandler {
 			flush();
 		}
 
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 		fclose( $o );
 		exit;
 	}

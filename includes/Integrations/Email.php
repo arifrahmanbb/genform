@@ -20,6 +20,7 @@ final class Email {
 	 */
 	public static function send( int $entry_id, int $form_id, array $data ): void {
 		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$form = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}genform_forms WHERE id = %d", $form_id ) );
 		if ( ! $form ) {
 			return;

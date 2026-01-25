@@ -137,8 +137,13 @@ final class Settings {
 	 * Helper function to render a checkbox setting.
 	 */
 	private function renderCheckboxField( string $key, string $desc = '' ): void {
-		$c = ! empty( get_option( 'genform_general', array() )[ $key ] ) ? 'checked' : '';
-		printf( '<label><input type="checkbox" name="genform_general[%1$s]" value="1" %2$s /> %3$s</label>', esc_attr( $key ), $c, esc_html( $desc ) );
+		$v = get_option( 'genform_general', array() )[ $key ] ?? 0;
+		printf(
+			'<label><input type="checkbox" name="genform_general[%1$s]" value="1" %2$s /> %3$s</label>',
+			esc_attr( $key ),
+			checked( 1, $v, false ),
+			esc_html( $desc )
+		);
 	}
 
 	/**

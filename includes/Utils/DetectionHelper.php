@@ -21,7 +21,7 @@ final class DetectionHelper {
 	 * @return array{browser: string, os: string}
 	 */
 	public static function getInfo(): array {
-		$ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+		$ua = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
 		return array(
 			'browser' => self::getBrowser( $ua ),
 			'os'      => self::getOS( $ua ),

@@ -16,8 +16,9 @@ if ( ! current_user_can( 'manage_options' ) ) {
 }
 
 global $wpdb;
+
 // Fetch forms with submission counts.
-$fs = $wpdb->get_results( "SELECT f.*, (SELECT COUNT(*) FROM {$wpdb->prefix}genform_entries WHERE form_id = f.id) as e_c FROM {$wpdb->prefix}genform_forms f ORDER BY f.created_at DESC" );
+$genform_fs = $wpdb->get_results( "SELECT f.*, (SELECT COUNT(*) FROM {$wpdb->prefix}genform_entries WHERE form_id = f.id) as e_c FROM {$wpdb->prefix}genform_forms f ORDER BY f.created_at DESC" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 ?>
 
 <div class="wrap genform-admin-wrap">
@@ -28,14 +29,17 @@ $fs = $wpdb->get_results( "SELECT f.*, (SELECT COUNT(*) FROM {$wpdb->prefix}genf
 		</a>
 	</div>
 
-	<?php if ( isset( $_GET['duplicated'] ) ) : ?>
+	<?php
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( isset( $_GET['duplicated'] ) ) :
+		?>
 		<div class="notice notice-success is-dismissible">
 			<p><?php esc_html_e( 'Form duplicated successfully.', 'genform' ); ?></p>
 		</div>
 	<?php endif; ?>
 
 	<div class="gfm-card">
-		<?php if ( empty( $fs ) ) : ?>
+		<?php if ( empty( $genform_fs ) ) : ?>
 			<div class="gfm-empty-state">
 				<span class="dashicons dashicons-forms"></span>
 				<p><?php esc_html_e( 'No forms yet.', 'genform' ); ?></p>
@@ -56,40 +60,40 @@ $fs = $wpdb->get_results( "SELECT f.*, (SELECT COUNT(*) FROM {$wpdb->prefix}genf
 					</tr>
 				</thead>
 				<tbody>
-					<?php foreach ( $fs as $f ) : ?>
+					<?php foreach ( $genform_fs as $genform_f ) : ?>
 						<tr>
 							<td>
 								<strong>
-									<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=genform-builder&action=edit&form_id=' . $f->id ), 'genform_edit_form' ) ); ?>">
-										<?php echo esc_html( $f->form_name ); ?>
+									<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=genform-builder&action=edit&form_id=' . $genform_f->id ), 'genform_edit_form' ) ); ?>">
+										<?php echo esc_html( $genform_f->form_name ); ?>
 									</a>
 								</strong>
 							</td>
 							<td>
 								<div class="gfm-shortcode-copy">
-									<code>[genform id="<?php echo (int) $f->id; ?>"]</code>
-									<button class="gfm-copy-btn dashicons dashicons-admin-page" data-code='[genform id="<?php echo (int) $f->id; ?>"]'></button>
+									<code>[genform id="<?php echo (int) $genform_f->id; ?>"]</code>
+									<button class="gfm-copy-btn dashicons dashicons-admin-page" data-code='[genform id="<?php echo (int) $genform_f->id; ?>"]'></button>
 								</div>
 							</td>
 							<td>
-								<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=genform-entries&form_id=' . $f->id ), 'genform_view_entries' ) ); ?>" class="gfm-count-badge">
-									<?php echo (int) $f->e_c; ?>
+								<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=genform-entries&form_id=' . $genform_f->id ), 'genform_view_entries' ) ); ?>" class="gfm-count-badge">
+									<?php echo (int) $genform_f->e_c; ?>
 								</a>
 							</td>
 							<td>
-								<span class="gfm-status gfm-status-<?php echo esc_attr( $f->status ); ?>">
-									<?php echo esc_html( ucfirst( $f->status ) ); ?>
+								<span class="gfm-status gfm-status-<?php echo esc_attr( $genform_f->status ); ?>">
+									<?php echo esc_html( ucfirst( $genform_f->status ) ); ?>
 								</span>
 							</td>
-							<td><?php echo esc_html( date_i18n( get_option( 'date_format' ), strtotime( $f->created_at ) ) ); ?></td>
+							<td><?php echo esc_html( date_i18n( get_option( 'date_format' ), strtotime( $genform_f->created_at ) ) ); ?></td>
 							<td>
-								<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=genform-builder&action=edit&form_id=' . $f->id ), 'genform_edit_form' ) ); ?>" class="button">
+								<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=genform-builder&action=edit&form_id=' . $genform_f->id ), 'genform_edit_form' ) ); ?>" class="button">
 									<?php esc_html_e( 'Edit', 'genform' ); ?>
 								</a>
-								<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=genform&action=duplicate&form_id=' . $f->id ), 'genform_duplicate_form' ) ); ?>" class="button">
+								<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=genform&action=duplicate&form_id=' . $genform_f->id ), 'genform_duplicate_form' ) ); ?>" class="button">
 									<?php esc_html_e( 'Duplicate', 'genform' ); ?>
 								</a>
-								<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=genform&action=delete&form_id=' . $f->id ), 'genform_delete_form' ) ); ?>" class="button button-link-delete">
+								<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=genform&action=delete&form_id=' . $genform_f->id ), 'genform_delete_form' ) ); ?>" class="button button-link-delete">
 									<?php esc_html_e( 'Delete', 'genform' ); ?>
 								</a>
 							</td>

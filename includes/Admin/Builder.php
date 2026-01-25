@@ -28,11 +28,16 @@ final class Builder {
 	 * Handles cloning an existing form into a new entry.
 	 */
 	public function handleDuplicate(): void {
-		if ( ( $_GET['page'] ?? '' ) !== 'genform' || ( $_GET['action'] ?? '' ) !== 'duplicate' ) {
+		$page      = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
+		$action    = isset( $_GET['action'] ) ? sanitize_text_field( wp_unslash( $_GET['action'] ) ) : '';
+		$form_id   = isset( $_GET['form_id'] ) ? absint( wp_unslash( $_GET['form_id'] ) ) : 0;
+		$wp_nonce  = isset( $_GET['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ) : '';
+
+		if ( 'genform' !== $page || 'duplicate' !== $action || ! $form_id ) {
 			return;
 		}
 
-		if ( ! wp_verify_nonce( $_GET['_wpnonce'] ?? '', 'genform_duplicate_form' ) ) {
+		if ( ! wp_verify_nonce( $wp_nonce, 'genform_duplicate_form' ) ) {
 			return;
 		}
 
@@ -41,14 +46,11 @@ final class Builder {
 		}
 
 		global $wpdb;
-		$id = absint( $_GET['form_id'] ?? 0 );
-		if ( ! $id ) {
-			return;
-		}
-
-		$form = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}genform_forms WHERE id = %d", $id ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$form = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}genform_forms WHERE id = %d", $form_id ) );
 
 		if ( $form ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 			$wpdb->insert(
 				"{$wpdb->prefix}genform_forms",
 				array(
@@ -79,7 +81,8 @@ final class Builder {
 			return;
 		}
 
-		if ( ! wp_verify_nonce( $_POST['genform_builder_nonce'], 'genform_save_form' ) ) {
+		$gen_nonce = sanitize_text_field( wp_unslash( $_POST['genform_builder_nonce'] ) );
+		if ( ! wp_verify_nonce( $gen_nonce, 'genform_save_form' ) ) {
 			wp_die( esc_html__( 'Security check failed.', 'genform' ) );
 		}
 
@@ -111,42 +114,49 @@ final class Builder {
 	 * Core saving procedure and JSON validation.
 	 */
 	private function save_form(): void {
+		$gen_nonce = isset( $_POST['genform_builder_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['genform_builder_nonce'] ) ) : '';
+		if ( ! wp_verify_nonce( $gen_nonce, 'genform_save_form' ) ) {
+			return;
+		}
+
 		global $wpdb;
-		$t    = "{$wpdb->prefix}genform_forms";
-		$id   = absint( $_GET['form_id'] ?? 0 );
-		$name = sanitize_text_field( $_POST['form_name'] ?? '' );
-		$raw_data = wp_unslash( $_POST['form_data'] ?? '' );
-		$raw_sets = wp_unslash( $_POST['form_settings'] ?? '' );
+		$form_id  = isset( $_GET['form_id'] ) ? absint( wp_unslash( $_GET['form_id'] ) ) : 0;
+		$name     = isset( $_POST['form_name'] ) ? sanitize_text_field( wp_unslash( $_POST['form_name'] ) ) : '';
+		// Input is JSON; it is unslashed here and recursively sanitized after decoding below.
+		$raw_data = isset( $_POST['form_data'] ) ? wp_unslash( $_POST['form_data'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$raw_sets = isset( $_POST['form_settings'] ) ? wp_unslash( $_POST['form_settings'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 		if ( ! $name || ! $raw_data ) {
 			return;
 		}
 
-		$decoded_data = json_decode( $raw_data, true );
-		$decoded_sets = json_decode( $raw_sets, true );
+		$decoded_data = json_decode( (string) $raw_data, true );
+		$decoded_sets = json_decode( (string) $raw_sets, true );
 
 		if ( json_last_error() !== JSON_ERROR_NONE ) {
 			wp_die( esc_html__( 'Invalid JSON data provided.', 'genform' ) );
 		}
 
 		// Sanitize structured data before DB storage.
-		$data = wp_json_encode( $this->sanitize_recursive( $decoded_data ) );
-		$sets = wp_json_encode( $this->sanitize_recursive( $decoded_sets ) );
+		$clean_data = wp_json_encode( $this->sanitize_recursive( $decoded_data ) );
+		$clean_sets = wp_json_encode( $this->sanitize_recursive( $decoded_sets ) );
 
 		$p = array(
 			'form_name'     => $name,
-			'form_data'     => $data,
-			'form_settings' => $sets,
+			'form_data'     => $clean_data,
+			'form_settings' => $clean_sets,
 			'status'        => 'active',
 		);
 
-		if ( $id ) {
-			$wpdb->update( $t, $p, array( 'id' => $id ) );
+		if ( $form_id ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->update( "{$wpdb->prefix}genform_forms", $p, array( 'id' => $form_id ) );
 			add_settings_error( 'genform_messages', 'f_upd', esc_html__( 'Form updated successfully.', 'genform' ), 'success' );
 		} else {
-			$wpdb->insert( $t, $p );
-			$id = $wpdb->insert_id;
-			wp_safe_redirect( admin_url( "admin.php?page=genform-builder&action=edit&form_id=$id&_wpnonce=" . wp_create_nonce( 'genform_edit_form' ) ) );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->insert( "{$wpdb->prefix}genform_forms", $p );
+			$new_id = $wpdb->insert_id;
+			wp_safe_redirect( admin_url( "admin.php?page=genform-builder&action=edit&form_id=$new_id&_wpnonce=" . wp_create_nonce( 'genform_edit_form' ) ) );
 			exit;
 		}
 	}
@@ -155,11 +165,16 @@ final class Builder {
 	 * Permanently removes a form and its associated entry records.
 	 */
 	public function handleDeleteForm(): void {
-		if ( ( $_GET['page'] ?? '' ) !== 'genform' || ( $_GET['action'] ?? '' ) !== 'delete' ) {
+		$page      = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
+		$action    = isset( $_GET['action'] ) ? sanitize_text_field( wp_unslash( $_GET['action'] ) ) : '';
+		$form_id   = isset( $_GET['form_id'] ) ? absint( wp_unslash( $_GET['form_id'] ) ) : 0;
+		$wp_nonce  = isset( $_GET['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ) : '';
+
+		if ( 'genform' !== $page || 'delete' !== $action || ! $form_id ) {
 			return;
 		}
 
-		if ( ! wp_verify_nonce( $_GET['_wpnonce'] ?? '', 'genform_delete_form' ) ) {
+		if ( ! wp_verify_nonce( $wp_nonce, 'genform_delete_form' ) ) {
 			return;
 		}
 
@@ -168,13 +183,10 @@ final class Builder {
 		}
 
 		global $wpdb;
-		$id = absint( $_GET['form_id'] ?? 0 );
-		if ( ! $id ) {
-			return;
-		}
-
-		$wpdb->delete( "{$wpdb->prefix}genform_forms", array( 'id' => $id ) );
-		$wpdb->delete( "{$wpdb->prefix}genform_entries", array( 'form_id' => $id ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->delete( "{$wpdb->prefix}genform_forms", array( 'id' => $form_id ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->delete( "{$wpdb->prefix}genform_entries", array( 'form_id' => $form_id ) );
 
 		wp_safe_redirect( admin_url( 'admin.php?page=genform' ) );
 		exit;

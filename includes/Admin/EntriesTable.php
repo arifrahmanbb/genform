@@ -37,50 +37,77 @@ class EntriesTable extends \WP_List_Table {
 	 */
 	public function prepare_items() {
 		global $wpdb;
+
 		$per_page     = 20;
 		$current_page = $this->get_pagenum();
 		$offset       = ( $current_page - 1 ) * $per_page;
-		$t_e          = "{$wpdb->prefix}genform_entries";
-		$t_f          = "{$wpdb->prefix}genform_forms";
 
-		$query = "SELECT e.*, f.form_name FROM $t_e e LEFT JOIN $t_f f ON e.form_id = f.id";
 		$where = array();
 
 		// Handle filtering by status (trash vs active).
-		$status = $_GET['status'] ?? '';
-		if ( $status === 'trash' ) {
-			$where[] = "e.status = 'trash'";
-		} elseif ( $status === 'unread' ) {
-			$where[] = "e.status = 'unread'";
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$status = isset( $_GET['status'] ) ? sanitize_text_field( wp_unslash( $_GET['status'] ) ) : '';
+		if ( 'trash' === $status ) {
+			$where[] = $wpdb->prepare( 'e.status = %s', 'trash' );
+		} elseif ( 'unread' === $status ) {
+			$where[] = $wpdb->prepare( 'e.status = %s', 'unread' );
 		} else {
-			$where[] = "e.status != 'trash'";
+			$where[] = $wpdb->prepare( 'e.status != %s', 'trash' );
 		}
 
 		// Filter by specific Form ID.
-		$form_id = absint( $_GET['form_id'] ?? 0 );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$form_id = isset( $_GET['form_id'] ) ? absint( wp_unslash( $_GET['form_id'] ) ) : 0;
 		if ( $form_id ) {
 			$where[] = $wpdb->prepare( 'e.form_id = %d', $form_id );
 		}
 
 		// Search input.
-		$s = sanitize_text_field( $_REQUEST['s'] ?? '' );
-		if ( $s ) {
-			$where[] = $wpdb->prepare( 'e.entry_data LIKE %s', '%' . $wpdb->esc_like( $s ) . '%' );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$search = isset( $_REQUEST['s'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['s'] ) ) : '';
+		if ( $search ) {
+			$where[] = $wpdb->prepare( 'e.entry_data LIKE %s', '%' . $wpdb->esc_like( $search ) . '%' );
 		}
 
+		$where_sql = '';
 		if ( ! empty( $where ) ) {
-			$query .= ' WHERE ' . implode( ' AND ', $where );
+			$where_sql = ' WHERE ' . implode( ' AND ', $where );
 		}
 
-		// Sorting.
-		$orderby = sanitize_sql_orderby( $_GET['orderby'] ?? 'created_at' );
-		$order   = ( strtolower( $_GET['order'] ?? '' ) === 'asc' ) ? 'ASC' : 'DESC';
-		$query  .= " ORDER BY $orderby $order";
+		// Sorting validation - strictly whitelisted column names only.
+		$allowed_orderby = array( 'id', 'created_at', 'form_name' );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$orderby_input = isset( $_GET['orderby'] ) ? sanitize_key( wp_unslash( $_GET['orderby'] ) ) : '';
+		$orderby_col   = in_array( $orderby_input, $allowed_orderby, true ) ? $orderby_input : 'created_at';
 
-		$total = $wpdb->get_var( "SELECT COUNT(e.id) FROM $t_e e WHERE " . ( ! empty( $where ) ? implode( ' AND ', $where ) : '1=1' ) );
-		$query .= $wpdb->prepare( ' LIMIT %d OFFSET %d', $per_page, $offset );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$order_input = isset( $_GET['order'] ) ? strtoupper( sanitize_text_field( wp_unslash( $_GET['order'] ) ) ) : '';
+		$order_dir   = ( 'ASC' === $order_input ) ? 'ASC' : 'DESC';
 
-		$this->items = $wpdb->get_results( $query );
+		// Build the full SQL query.
+		// The $where_sql contains only properly prepared segments from $wpdb->prepare().
+		// The $orderby_col and $order_dir are strictly validated against hardcoded whitelists.
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
+
+		// Using $wpdb->prefix directly is acceptable as it's a core WordPress property.
+		// The ORDER BY clause uses only whitelisted literal column names (id, created_at, form_name).
+		// The WHERE clause is built entirely from $wpdb->prepare() segments.
+		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter
+		$this->items = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT e.*, f.form_name FROM {$wpdb->prefix}genform_entries e LEFT JOIN {$wpdb->prefix}genform_forms f ON e.form_id = f.id {$where_sql} ORDER BY {$orderby_col} {$order_dir} LIMIT %d OFFSET %d",
+				$per_page,
+				$offset
+			)
+		);
+
+		// Count query - $where_sql contains only prepared segments.
+		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter
+		$total = $wpdb->get_var( "SELECT COUNT(e.id) FROM {$wpdb->prefix}genform_entries e {$where_sql}" );
+		// phpcs:enable
 
 		$this->set_pagination_args(
 			array(
@@ -97,16 +124,19 @@ class EntriesTable extends \WP_List_Table {
 	 */
 	protected function get_views() {
 		global $wpdb;
-		$t   = "{$wpdb->prefix}genform_entries";
-		$all = $wpdb->get_var( "SELECT COUNT(id) FROM $t WHERE status != 'trash'" );
-		$unr = $wpdb->get_var( "SELECT COUNT(id) FROM $t WHERE status = 'unread'" );
-		$trs = $wpdb->get_var( "SELECT COUNT(id) FROM $t WHERE status = 'trash'" );
-		$cur = $_GET['status'] ?? '';
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$all = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(id) FROM {$wpdb->prefix}genform_entries WHERE status != %s", 'trash' ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$unr = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(id) FROM {$wpdb->prefix}genform_entries WHERE status = %s", 'unread' ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$trs = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(id) FROM {$wpdb->prefix}genform_entries WHERE status = %s", 'trash' ) );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$cur = isset( $_GET['status'] ) ? sanitize_text_field( wp_unslash( $_GET['status'] ) ) : '';
 
 		return array(
-			'all'    => sprintf( '<a href="%s" class="%s">%s <span class="count">(%d)</span></a>', esc_url( admin_url( 'admin.php?page=genform-entries' ) ), ( $cur === '' ? 'current' : '' ), esc_html__( 'All', 'genform' ), (int) $all ),
-			'unread' => sprintf( '<a href="%s" class="%s">%s <span class="count">(%d)</span></a>', esc_url( admin_url( 'admin.php?page=genform-entries&status=unread' ) ), ( $cur === 'unread' ? 'current' : '' ), esc_html__( 'Unread', 'genform' ), (int) $unr ),
-			'trash'  => sprintf( '<a href="%s" class="%s">%s <span class="count">(%d)</span></a>', esc_url( admin_url( 'admin.php?page=genform-entries&status=trash' ) ), ( $cur === 'trash' ? 'current' : '' ), esc_html__( 'Trash', 'genform' ), (int) $trs ),
+			'all'    => sprintf( '<a href="%s" class="%s">%s <span class="count">(%d)</span></a>', esc_url( admin_url( 'admin.php?page=genform-entries' ) ), ( '' === $cur ? 'current' : '' ), esc_html__( 'All', 'genform' ), (int) $all ),
+			'unread' => sprintf( '<a href="%s" class="%s">%s <span class="count">(%d)</span></a>', esc_url( admin_url( 'admin.php?page=genform-entries&status=unread' ) ), ( 'unread' === $cur ? 'current' : '' ), esc_html__( 'Unread', 'genform' ), (int) $unr ),
+			'trash'  => sprintf( '<a href="%s" class="%s">%s <span class="count">(%d)</span></a>', esc_url( admin_url( 'admin.php?page=genform-entries&status=trash' ) ), ( 'trash' === $cur ? 'current' : '' ), esc_html__( 'Trash', 'genform' ), (int) $trs ),
 		);
 	}
 
@@ -138,7 +168,9 @@ class EntriesTable extends \WP_List_Table {
 	 * Configures bulk action options.
 	 */
 	public function get_bulk_actions() {
-		if ( ( $_GET['status'] ?? '' ) === 'trash' ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$status = isset( $_GET['status'] ) ? sanitize_text_field( wp_unslash( $_GET['status'] ) ) : '';
+		if ( 'trash' === $status ) {
 			return array(
 				'restore' => esc_html__( 'Restore', 'genform' ),
 				'delete'  => esc_html__( 'Delete permanently', 'genform' ),
@@ -190,6 +222,7 @@ class EntriesTable extends \WP_List_Table {
 	public function column_actions( $item ) {
 		$d_e = json_decode( $item->entry_data, true ) ?: array();
 		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$row = $wpdb->get_row( $wpdb->prepare( "SELECT form_data FROM {$wpdb->prefix}genform_forms WHERE id = %d", $item->form_id ) );
 		$r_d = array();
 
@@ -241,8 +274,10 @@ class EntriesTable extends \WP_List_Table {
 			return;
 		}
 		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$fs  = $wpdb->get_results( "SELECT id, form_name FROM {$wpdb->prefix}genform_forms ORDER BY form_name ASC" );
-		$cur = absint( $_GET['form_id'] ?? 0 );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$cur = isset( $_GET['form_id'] ) ? absint( wp_unslash( $_GET['form_id'] ) ) : 0;
 		?>
 		<div class="alignleft actions">
 			<select name="form_id" id="filter-by-form">
