@@ -15,11 +15,25 @@
 
     &-content {
         background: $white;
-        width: 700px;
-        max-width: 95%;
         border-radius: $radius;
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         overflow: hidden;
+        @include transition(transform);
+        transform: scale(0.9);
+    }
+
+    &.show .gfm-modal-content {
+        transform: scale(1);
+    }
+
+    &-large {
+        width: 700px;
+        max-width: 95%;
+    }
+
+    &-mini {
+        width: 400px;
+        max-width: 90%;
     }
 
     &-header {
@@ -32,6 +46,9 @@
             margin: 0;
             font-size: 18px;
             font-weight: 700;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
     }
 
@@ -42,14 +59,138 @@
     }
 
     &-section-title {
-        font-size: 12px;
-        font-weight: 800;
+        font-size: 13px;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.1em;
-        color: $text-muted;
-        margin-bottom: 15px;
-        border-bottom: 1px solid #f1f5f9;
-        padding-bottom: 8px;
+        letter-spacing: 0.05em;
+        color: $text-main;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .dashicons {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+            color: $primary;
+        }
+    }
+}
+
+.gfm-confirm-icon-box {
+    width: 64px;
+    height: 64px;
+    background: #fee2e2;
+    color: #ef4444;
+    border-radius: 50%;
+    @include flex-center;
+    margin: 0 auto 20px;
+
+    .dashicons {
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+    }
+}
+
+#gfm-confirm-title {
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+
+#gfm-confirm-desc {
+    color: $text-muted;
+    margin-bottom: 25px;
+}
+
+.gfm-confirm-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.gfm-modal-subtitle {
+    font-size: 13px;
+    font-weight: 500;
+    color: $text-muted;
+}
+
+.gfm-badge-id {
+    background: $primary;
+    color: $white;
+    padding: 2px 10px;
+    border-radius: 99px;
+    font-size: 12px;
+    margin-left: 8px;
+    font-weight: 600;
+}
+
+.gfm-details-modern-list {
+    display: grid;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.gfm-detail-item {
+    background: #f8fafc;
+    padding: 15px 20px;
+    border-radius: $radius-sm;
+    border-left: 3px solid $border;
+    @include transition;
+
+    &:hover {
+        background: #f1f5f9;
+        border-left-color: $primary;
+    }
+}
+
+.gfm-detail-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: $text-muted;
+    margin-bottom: 5px;
+}
+
+.gfm-detail-value {
+    font-size: 15px;
+    color: $text-main;
+    font-weight: 500;
+}
+
+.gfm-system-info-box {
+    margin-top: 30px;
+    background: #fcfdfe;
+    border: 1px solid $border;
+    border-radius: $radius;
+    padding: 20px;
+}
+
+.gfm-system-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.gfm-system-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: $text-muted;
+
+    .dashicons {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+    }
+
+    code {
+        background: #f1f5f9;
+        padding: 2px 4px;
+        border-radius: 4px;
+        color: $primary-dark;
     }
 }
 

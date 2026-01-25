@@ -1,69 +1,86 @@
 /**
- * GenForm Frontend JavaScript
+ * GenForm Frontend JavaScript (Vanilla JS)
  *
- * Manages dynamic typography and handling of form submissions via AJAX.
+ * Manages dynamic typography and handling of form submissions via Fetch API.
  */
 
-(function ($) {
+(function () {
 	'use strict';
 
-	$(document).ready(function () {
+	document.addEventListener('DOMContentLoaded', function () {
 
 		/**
 		 * Initialization: Apply dynamic styles based on form settings.
 		 */
-		$('.gfm-form-container').each(function () {
-			const $container = $(this);
-			const size = $container.data('size');
-			const weight = $container.data('weight');
+		const containers = document.querySelectorAll('.gfm-form-container');
+		containers.forEach(container => {
+			const size = container.dataset.size;
+			const weight = container.dataset.weight;
 
 			if (size) {
-				$container.css('--gfm-base-size', size + 'px');
+				container.style.setProperty('--gfm-base-size', size + 'px');
 			}
 			if (weight) {
-				$container.css('font-weight', weight);
+				container.style.fontWeight = weight;
 			}
 		});
 
 		/**
-		 * Handles form submission via AJAX.
+		 * Handles form submission via Fetch API.
 		 */
-		$(document).on('submit', '.gfm-form-js', function (e) {
+		document.addEventListener('submit', async function (e) {
+			const form = e.target.closest('.gfm-form-js');
+			if (!form) return;
+
 			e.preventDefault();
 
-			const $form = $(this);
-			const $btn = $form.find('.gfm-submit');
-			const $msg = $form.find('.gfm-message');
-			const originalText = $btn.text();
-			const formData = $form.serialize();
+			const btn = form.querySelector('.gfm-submit');
+			const msg = form.querySelector('.gfm-message');
+			const originalText = btn.textContent;
+			const formData = new FormData(form);
 
-			// Prepare UI for submission state.
-			$btn.prop('disabled', true).text('...');
-			$msg.addClass('gfm-hidden').removeClass('gfm-success gfm-error');
+			// Prepare UI for submission state
+			btn.disabled = true;
+			btn.textContent = '...';
+			msg.className = 'gfm-message gfm-hidden';
+			msg.textContent = '';
+			msg.style.display = 'none';
 
-			$.ajax({
-				url: genform.ajax_url,
-				type: 'POST',
-				data: formData,
-				success: (response) => {
-					if (response.success) {
-						$msg.removeClass('gfm-hidden').addClass('gfm-success').text(response.data.message).hide().fadeIn();
-						if (response.data.redirect) {
-							window.location.href = response.data.redirect;
-						}
-						$form[0].reset();
-					} else {
-						$msg.removeClass('gfm-hidden').addClass('gfm-error').text(response.data.message).hide().fadeIn();
+			try {
+				const response = await fetch(genform.ajax_url, {
+					method: 'POST',
+					body: formData
+				});
+
+				const result = await response.json();
+
+				if (result.success) {
+					msg.classList.remove('gfm-hidden');
+					msg.classList.add('gfm-success');
+					msg.textContent = result.data.message;
+					msg.style.display = 'block';
+
+					if (result.data.redirect) {
+						window.location.href = result.data.redirect;
 					}
-				},
-				error: () => {
-					$msg.removeClass('gfm-hidden').addClass('gfm-error').text('An unknown error occurred.').hide().fadeIn();
-				},
-				complete: () => {
-					$btn.prop('disabled', false).text(originalText);
+					form.reset();
+				} else {
+					msg.classList.remove('gfm-hidden');
+					msg.classList.add('gfm-error');
+					msg.textContent = result.data.message || 'An error occurred.';
+					msg.style.display = 'block';
 				}
-			});
+			} catch (error) {
+				console.error('GenForm Submission Error:', error);
+				msg.classList.remove('gfm-hidden');
+				msg.classList.add('gfm-error');
+				msg.textContent = 'An unknown error occurred.';
+				msg.style.display = 'block';
+			} finally {
+				btn.disabled = false;
+				btn.textContent = originalText;
+			}
 		});
 	});
 
-})(jQuery);
+})();

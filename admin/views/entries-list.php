@@ -58,14 +58,3 @@ $fid = absint( $_GET['form_id'] ?? 0 );
 		</form>
 	</div>
 </div>
-
-<!-- Modal Structure for Row Preview -->
-<div id="gfm-entry-modal" class="gfm-modal gfm-hidden">
-	<div class="gfm-modal-content">
-		<div class="gfm-modal-header">
-			<h3><?php esc_html_e( 'Entry Details', 'genform' ); ?></h3>
-			<span class="gfm-close-modal">&times;</span>
-		</div>
-		<div class="gfm-modal-body" id="gfm-modal-body"></div>
-	</div>
-</div>

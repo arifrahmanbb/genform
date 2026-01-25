@@ -53,6 +53,7 @@ final class Core {
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueueFrontendAssets' ) );
 		add_action( 'wp_dashboard_setup', array( $this, 'registerDashboardWidget' ) );
 		add_action( 'admin_bar_menu', array( $this, 'addAdminBarMenu' ), 999 );
+		add_action( 'admin_footer', array( $this, 'outputGlobalModals' ) );
 
 		$this->loadComponents();
 	}
@@ -196,6 +197,45 @@ final class Core {
 	}
 
 	/**
+	 * Output common modal structures to the admin footer.
+	 */
+	public function outputGlobalModals(): void {
+		$screen = get_current_screen();
+		if ( ! $screen || ! str_contains( $screen->id, 'genform' ) ) {
+			return;
+		}
+		?>
+		<!-- Entry Detail Modal -->
+		<div id="gfm-entry-modal" class="gfm-modal gfm-hidden">
+			<div class="gfm-modal-content gfm-modal-large">
+				<div class="gfm-modal-header">
+					<h3><!-- JS Dynamic Content --></h3>
+					<span class="gfm-close-modal dashicons dashicons-no"></span>
+				</div>
+				<div class="gfm-modal-body" id="gfm-modal-body"></div>
+			</div>
+		</div>
+
+		<!-- Custom Confirm Modal -->
+		<div id="gfm-confirm-modal" class="gfm-modal gfm-hidden">
+			<div class="gfm-modal-content gfm-modal-mini">
+				<div class="gfm-modal-body gfm-confirm-body text-center">
+					<div class="gfm-confirm-icon-box">
+						<span class="dashicons dashicons-warning"></span>
+					</div>
+					<h3 id="gfm-confirm-title"><?php esc_html_e( 'Are you sure?', 'genform' ); ?></h3>
+					<p id="gfm-confirm-desc"><?php esc_html_e( 'This action cannot be undone.', 'genform' ); ?></p>
+					<div class="gfm-confirm-actions">
+						<button type="button" id="gfm-confirm-cancel" class="gfm-btn gfm-btn-outline"><?php esc_html_e( 'Cancel', 'genform' ); ?></button>
+						<button type="button" id="gfm-confirm-ok" class="gfm-btn gfm-btn-danger"><?php esc_html_e( 'Yes, Delete', 'genform' ); ?></button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<?php
+	}
+
+	/**
 	 * Enqueue styles and scripts for the admin area.
 	 */
 	public function enqueueAdminAssets( string $hook ): void {
@@ -237,11 +277,11 @@ final class Core {
 
 		wp_enqueue_style( 'genform-admin', GENFORM_URL . 'assets/css/admin.css', array(), GENFORM_VERSION );
 		wp_add_inline_style( 'genform-admin', $this->getDynamicStylesCss() );
-		wp_enqueue_script( 'genform-admin', GENFORM_URL . 'assets/js/admin.js', array( 'jquery', 'wp-lists', 'common' ), GENFORM_VERSION, array( 'strategy' => 'defer', 'in_footer' => true ) );
+		wp_enqueue_script( 'genform-admin', GENFORM_URL . 'assets/js/admin.js', array( 'wp-lists', 'common' ), GENFORM_VERSION, array( 'strategy' => 'defer', 'in_footer' => true ) );
 
 		if ( str_contains( $hook, 'genform-builder' ) ) {
 			wp_enqueue_script( 'jquery-ui-sortable' );
-			wp_enqueue_script( 'genform-builder', GENFORM_URL . 'assets/js/form-builder.js', array( 'jquery', 'jquery-ui-sortable' ), GENFORM_VERSION, array( 'strategy' => 'defer', 'in_footer' => true ) );
+			wp_enqueue_script( 'genform-builder', GENFORM_URL . 'assets/js/form-builder.js', array( 'jquery-ui-sortable' ), GENFORM_VERSION, array( 'strategy' => 'defer', 'in_footer' => true ) );
 
 			$id   = isset( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : 0;
 			$form = $id ? $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}genform_forms WHERE id = %d", $id ) ) : null;
@@ -316,7 +356,7 @@ final class Core {
 	public function enqueueFrontendAssets(): void {
 		wp_enqueue_style( 'genform-frontend', GENFORM_URL . 'assets/css/frontend.css', array(), GENFORM_VERSION );
 		wp_add_inline_style( 'genform-frontend', $this->getDynamicStylesCss() );
-		wp_enqueue_script( 'genform-frontend', GENFORM_URL . 'assets/js/frontend.js', array( 'jquery' ), GENFORM_VERSION, array( 'strategy' => 'defer', 'in_footer' => true ) );
+		wp_enqueue_script( 'genform-frontend', GENFORM_URL . 'assets/js/frontend.js', array(), GENFORM_VERSION, array( 'strategy' => 'defer', 'in_footer' => true ) );
 		wp_localize_script( 'genform-frontend', 'genform', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 	}
 
@@ -325,13 +365,37 @@ final class Core {
 	 */
 	public static function activate(): void {
 		global $wpdb;
-		$c   = $wpdb->get_charset_collate();
-		$t_f = "{$wpdb->prefix}genform_forms";
-		$s_f = "CREATE TABLE $t_f (id bigint(20) NOT NULL AUTO_INCREMENT,form_name varchar(255) NOT NULL,form_data longtext NOT NULL,form_settings longtext,status varchar(20) DEFAULT 'active',created_at datetime DEFAULT CURRENT_TIMESTAMP,updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,PRIMARY KEY (id)) $c;";
-		$t_e = "{$wpdb->prefix}genform_entries";
-		$s_e = "CREATE TABLE $t_e (id bigint(20) NOT NULL AUTO_INCREMENT,form_id bigint(20) NOT NULL,entry_data longtext NOT NULL,entry_metadata longtext,user_ip varchar(100),user_agent varchar(255),status varchar(20) DEFAULT 'unread',created_at datetime DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY (id)) $c;";
+
+		$charset_collate = $wpdb->get_charset_collate();
+		$table_forms     = "{$wpdb->prefix}genform_forms";
+		$table_entries   = "{$wpdb->prefix}genform_entries";
+
+		// Note: dbDelta requires two spaces before PRIMARY KEY and specific indentation.
+		$sql_forms = "CREATE TABLE $table_forms (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			form_name varchar(255) NOT NULL,
+			form_data longtext NOT NULL,
+			form_settings longtext,
+			status varchar(20) DEFAULT 'active' NOT NULL,
+			created_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+			updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
+			PRIMARY KEY  (id)
+		) $charset_collate;";
+
+		$sql_entries = "CREATE TABLE $table_entries (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			form_id bigint(20) unsigned NOT NULL,
+			entry_data longtext NOT NULL,
+			entry_metadata longtext,
+			user_ip varchar(100) DEFAULT '' NOT NULL,
+			user_agent varchar(255) DEFAULT '' NOT NULL,
+			status varchar(20) DEFAULT 'unread' NOT NULL,
+			created_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+			PRIMARY KEY  (id)
+		) $charset_collate;";
+
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-		dbDelta( $s_f );
-		dbDelta( $s_e );
+		dbDelta( $sql_forms );
+		dbDelta( $sql_entries );
 	}
 }

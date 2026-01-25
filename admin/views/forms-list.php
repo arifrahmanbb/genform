@@ -89,7 +89,7 @@ $fs = $wpdb->get_results( "SELECT f.*, (SELECT COUNT(*) FROM {$wpdb->prefix}genf
 								<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=genform&action=duplicate&form_id=' . $f->id ), 'genform_duplicate_form' ) ); ?>" class="button">
 									<?php esc_html_e( 'Duplicate', 'genform' ); ?>
 								</a>
-								<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=genform&action=delete&form_id=' . $f->id ), 'genform_delete_form' ) ); ?>" class="button button-link-delete" onclick="return confirm('<?php esc_attr_e( 'Delete form and entries?', 'genform' ); ?>')">
+								<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=genform&action=delete&form_id=' . $f->id ), 'genform_delete_form' ) ); ?>" class="button button-link-delete">
 									<?php esc_html_e( 'Delete', 'genform' ); ?>
 								</a>
 							</td>

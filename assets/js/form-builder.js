@@ -1,5 +1,5 @@
 /**
- * GenForm Builder JS
+ * GenForm Builder JS (Vanilla JS)
  *
  * Implements the core drag-and-drop form building experience,
  * including tab management, field creation, and live configuration updates.
@@ -10,16 +10,26 @@ class GenFormBuilder {
         this.fields = [];
         this.counter = 0;
         this.activeTab = 'fields';
-        this.init();
+        this.container = null;
+        this.dataInput = null;
+        this.settingsInput = null;
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.init());
+        } else {
+            this.init();
+        }
     }
 
     /**
      * Initializes the builder environment and loads initial data.
      */
     init() {
-        this.container = jQuery('#gfm-fields-container');
-        this.dataInput = jQuery('#gfm-data-input');
-        this.settingsInput = jQuery('#gfm-settings-input');
+        this.container = document.getElementById('gfm-fields-container');
+        this.dataInput = document.getElementById('gfm-data-input');
+        this.settingsInput = document.getElementById('gfm-settings-input');
+
+        if (!this.container) return;
 
         this.loadInitialData();
         this.bindEvents();
@@ -31,13 +41,17 @@ class GenFormBuilder {
      * Toggles between URL redirect and Success message settings in the builder.
      */
     initConfirmationToggle() {
-        const toggle = jQuery('#gfm-con-type');
+        const toggle = document.getElementById('gfm-con-type');
+        if (!toggle) return;
+
         const update = () => {
-            const val = toggle.val();
-            jQuery('.gfm-con-field').addClass('gfm-hidden');
-            jQuery(`.gfm-con-${val}`).removeClass('gfm-hidden');
+            const val = toggle.value;
+            document.querySelectorAll('.gfm-con-field').forEach(el => el.classList.add('gfm-hidden'));
+            const target = document.querySelector(`.gfm-con-${val}`);
+            if (target) target.classList.remove('gfm-hidden');
         };
-        toggle.on('change', update);
+
+        toggle.addEventListener('change', update);
         update();
     }
 
@@ -50,67 +64,92 @@ class GenFormBuilder {
 
             if (window.genformBuilder.initialSettings) {
                 const s = window.genformBuilder.initialSettings;
-                jQuery('#gfm-submit-text').val(s.submit_text || 'Submit');
-                jQuery('#gfm-con-type').val(s.con_type || 'message');
-                jQuery('#gfm-success-message').val(s.success_message || '');
-                jQuery('#gfm-error-message').val(s.error_message || '');
-                jQuery('#gfm-redirect-url').val(s.redirect_url || '');
-                jQuery('#gfm-admin-email').val(s.admin_email || '');
-                jQuery('#gfm-from-name').val(s.from_name || '');
+                const mapping = {
+                    'gfm-submit-text': s.submit_text || 'Submit',
+                    'gfm-submit-align': s.submit_align || 'left',
+                    'gfm-con-type': s.con_type || 'message',
+                    'gfm-success-message': s.success_message || '',
+                    'gfm-error-message': s.error_message || '',
+                    'gfm-redirect-url': s.redirect_url || '',
+                    'gfm-base-font-size': s.base_font_size || '16',
+                    'gfm-base-font-weight': s.base_font_weight || '400',
+                    'gfm-admin-email': s.admin_email || '{admin_email}',
+                    'gfm-from-name': s.from_name || '',
+                    'gfm-from-email': s.from_email || '',
+                    'gfm-reply-to': s.reply_to || '{field_email}',
+                    'gfm-email-subject': s.email_subject || '',
+                    'gfm-email-body': s.email_body || ''
+                };
+
+                for (const id in mapping) {
+                    const el = document.getElementById(id);
+                    if (el) el.value = mapping[id];
+                }
             }
         }
 
         if (this.fields.length) {
-            // Find the highest field ID suffix to prevent duplication.
-            this.counter = Math.max(...this.fields.map(f => parseInt(f.id.split('_')[1]))) || 0;
+            this.counter = Math.max(...this.fields.map(f => {
+                const parts = f.id.split('_');
+                return parts.length > 1 ? parseInt(parts[1]) : 0;
+            })) || 0;
             this.render();
         }
     }
 
     /**
-     * Bind global action buttons like Add Field and Switch Tab.
+     * Bind global action buttons.
      */
     bindEvents() {
-        jQuery('.gfm-add-field').on('click', (e) => {
-            const type = jQuery(e.currentTarget).data('type');
-            this.addField(type);
+        document.querySelectorAll('.gfm-add-field').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.addField(e.currentTarget.dataset.type);
+            });
         });
 
-        jQuery('#gfm-builder-form').on('submit', () => this.save());
+        const form = document.getElementById('gfm-builder-form');
+        if (form) {
+            form.addEventListener('submit', () => this.save());
+        }
 
-        jQuery('.gfm-tab-link').on('click', (e) => {
-            const tab = jQuery(e.currentTarget).data('tab');
-            this.switchTab(tab);
+        document.querySelectorAll('.gfm-tab-link').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.switchTab(e.currentTarget.dataset.tab);
+            });
         });
     }
 
     /**
-     * Integrates jQuery UI Sortable for reordering fields on the canvas.
+     * Use jQuery Sortable (keeping it for now as a fallback for drag-drop logic).
      */
     initSortable() {
-        this.container.sortable({
-            placeholder: "gfm-sortable-placeholder",
-            handle: ".gfm-field-drag-handle",
-            update: () => {
-                this.updateOrder();
-            }
-        });
+        if (typeof jQuery !== 'undefined' && typeof jQuery.fn.sortable !== 'undefined') {
+            jQuery(this.container).sortable({
+                placeholder: "gfm-sortable-placeholder",
+                handle: ".gfm-field-drag-handle",
+                update: () => {
+                    this.updateOrder();
+                }
+            });
+        }
     }
 
     /**
-     * Logic for switching between builder navigation tabs.
+     * Switching tabs.
      */
     switchTab(tab) {
         this.activeTab = tab;
-        jQuery('.gfm-tab-link').removeClass('active');
-        jQuery(`.gfm-tab-link[data-tab="${tab}"]`).addClass('active');
+        document.querySelectorAll('.gfm-tab-link').forEach(el => el.classList.remove('active'));
+        const activeLink = document.querySelector(`.gfm-tab-link[data-tab="${tab}"]`);
+        if (activeLink) activeLink.classList.add('active');
 
-        jQuery('.gfm-tab-content').addClass('gfm-hidden');
-        jQuery(`#gfm-tab-${tab}`).removeClass('gfm-hidden');
+        document.querySelectorAll('.gfm-tab-content').forEach(el => el.classList.add('gfm-hidden'));
+        const activeTab = document.getElementById(`gfm-tab-${tab}`);
+        if (activeTab) activeTab.classList.remove('gfm-hidden');
     }
 
     /**
-     * Append a new field of a specific type to the internal fields collection.
+     * Append new field.
      */
     addField(type) {
         this.counter++;
@@ -134,19 +173,16 @@ class GenFormBuilder {
         this.fields.push(field);
         this.render();
 
-        // Auto-open settings for the newly added field.
         setTimeout(() => {
-            const $node = this.container.find(`[data-id="${field.id}"]`);
-            $node.find('.gfm-edit-btn').click();
-            jQuery('html, body').animate({
-                scrollTop: $node.offset().top - 100
-            }, 500);
+            const node = this.container.querySelector(`[data-id="${field.id}"]`);
+            if (node) {
+                const editBtn = node.querySelector('.gfm-edit-btn');
+                if (editBtn) editBtn.click();
+                node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
         }, 100);
     }
 
-    /**
-     * Converts a display label to a database-safe meta key.
-     */
     slugify(text) {
         return text.toString().toLowerCase()
             .replace(/\s+/g, '_')
@@ -156,9 +192,6 @@ class GenFormBuilder {
             .replace(/-+$/, '');
     }
 
-    /**
-     * Provides human-readable labels for various field types.
-     */
     getDefaultLabel(type) {
         const labels = {
             text: 'Text Field',
@@ -179,28 +212,28 @@ class GenFormBuilder {
         return ['select', 'radio', 'checkbox'].includes(type);
     }
 
-    /**
-     * Resyncs the internal fields array with the visual order on the canvas.
-     */
     updateOrder() {
         const sortedFields = [];
-        this.container.find('.gfm-field-node').each((i, el) => {
-            const id = jQuery(el).data('id');
+        this.container.querySelectorAll('.gfm-field-node').forEach(el => {
+            const id = el.dataset.id;
             const field = this.fields.find(f => f.id === id);
-            if (field) {
-                sortedFields.push(field);
-            }
+            if (field) sortedFields.push(field);
         });
         this.fields = sortedFields;
     }
 
-    /**
-     * Clears the canvas and rebuilds every field node from existing data.
-     */
     render() {
-        this.container.empty();
+        this.container.innerHTML = '';
+        if (this.fields.length === 0) {
+            this.container.innerHTML = `
+                <div class="gfm-empty-canvas">
+                    <span class="dashicons dashicons-plus-alt"></span>
+                    <p>Add fields here.</p>
+                </div>`;
+            return;
+        }
         this.fields.forEach(f => {
-            this.container.append(this.createFieldNode(f));
+            this.container.appendChild(this.createFieldNode(f));
         });
     }
 
@@ -215,198 +248,219 @@ class GenFormBuilder {
         return 'e.g. ' + (examples[type] || 'Enter value...');
     }
 
-    /**
-     * Generates the jQuery DOM element representing a field in the builder.
-     */
     createFieldNode(f) {
         const i18n = window.genformBuilder?.i18n || {};
-        f.label = f.label || '';
-        f.placeholder = f.placeholder || '';
-        f.default_value = f.default_value || '';
-        f.css_class = f.css_class || '';
-        f.width = f.width || '100';
+        const div = document.createElement('div');
+        div.className = 'gfm-field-node gfm-card';
+        div.dataset.id = f.id;
 
-        const node = jQuery(`
-            <div class="gfm-field-node gfm-card" data-id="${f.id}">
-                <div class="gfm-field-header">
-                    <span class="gfm-field-drag-handle dashicons dashicons-move"></span>
-                    <span class="gfm-field-title"><strong>${f.label}</strong> <small>${f.type}</small></span>
-                    <div class="gfm-field-actions">
-                        <button type="button" class="gfm-edit-btn gfm-opt-btn dashicons dashicons-admin-generic"></button>
-                        <button type="button" class="gfm-delete-btn gfm-opt-btn dashicons dashicons-trash"></button>
-                    </div>
-                </div>
-                <div class="gfm-field-settings-panel gfm-hidden">
-                    <div class="gfm-grid">
-                        <div class="gfm-col">
-                            <label>${i18n.label || 'Label'}</label>
-                            <input type="text" class="gfm-setter" data-prop="label" value="${f.label}">
-                        </div>
-                        <div class="gfm-col">
-                            <label>Meta Key</label>
-                            <input type="text" class="gfm-setter" data-prop="name" value="${f.name}">
-                        </div>
-                    </div>
-                    <div class="gfm-grid">
-                        <div class="gfm-col">
-                            <label>Placeholder</label>
-                            <input type="text" class="gfm-setter" data-prop="placeholder" value="${f.placeholder}">
-                        </div>
-                        <div class="gfm-col">
-                            <label>Default</label>
-                            <input type="text" class="gfm-setter" data-prop="default_value" value="${f.default_value}">
-                        </div>
-                    </div>
-                    <div class="gfm-grid">
-                        <div class="gfm-col">
-                            <label>Width</label>
-                            <div class="gfm-width-selector">
-                                <button type="button" class="gfm-width-btn ${f.width === '100' ? 'active' : ''}" data-width="100">Full</button>
-                                <button type="button" class="gfm-width-btn ${f.width === '50' ? 'active' : ''}" data-width="50">Half</button>
-                            </div>
-                        </div>
-                        <div class="gfm-col">
-                            <label>Class</label>
-                            <input type="text" class="gfm-setter" data-prop="css_class" value="${f.css_class}">
-                        </div>
-                    </div>
-                    <div class="gfm-grid">
-                        <div class="gfm-col">
-                            <label class="gfm-checkbox-trigger">
-                                <input type="checkbox" class="gfm-setter-check" data-prop="required" ${f.required ? 'checked' : ''}>
-                                <span>${i18n.required || 'Required'}</span>
-                            </label>
-                        </div>
-                    </div>
-                    ${this.renderOptionsSetter(f)}
+        div.innerHTML = `
+            <div class="gfm-field-header">
+                <span class="gfm-field-drag-handle dashicons dashicons-move"></span>
+                <span class="gfm-field-title"><strong>${this.escape(f.label)}</strong> <small>${this.escape(f.type)}</small></span>
+                <div class="gfm-field-actions">
+                    <button type="button" class="gfm-edit-btn gfm-opt-btn dashicons dashicons-admin-generic"></button>
+                    <button type="button" class="gfm-delete-btn gfm-opt-btn dashicons dashicons-trash"></button>
                 </div>
             </div>
-        `);
-
-        // Handle width toggle events.
-        node.find('.gfm-width-btn').on('click', (e) => {
-            const btn = jQuery(e.currentTarget);
-            f.width = btn.data('width').toString();
-            node.find('.gfm-width-btn').removeClass('active');
-            btn.addClass('active');
-        });
-
-        // Toggle settings panel editability.
-        node.find('.gfm-edit-btn').on('click', (e) => {
-            e.stopPropagation();
-            node.toggleClass('active');
-            node.find('.gfm-field-settings-panel').slideToggle();
-        });
-
-        // Handle field deletion.
-        node.find('.gfm-delete-btn').on('click', () => {
-            if (confirm('Are you sure you want to delete this field?')) {
-                this.fields = this.fields.filter(x => x.id !== f.id);
-                node.fadeOut(() => this.render());
-            }
-        });
-
-        // Sync input changes back to the internal data collection.
-        node.find('.gfm-setter').on('input change', (e) => {
-            const prop = jQuery(e.target).data('prop');
-            f[prop] = e.target.value;
-            if (prop === 'label') {
-                node.find('.gfm-field-title strong').text(f.label);
-            }
-        });
-
-        node.find('.gfm-setter-check').on('change', (e) => {
-            const prop = jQuery(e.target).data('prop');
-            f[prop] = e.target.checked;
-        });
-
-        // Custom field option management logic.
-        node.find('.gfm-add-opt-btn').on('click', () => {
-            f.options.push({ label: 'New Option', value: 'opt' });
-            this.updateOptionsUI(node, f);
-        });
-
-        node.on('input', '.gfm-opt-label', (e) => {
-            const idx = jQuery(e.target).data('index');
-            f.options[idx].label = e.target.value;
-        });
-
-        node.on('input', '.gfm-opt-value', (e) => {
-            const idx = jQuery(e.target).data('index');
-            f.options[idx].value = e.target.value;
-        });
-
-        node.on('click', '.gfm-opt-remove', (e) => {
-            const idx = jQuery(e.currentTarget).data('index');
-            f.options.splice(idx, 1);
-            this.updateOptionsUI(node, f);
-        });
-
-        return node;
-    }
-
-    /**
-     * Refreshes only the options sub-list for multi-choice fields.
-     */
-    updateOptionsUI(node, f) {
-        const list = node.find('.gfm-options-list');
-        list.empty();
-        f.options.forEach((o, i) => {
-            list.append(`
-                <div class="gfm-opt-row">
-                    <span class="dashicons dashicons-menu gfm-opt-drag"></span>
-                    <input type="text" class="gfm-opt-label" data-index="${i}" value="${o.label}">
-                    <input type="text" class="gfm-opt-value" data-index="${i}" value="${o.value}">
-                    <button type="button" class="gfm-opt-btn gfm-opt-remove" data-index="${i}">
-                        <span class="dashicons dashicons-no"></span>
-                    </button>
+            <div class="gfm-field-settings-panel gfm-hidden" style="display:none;">
+                <div class="gfm-grid">
+                    <div class="gfm-col">
+                        <label>${i18n.label || 'Label'}</label>
+                        <input type="text" class="gfm-setter" data-prop="label" value="${this.escape(f.label)}">
+                    </div>
+                    <div class="gfm-col">
+                        <label>Meta Key</label>
+                        <input type="text" class="gfm-setter" data-prop="name" value="${this.escape(f.name)}">
+                    </div>
                 </div>
-            `);
+                <div class="gfm-grid">
+                    <div class="gfm-col">
+                        <label>Placeholder</label>
+                        <input type="text" class="gfm-setter" data-prop="placeholder" value="${this.escape(f.placeholder)}">
+                    </div>
+                    <div class="gfm-col">
+                        <label>Default</label>
+                        <input type="text" class="gfm-setter" data-prop="default_value" value="${this.escape(f.default_value)}">
+                    </div>
+                </div>
+                <div class="gfm-grid">
+                    <div class="gfm-col">
+                        <label>Width</label>
+                        <div class="gfm-width-selector">
+                            <button type="button" class="gfm-width-btn ${f.width === '100' ? 'active' : ''}" data-width="100">Full</button>
+                            <button type="button" class="gfm-width-btn ${f.width === '50' ? 'active' : ''}" data-width="50">Half</button>
+                        </div>
+                    </div>
+                    <div class="gfm-col">
+                        <label>Class</label>
+                        <input type="text" class="gfm-setter" data-prop="css_class" value="${this.escape(f.css_class)}">
+                    </div>
+                </div>
+                <div class="gfm-grid">
+                    <div class="gfm-col">
+                        <label class="gfm-checkbox-trigger">
+                            <input type="checkbox" class="gfm-setter-check" data-prop="required" ${f.required ? 'checked' : ''}>
+                            <span>${i18n.required || 'Required'}</span>
+                        </label>
+                    </div>
+                </div>
+                ${this.renderOptionsSetter(f)}
+            </div>`;
+
+        // Event: Width
+        div.querySelectorAll('.gfm-width-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                f.width = btn.dataset.width;
+                div.querySelectorAll('.gfm-width-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+
+        // Event: Edit
+        div.querySelector('.gfm-edit-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            const panel = div.querySelector('.gfm-field-settings-panel');
+            const isActive = div.classList.toggle('active');
+
+            if (isActive) {
+                panel.style.display = 'block';
+                panel.classList.remove('gfm-hidden');
+            } else {
+                panel.style.display = 'none';
+                panel.classList.add('gfm-hidden');
+            }
+        });
+
+        // Event: Delete
+        div.querySelector('.gfm-delete-btn').addEventListener('click', async () => {
+            const confirmed = await window.gfmAdmin.gfmConfirm('Delete Field?', 'This field and its configuration will be removed from the builder.');
+            if (confirmed) {
+                window.gfmAdmin.showSpinner();
+                setTimeout(() => {
+                    this.fields = this.fields.filter(x => x.id !== f.id);
+                    div.style.transition = 'opacity 0.3s';
+                    div.style.opacity = '0';
+                    setTimeout(() => {
+                        this.render();
+                        window.gfmAdmin.hideSpinner();
+                        window.gfmAdmin.showNotice('Field removed successfully.');
+                    }, 300);
+                }, 500);
+            }
+        });
+
+        // Sync inputs
+        div.querySelectorAll('.gfm-setter').forEach(input => {
+            input.addEventListener('input', (e) => {
+                const prop = e.target.dataset.prop;
+                f[prop] = e.target.value;
+                if (prop === 'label') {
+                    div.querySelector('.gfm-field-title strong').textContent = f.label;
+                }
+            });
+        });
+
+        div.querySelectorAll('.gfm-setter-check').forEach(input => {
+            input.addEventListener('change', (e) => {
+                f[e.target.dataset.prop] = e.target.checked;
+            });
+        });
+
+        // Options Events
+        const addOptBtn = div.querySelector('.gfm-add-opt-btn');
+        if (addOptBtn) {
+            addOptBtn.addEventListener('click', () => {
+                f.options.push({ label: 'New Option', value: 'opt' });
+                this.updateOptionsUI(div, f);
+            });
+        }
+
+        div.addEventListener('input', (e) => {
+            if (e.target.classList.contains('gfm-opt-label')) {
+                f.options[e.target.dataset.index].label = e.target.value;
+            }
+            if (e.target.classList.contains('gfm-opt-value')) {
+                f.options[e.target.dataset.index].value = e.target.value;
+            }
+        });
+
+        div.addEventListener('click', (e) => {
+            const removeBtn = e.target.closest('.gfm-opt-remove');
+            if (removeBtn) {
+                f.options.splice(removeBtn.dataset.index, 1);
+                this.updateOptionsUI(div, f);
+            }
+        });
+
+        return div;
+    }
+
+    updateOptionsUI(node, f) {
+        const list = node.querySelector('.gfm-options-list');
+        if (!list) return;
+        list.innerHTML = '';
+        f.options.forEach((o, i) => {
+            const row = document.createElement('div');
+            row.className = 'gfm-opt-row';
+            row.innerHTML = `
+                <span class="dashicons dashicons-menu gfm-opt-drag"></span>
+                <input type="text" class="gfm-opt-label" data-index="${i}" value="${this.escape(o.label)}">
+                <input type="text" class="gfm-opt-value" data-index="${i}" value="${this.escape(o.value)}">
+                <button type="button" class="gfm-opt-btn gfm-opt-remove" data-index="${i}">
+                    <span class="dashicons dashicons-no"></span>
+                </button>`;
+            list.appendChild(row);
         });
     }
 
-    /**
-     * Renders the HTML for the options management section.
-     */
     renderOptionsSetter(f) {
         if (!this.isOptionField(f.type)) return '';
         const listHtml = f.options.map((o, i) => `
             <div class="gfm-opt-row">
                 <span class="dashicons dashicons-menu gfm-opt-drag"></span>
-                <input type="text" class="gfm-opt-label" data-index="${i}" value="${o.label}">
-                <input type="text" class="gfm-opt-value" data-index="${i}" value="${o.value}">
+                <input type="text" class="gfm-opt-label" data-index="${i}" value="${this.escape(o.label)}">
+                <input type="text" class="gfm-opt-value" data-index="${i}" value="${this.escape(o.value)}">
                 <button type="button" class="gfm-opt-btn gfm-opt-remove" data-index="${i}">
                     <span class="dashicons dashicons-no"></span>
                 </button>
-            </div>
-        `).join('');
+            </div>`).join('');
 
         return `
             <div class="gfm-options-setter">
                 <h4>Options</h4>
                 <div class="gfm-options-list">${listHtml}</div>
                 <button type="button" class="gfm-add-opt-btn">Add Option</button>
-            </div>
-        `;
+            </div>`;
     }
 
-    /**
-     * Orchestrates the collection of all current UI state into the hidden save inputs.
-     */
     save() {
         const settings = {
-            submit_text: jQuery('#gfm-submit-text').val(),
-            con_type: jQuery('#gfm-con-type').val(),
-            success_message: jQuery('#gfm-success-message').val(),
-            error_message: jQuery('#gfm-error-message').val(),
-            redirect_url: jQuery('#gfm-redirect-url').val(),
-            admin_email: jQuery('#gfm-admin-email').val(),
-            from_name: jQuery('#gfm-from-name').val(),
+            submit_text: document.getElementById('gfm-submit-text')?.value,
+            submit_align: document.getElementById('gfm-submit-align')?.value,
+            con_type: document.getElementById('gfm-con-type')?.value,
+            success_message: document.getElementById('gfm-success-message')?.value,
+            error_message: document.getElementById('gfm-error-message')?.value,
+            redirect_url: document.getElementById('gfm-redirect-url')?.value,
+            base_font_size: document.getElementById('gfm-base-font-size')?.value,
+            base_font_weight: document.getElementById('gfm-base-font-weight')?.value,
+            admin_email: document.getElementById('gfm-admin-email')?.value,
+            from_name: document.getElementById('gfm-from-name')?.value,
+            from_email: document.getElementById('gfm-from-email')?.value,
+            reply_to: document.getElementById('gfm-reply-to')?.value,
+            email_subject: document.getElementById('gfm-email-subject')?.value,
+            email_body: document.getElementById('gfm-email-body')?.value,
         };
 
-        this.dataInput.val(JSON.stringify({ fields: this.fields }));
-        this.settingsInput.val(JSON.stringify(settings));
+        if (this.dataInput) this.dataInput.value = JSON.stringify({ fields: this.fields });
+        if (this.settingsInput) this.settingsInput.value = JSON.stringify(settings);
+    }
+
+    escape(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 }
 
-jQuery(document).ready(() => new GenFormBuilder());
+new GenFormBuilder();

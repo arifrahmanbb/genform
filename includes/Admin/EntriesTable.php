@@ -223,9 +223,10 @@ class EntriesTable extends \WP_List_Table {
 		}
 
 		return sprintf(
-			'<div class="gfm-table-actions"><a href="#" class="gfm-view-entry gfm-action-icon" data-payload=\'%1$s\' data-metadata=\'%2$s\' title="%3$s"><span class="dashicons dashicons-visibility"></span></a><a href="%4$s" class="gfm-action-icon gfm-action-trash-simple" title="%5$s"><span class="dashicons dashicons-trash"></span></a></div>',
+			'<div class="gfm-table-actions"><a href="#" class="gfm-view-entry gfm-action-icon" data-payload=\'%1$s\' data-metadata=\'%2$s\' data-form=\'%3$s\' title="%4$s"><span class="dashicons dashicons-visibility"></span></a><a href="%5$s" class="gfm-action-icon gfm-action-trash-simple" title="%6$s"><span class="dashicons dashicons-trash"></span></a></div>',
 			esc_attr( wp_json_encode( $r_d ) ),
 			esc_attr( $item->entry_metadata ?: '{}' ),
+			esc_attr( $item->form_name ?: esc_html__( 'Deleted Form', 'genform' ) ),
 			esc_attr__( 'View details', 'genform' ),
 			esc_url( wp_nonce_url( admin_url( 'admin.php?page=genform-entries&action=trash&entry=' . $item->id ), 'bulk-entries' ) ),
 			esc_attr__( 'Move to Trash', 'genform' )

@@ -106,12 +106,51 @@ $s  = $f ? json_decode( $f->form_settings, true ) : array();
 				</div>
 				<div class="gfm-grid gfm-con-field gfm-con-message">
 					<div class="gfm-col">
-						<label><?php esc_html_e( 'Success', 'genform' ); ?></label>
+						<label><?php esc_html_e( 'Success Message', 'genform' ); ?></label>
 						<textarea id="gfm-success-message"><?php echo esc_textarea( $s['success_message'] ?? '' ); ?></textarea>
 					</div>
 					<div class="gfm-col">
-						<label><?php esc_html_e( 'Error', 'genform' ); ?></label>
+						<label><?php esc_html_e( 'Error Message', 'genform' ); ?></label>
 						<textarea id="gfm-error-message"><?php echo esc_textarea( $s['error_message'] ?? '' ); ?></textarea>
+					</div>
+				</div>
+			</div>
+
+			<div class="gfm-card">
+				<h3><?php esc_html_e( 'Submit Button', 'genform' ); ?></h3>
+				<div class="gfm-grid">
+					<div class="gfm-col">
+						<label><?php esc_html_e( 'Button Text', 'genform' ); ?></label>
+						<input type="text" id="gfm-submit-text" value="<?php echo esc_attr( $s['submit_text'] ?? esc_html__( 'Submit', 'genform' ) ); ?>">
+					</div>
+					<div class="gfm-col">
+						<label><?php esc_html_e( 'Button Alignment', 'genform' ); ?></label>
+						<select id="gfm-submit-align">
+							<option value="left" <?php selected( $s['submit_align'] ?? 'left', 'left' ); ?>><?php esc_html_e( 'Left', 'genform' ); ?></option>
+							<option value="center" <?php selected( $s['submit_align'] ?? 'left', 'center' ); ?>><?php esc_html_e( 'Center', 'genform' ); ?></option>
+							<option value="right" <?php selected( $s['submit_align'] ?? 'left', 'right' ); ?>><?php esc_html_e( 'Right', 'genform' ); ?></option>
+							<option value="full" <?php selected( $s['submit_align'] ?? 'left', 'full' ); ?>><?php esc_html_e( 'Full Width', 'genform' ); ?></option>
+						</select>
+					</div>
+				</div>
+			</div>
+
+			<div class="gfm-card">
+				<h3><?php esc_html_e( 'Typography & Spacing', 'genform' ); ?></h3>
+				<div class="gfm-grid">
+					<div class="gfm-col">
+						<label><?php esc_html_e( 'Base Font Size (px)', 'genform' ); ?></label>
+						<input type="number" id="gfm-base-font-size" value="<?php echo esc_attr( $s['base_font_size'] ?? '16' ); ?>" min="12" max="24">
+					</div>
+					<div class="gfm-col">
+						<label><?php esc_html_e( 'Font Weight', 'genform' ); ?></label>
+						<select id="gfm-base-font-weight">
+							<option value="300" <?php selected( $s['base_font_weight'] ?? '400', '300' ); ?>><?php esc_html_e( 'Light (300)', 'genform' ); ?></option>
+							<option value="400" <?php selected( $s['base_font_weight'] ?? '400', '400' ); ?>><?php esc_html_e( 'Regular (400)', 'genform' ); ?></option>
+							<option value="500" <?php selected( $s['base_font_weight'] ?? '400', '500' ); ?>><?php esc_html_e( 'Medium (500)', 'genform' ); ?></option>
+							<option value="600" <?php selected( $s['base_font_weight'] ?? '400', '600' ); ?>><?php esc_html_e( 'Semi-Bold (600)', 'genform' ); ?></option>
+							<option value="700" <?php selected( $s['base_font_weight'] ?? '400', '700' ); ?>><?php esc_html_e( 'Bold (700)', 'genform' ); ?></option>
+						</select>
 					</div>
 				</div>
 			</div>
@@ -120,16 +159,36 @@ $s  = $f ? json_decode( $f->form_settings, true ) : array();
 		<!-- Email Notifications Tab -->
 		<div id="gfm-tab-notifications" class="gfm-tab-content gfm-hidden">
 			<div class="gfm-card">
-				<h3><?php esc_html_e( 'Email', 'genform' ); ?></h3>
+				<h3><?php esc_html_e( 'Email Notifications', 'genform' ); ?></h3>
 				<div class="gfm-grid">
 					<div class="gfm-col">
-						<label><?php esc_html_e( 'To', 'genform' ); ?></label>
+						<label><?php esc_html_e( 'Send To Email', 'genform' ); ?></label>
 						<input type="text" id="gfm-admin-email" value="<?php echo esc_attr( $s['admin_email'] ?? '{admin_email}' ); ?>">
+						<span class="gfm-setting-desc"><?php esc_html_e( 'Use {admin_email} for site admin email.', 'genform' ); ?></span>
 					</div>
 					<div class="gfm-col">
 						<label><?php esc_html_e( 'From Name', 'genform' ); ?></label>
-						<input type="text" id="gfm-from-name" value="<?php echo esc_attr( $s['from_name'] ?? '' ); ?>">
+						<input type="text" id="gfm-from-name" value="<?php echo esc_attr( $s['from_name'] ?? '' ); ?>" placeholder="{global_from_name}">
 					</div>
+				</div>
+				<div class="gfm-grid">
+					<div class="gfm-col">
+						<label><?php esc_html_e( 'From Email', 'genform' ); ?></label>
+						<input type="text" id="gfm-from-email" value="<?php echo esc_attr( $s['from_email'] ?? '' ); ?>" placeholder="{global_from_email}">
+					</div>
+					<div class="gfm-col">
+						<label><?php esc_html_e( 'Reply-To Email', 'genform' ); ?></label>
+						<input type="text" id="gfm-reply-to" value="<?php echo esc_attr( $s['reply_to'] ?? '{field_email}' ); ?>">
+					</div>
+				</div>
+				<div class="gfm-setting-row gfm-mt-md">
+					<label><?php esc_html_e( 'Email Subject', 'genform' ); ?></label>
+					<input type="text" id="gfm-email-subject" value="<?php echo esc_attr( $s['email_subject'] ?? '' ); ?>" class="widefat" placeholder="<?php esc_attr_e( 'New Submission: {form_name}', 'genform' ); ?>">
+				</div>
+				<div class="gfm-setting-row gfm-mt-md">
+					<label><?php esc_html_e( 'Email Body', 'genform' ); ?></label>
+					<textarea id="gfm-email-body" rows="8" class="widefat" placeholder="<?php esc_attr_e( "{all_fields}\n\nSent from {site_title}", 'genform' ); ?>"><?php echo esc_textarea( $s['email_body'] ?? '' ); ?></textarea>
+					<span class="gfm-setting-desc"><?php esc_html_e( 'Tags: {all_fields}, {form_name}, {site_title}, {field_ID}', 'genform' ); ?></span>
 				</div>
 			</div>
 		</div>

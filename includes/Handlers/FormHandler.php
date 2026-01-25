@@ -25,6 +25,8 @@ final class FormHandler {
 		add_action( 'wp_ajax_genform_submit', array( $this, 'handleSubmission' ) );
 		add_action( 'wp_ajax_nopriv_genform_submit', array( $this, 'handleSubmission' ) );
 		add_action( 'wp_ajax_genform_delete_entry', array( $this, 'handleDeleteEntry' ) );
+		add_action( 'wp_ajax_genform_trash_entry', array( $this, 'handleTrashEntry' ) );
+		add_action( 'wp_ajax_genform_delete_form', array( $this, 'handleDeleteFormAjax' ) );
 		add_action( 'wp_ajax_genform_mark_as_read', array( $this, 'handleMarkAsRead' ) );
 		add_action( 'admin_init', array( $this, 'processBulkActions' ) );
 	}
@@ -130,6 +132,41 @@ final class FormHandler {
 		if ( $id ) {
 			global $wpdb;
 			$wpdb->delete( "{$wpdb->prefix}genform_entries", array( 'id' => $id ) );
+			wp_send_json_success();
+		}
+		wp_send_json_error();
+	}
+
+	/**
+	 * Admin AJAX handler for trashing an entry.
+	 */
+	public function handleTrashEntry(): void {
+		check_ajax_referer( 'genform_admin_nonce', 'nonce' );
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => esc_html__( 'Unauthorized', 'genform' ) ) );
+		}
+		$id = absint( $_POST['entry_id'] ?? 0 );
+		if ( $id ) {
+			global $wpdb;
+			$wpdb->update( "{$wpdb->prefix}genform_entries", array( 'status' => 'trash' ), array( 'id' => $id ) );
+			wp_send_json_success();
+		}
+		wp_send_json_error();
+	}
+
+	/**
+	 * Admin AJAX handler for deleting a form.
+	 */
+	public function handleDeleteFormAjax(): void {
+		check_ajax_referer( 'genform_admin_nonce', 'nonce' );
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => esc_html__( 'Unauthorized', 'genform' ) ) );
+		}
+		$id = absint( $_POST['form_id'] ?? 0 );
+		if ( $id ) {
+			global $wpdb;
+			$wpdb->delete( "{$wpdb->prefix}genform_forms", array( 'id' => $id ) );
+			$wpdb->delete( "{$wpdb->prefix}genform_entries", array( 'form_id' => $id ) );
 			wp_send_json_success();
 		}
 		wp_send_json_error();

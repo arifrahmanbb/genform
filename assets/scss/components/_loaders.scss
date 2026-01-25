@@ -1,0 +1,54 @@
+@use '../abstracts' as *;
+
+/**
+ * Global Spinner Overlay
+ */
+.gfm-spinner-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.7);
+    z-index: 999999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.gfm-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba($primary, 0.2);
+    border-top-color: $primary;
+    border-radius: 50%;
+    animation: gfm-spin 0.8s linear infinite;
+}
+
+@keyframes gfm-spin {
+    to { transform: rotate(360deg); }
+}
+
+/**
+ * Floating Notice HUD
+ */
+.gfm-builder-notice {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #1e293b;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 500;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+    z-index: 999999;
+    @include transition;
+    opacity: 0;
+
+    &.show {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
