@@ -1,13 +1,71 @@
 @use '../abstracts' as *;
 
-.gfm-unread-dot-badge { width: 8px; height: 8px; background: $primary; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 0 3px rgba($primary, 0.15); }
-
 .gfm-status {
-    padding: 6px 12px; border-radius: 20px; font-size: 11px; letter-spacing: 0.05em; font-weight: 700;
-    &-active { background: #ecfdf5; color: $success; }
-    &-inactive { background: #f1f5f9; color: $text-muted; }
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: $radius-full;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    font-weight: $weight-bold;
+    text-transform: uppercase;
+    
+    &-active {
+        background: $gfm-color-success;
+        color: $gfm-color-success-text;
+    }
+    
+    &-inactive {
+        background: $bg;
+        color: $text-muted;
+    }
+
+    &-trash {
+        background: $gfm-color-error;
+        color: $gfm-color-error-text;
+    }
 }
 
-.gfm-shortcode-copy { display: flex; align-items: center; gap: $space-xs; code { background: #f1f5f9; color: $text-main; padding: 4px 8px; border-radius: $radius-sm; } }
-.gfm-copy-btn { background: none; border: none; cursor: pointer; color: $text-muted; @include transition; &:hover { color: $primary; } }
-.gfm-count-badge { background: $primary; color: $white !important; padding: 2px 8px; border-radius: 99px; text-decoration: none; font-size: 11px; font-weight: 700; @include transition; &:hover { background: $primary-dark; transform: scale(1.1); } }
+.gfm-shortcode-copy {
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+    background: $bg;
+    padding: 4px 6px 4px 12px;
+    border-radius: $radius-md;
+    border: 1px solid $border;
+    max-width: fit-content;
+
+    code {
+        background: transparent;
+        color: $text-main;
+        padding: 0;
+        font-family: 'JetBrains Mono', 'Monaco', monospace;
+        font-size: 13px;
+        font-weight: 500;
+    }
+}
+
+.gfm-copy-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: $text-light;
+    width: 28px;
+    height: 28px;
+    border-radius: $radius-sm;
+    @include flex-center;
+    transition: $transition-base;
+
+    &:hover {
+        background: $white;
+        color: $primary;
+        box-shadow: $shadow-sm;
+    }
+
+    .dashicons {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+    }
+}

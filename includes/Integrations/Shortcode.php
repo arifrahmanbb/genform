@@ -54,6 +54,17 @@ final class Shortcode {
 		$settings = json_decode( $form->form_settings, true );
 		$nonce    = wp_create_nonce( "genform_submit_{$form->id}" );
 
+		// Dynamic styles for this specific form instance.
+		$bsize   = (int) ( $settings['base_font_size'] ?? 16 );
+		$bweight = (int) ( $settings['base_font_weight'] ?? 400 );
+		$custom_css = "
+			#gfm-form-{$form->id} {
+				--gfm-base-size: {$bsize}px;
+				font-weight: {$bweight};
+			}
+		";
+		wp_add_inline_style( 'genform-frontend', $custom_css );
+
 		include GENFORM_PATH . 'public/views/form-template.php';
 	}
 }

@@ -2,81 +2,112 @@
 
 .genform-admin-wrap .wp-list-table {
     border: 1px solid $border;
-    border-radius: $radius-sm;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border-radius: $radius;
+    box-shadow: $shadow-sm;
     border-collapse: separate;
     border-spacing: 0;
-    margin-top: 10px;
+    margin-top: $space-sm;
+    overflow: hidden;
 
     thead th {
-        background: #fcfdfe;
+        background: #F9FAFB;
         border-bottom: 1px solid $border;
-        padding: 16px 12px; // Increased padding
-        font-weight: 600;
+        padding: 18px $space-sm;
+        font-weight: $weight-bold;
         color: $text-muted;
         text-transform: uppercase;
         font-size: 11px;
-        letter-spacing: 0.05em;
-        border-right: none; // No vertical borders
-    }
-
-    tbody td {
-        padding: 20px 12px; // Increased row padding for better readability
-        border-bottom: 1px solid #f1f5f9; // Minimalist horizontal border
-        vertical-align: middle;
+        letter-spacing: 0.1em;
         border-right: none;
     }
 
-    tbody tr:hover {
-        background-color: #f9fafb !important;
+    tbody td {
+        padding: 22px $space-sm;
+        border-bottom: 1px solid $border;
+        vertical-align: middle;
+        border-right: none;
+        color: $text-main;
+        font-size: $size-base;
+    }
+
+    tbody tr {
+        transition: $transition-base;
+        
+        &:last-child td {
+            border-bottom: none;
+        }
+
+        &:hover {
+            background-color: #F9FAFB !important;
+        }
     }
 }
 
 .gfm-id-cell {
     display: flex;
     align-items: center;
-    gap: 8px;
-    color: #94a3b8;
-    font-weight: 500;
+    gap: $space-xs;
+    color: $text-light;
+    font-weight: $weight-medium;
 }
 
-// Stylized 'Unread' status indicator (10px blue dot)
 .gfm-unread-dot-badge {
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     background: $primary;
-    border-radius: 50%;
+    border-radius: $radius-full;
     flex-shrink: 0;
-    box-shadow: 0 0 0 3px rgba($primary, 0.15);
+    box-shadow: 0 0 0 4px rgba($primary, 0.1);
 }
 
 .gfm-table-actions {
     display: flex;
-    gap: 8px;
+    gap: $space-xs;
 }
 
-// Responsive action icons with soft hover states
 .gfm-action-icon {
     @include flex-center;
     width: 32px;
     height: 32px;
     border-radius: $radius-sm;
-    background: #f8fafc;
+    background: $white;
     border: 1px solid $border;
     color: $text-muted !important;
-    @include transition;
+    transition: $transition-base;
     text-decoration: none !important;
 
     &:hover {
         border-color: $primary;
-        color: $primary !important;
-        background: $primary-light; // Soft background color
-        transform: translateY(-1px);
+        color: $white !important;
+        background: $primary !important;
+        transform: translateY(-2px);
+        box-shadow: $shadow-md;
     }
 
     .dashicons {
         font-size: 18px;
         width: 18px;
         height: 18px;
+    }
+}
+
+.gfm-count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 8px;
+    background: $primary-light;
+    color: $primary;
+    border-radius: $radius-full;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: $transition-base;
+
+    &:hover {
+        background: $primary;
+        color: $white;
     }
 }

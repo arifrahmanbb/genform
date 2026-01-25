@@ -283,7 +283,7 @@ final class Core {
 
 		if ( str_contains( $hook, 'genform-builder' ) ) {
 			wp_enqueue_script( 'jquery-ui-sortable' );
-			wp_enqueue_script( 'genform-builder', GENFORM_URL . 'assets/js/form-builder.js', array( 'jquery-ui-sortable' ), GENFORM_VERSION, array( 'strategy' => 'defer', 'in_footer' => true ) );
+			wp_enqueue_script( 'genform-builder', GENFORM_URL . 'assets/js/form-builder.js', array( 'jquery-ui-sortable', 'genform-admin' ), GENFORM_VERSION, array( 'strategy' => 'defer', 'in_footer' => true ) );
 
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$genform_requested_id = isset( $_GET['form_id'] ) ? absint( wp_unslash( $_GET['form_id'] ) ) : 0;

@@ -7,9 +7,10 @@
 #gfm-tab-settings,
 #gfm-tab-notifications {
     .gfm-card {
-        max-width: 800px;
+        max-width: 850px;
         margin-left: auto;
         margin-right: auto;
+        padding: $space-lg;
     }
 }
 
@@ -19,46 +20,53 @@
     }
 
     .form-table th {
-        padding: 24px 10px 24px 0;
-        width: 240px;
+        padding: 24px 20px 24px 0;
+        width: 260px;
         font-size: 14px;
-        font-weight: 700;
+        font-weight: $weight-bold;
         color: $text-main;
+        vertical-align: top;
     }
 
     .form-table td {
-        padding: 16px 0;
+        padding: 24px 0;
+        
+        p.description {
+            margin-top: 8px;
+            font-size: 12.5px;
+            color: $text-muted;
+        }
     }
 
     .form-table h2 {
-        font-size: 18px;
+        font-size: 20px;
         font-weight: 800;
-        margin: 40px 0 10px 0;
+        margin: $space-lg 0 $space-xs 0;
         color: $text-main;
-        border-bottom: 2px solid #f1f5f9;
-        padding-bottom: 12px;
+        letter-spacing: -0.01em;
     }
 
     .gfm-section-desc {
         font-size: 14px;
         color: $text-muted;
-        margin: 0px 0 $space-md 0;
+        margin: 0 0 $space-lg 0;
         line-height: 1.6;
         max-width: 700px;
     }
 
     .gfm-color-picker {
-        height: 44px;
-        width: 64px;
-        padding: 4px;
+        height: 48px;
+        width: 80px;
+        padding: 6px;
         border: 1px solid $border;
-        border-radius: $radius-sm;
+        border-radius: $radius-md;
         cursor: pointer;
         background: $white;
-        @include transition;
+        transition: $transition-base;
 
         &:hover {
-            border-color: $border-dark;
+            border-color: $primary;
+            box-shadow: $shadow-sm;
         }
     }
 
@@ -67,23 +75,28 @@
     }
 
     .submit {
-        margin-top: 32px;
+        margin-top: $space-lg;
         padding: 0;
 
         .button-primary {
-            background: $primary !important;
+            background: linear-gradient(135deg, $primary 0%, $primary-dark 100%) !important;
             border: none !important;
-            padding: 12px 32px !important;
+            padding: 14px 40px !important;
             height: auto !important;
-            font-weight: 700 !important;
-            border-radius: 10px !important;
-            box-shadow: 0 4px 12px rgba($primary, 0.2) !important;
-            @include transition;
+            font-weight: $weight-bold !important;
+            font-size: $size-base !important;
+            border-radius: $radius-md !important;
+            box-shadow: 0 10px 15px -3px rgba($primary, 0.25) !important;
+            transition: $transition-bounce !important;
+            text-shadow: none !important;
 
             &:hover {
-                background: $primary-dark !important;
-                transform: translateY(-1px) !important;
-                box-shadow: 0 6px 16px rgba($primary, 0.3) !important;
+                transform: translateY(-2px) !important;
+                box-shadow: 0 20px 25px -5px rgba($primary, 0.3) !important;
+            }
+
+            &:active {
+                transform: scale(0.98) !important;
             }
         }
     }

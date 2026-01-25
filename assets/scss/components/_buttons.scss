@@ -5,23 +5,34 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 24px;
-    border-radius: 10px;
-    font-weight: 600;
+    gap: $space-xs;
+    padding: 12px 24px;
+    border-radius: $radius-md;
+    font-weight: $weight-bold;
+    font-size: $size-base;
     cursor: pointer;
     text-decoration: none;
     border: 1px solid transparent;
-    @include transition;
+    transition: $transition-base;
     box-shadow: $shadow-sm;
+    line-height: 1;
+
+    &:active {
+        transform: scale(0.98);
+    }
+
+    &:focus-visible {
+        outline: 2px solid $primary-alt;
+        outline-offset: 2px;
+    }
 
     &-primary {
-        background: $primary;
+        background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
         color: $white !important;
 
         &:hover {
-            background: $primary-dark;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba($primary, 0.3);
+            box-shadow: 0 8px 20px -6px rgba($primary, 0.4);
+            transform: translateY(-2px);
         }
     }
 
@@ -33,6 +44,7 @@
         &:hover {
             background: $bg;
             border-color: $border-dark;
+            box-shadow: $shadow-md;
         }
     }
 
@@ -42,7 +54,15 @@
         border: 1px solid transparent;
 
         &:hover {
-            background: color.scale($primary-light, $lightness: -2%);
+            background: color.scale($primary-light, $lightness: -3%);
+            color: $primary-dark !important;
         }
+    }
+
+    .dashicons {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        margin-top: -1px;
     }
 }

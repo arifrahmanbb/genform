@@ -263,7 +263,7 @@ class GenFormBuilder {
                     <button type="button" class="gfm-delete-btn gfm-opt-btn dashicons dashicons-trash"></button>
                 </div>
             </div>
-            <div class="gfm-field-settings-panel gfm-hidden" style="display:none;">
+            <div class="gfm-field-settings-panel gfm-hidden">
                 <div class="gfm-grid">
                     <div class="gfm-col">
                         <label>${i18n.label || 'Label'}</label>
@@ -299,10 +299,13 @@ class GenFormBuilder {
                 </div>
                 <div class="gfm-grid">
                     <div class="gfm-col">
-                        <label class="gfm-checkbox-trigger">
-                            <input type="checkbox" class="gfm-setter-check" data-prop="required" ${f.required ? 'checked' : ''}>
-                            <span>${i18n.required || 'Required'}</span>
-                        </label>
+                        <div class="gfm-required-toggle-wrap">
+                            <label class="gfm-switch">
+                                <input type="checkbox" class="gfm-setter-check" data-prop="required" ${f.required ? 'checked' : ''}>
+                                <span class="slider"></span>
+                            </label>
+                            <span class="gfm-required-label">${i18n.required || 'Required'}</span>
+                        </div>
                     </div>
                 </div>
                 ${this.renderOptionsSetter(f)}
@@ -324,10 +327,8 @@ class GenFormBuilder {
             const isActive = div.classList.toggle('active');
 
             if (isActive) {
-                panel.style.display = 'block';
                 panel.classList.remove('gfm-hidden');
             } else {
-                panel.style.display = 'none';
                 panel.classList.add('gfm-hidden');
             }
         });
@@ -339,8 +340,7 @@ class GenFormBuilder {
                 window.gfmAdmin.showSpinner();
                 setTimeout(() => {
                     this.fields = this.fields.filter(x => x.id !== f.id);
-                    div.style.transition = 'opacity 0.3s';
-                    div.style.opacity = '0';
+                    div.classList.add('gfm-removing');
                     setTimeout(() => {
                         this.render();
                         window.gfmAdmin.hideSpinner();
@@ -405,10 +405,10 @@ class GenFormBuilder {
             row.className = 'gfm-opt-row';
             row.innerHTML = `
                 <span class="dashicons dashicons-menu gfm-opt-drag"></span>
-                <input type="text" class="gfm-opt-label" data-index="${i}" value="${this.escape(o.label)}">
-                <input type="text" class="gfm-opt-value" data-index="${i}" value="${this.escape(o.value)}">
+                <input type="text" class="gfm-opt-label" data-index="${i}" value="${this.escape(o.label)}" placeholder="Label">
+                <input type="text" class="gfm-opt-value" data-index="${i}" value="${this.escape(o.value)}" placeholder="Value">
                 <button type="button" class="gfm-opt-btn gfm-opt-remove" data-index="${i}">
-                    <span class="dashicons dashicons-no"></span>
+                    <span class="dashicons dashicons-no-alt"></span>
                 </button>`;
             list.appendChild(row);
         });
@@ -419,10 +419,10 @@ class GenFormBuilder {
         const listHtml = f.options.map((o, i) => `
             <div class="gfm-opt-row">
                 <span class="dashicons dashicons-menu gfm-opt-drag"></span>
-                <input type="text" class="gfm-opt-label" data-index="${i}" value="${this.escape(o.label)}">
-                <input type="text" class="gfm-opt-value" data-index="${i}" value="${this.escape(o.value)}">
+                <input type="text" class="gfm-opt-label" data-index="${i}" value="${this.escape(o.label)}" placeholder="Label">
+                <input type="text" class="gfm-opt-value" data-index="${i}" value="${this.escape(o.value)}" placeholder="Value">
                 <button type="button" class="gfm-opt-btn gfm-opt-remove" data-index="${i}">
-                    <span class="dashicons dashicons-no"></span>
+                    <span class="dashicons dashicons-no-alt"></span>
                 </button>
             </div>`).join('');
 
@@ -430,7 +430,10 @@ class GenFormBuilder {
             <div class="gfm-options-setter">
                 <h4>Options</h4>
                 <div class="gfm-options-list">${listHtml}</div>
-                <button type="button" class="gfm-add-opt-btn">Add Option</button>
+                <button type="button" class="gfm-add-opt-btn">
+                    <span class="dashicons dashicons-plus-alt2"></span>
+                    ${window.genformBuilder?.i18n?.add_option || 'Add Option'}
+                </button>
             </div>`;
     }
 

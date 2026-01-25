@@ -9,19 +9,21 @@
     font-family: $font-main;
     font-size: $size-base;
     color: $text-main;
+    -webkit-font-smoothing: antialiased;
 
-    // Global Label Styling for consistent spacing
+    // Global Label Styling
     label {
-        display: block !important;
-        margin-bottom: $space-xs !important;
-        font-size: 13px !important;
-        font-weight: 600 !important;
-        color: $text-main !important;
-        line-height: $input-height !important; // Align with input height for better rhythm if needed, but usually we want it above
-        line-height: 1.5 !important;
+        display: block;
+        margin-bottom: 8px;
+        font-size: 13px;
+        font-weight: $weight-bold;
+        color: $text-light;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        line-height: 1.4;
     }
 
-    // Broad styling for all textual inputs to ensure SaaS consistency
+    // Modern Textual Inputs
     input[type="text"],
     input[type="email"],
     input[type="url"],
@@ -35,6 +37,17 @@
         box-sizing: border-box;
         margin: 0;
         max-width: 100%;
+        background-color: $bg;
+        border-color: $border;
+
+        &:hover {
+            border-color: $border-dark;
+        }
+
+        &:focus {
+            background-color: $white;
+            border-color: $primary;
+        }
     }
 
     textarea {
@@ -43,13 +56,25 @@
         min-height: 120px;
         line-height: 1.6;
         resize: vertical;
+        padding: 12px 16px;
+        background-color: $bg;
+
+        &:focus {
+            background-color: $white;
+        }
     }
 
-    // Specific class-based overrides for WP elements
-    input.widefat, 
-    textarea.widefat {
-        @include input-field;
-        width: 100%;
+    // Custom Scrollbar for Textareas
+    textarea::-webkit-scrollbar {
+        width: 8px;
+    }
+    textarea::-webkit-scrollbar-track {
+        background: $bg;
+        border-radius: $radius-sm;
+    }
+    textarea::-webkit-scrollbar-thumb {
+        background: $border;
+        border-radius: $radius-sm;
     }
 
     // Standard setting rows container
@@ -57,18 +82,137 @@
         margin-bottom: $space-lg;
 
         label {
+            color: $text-main;
             font-size: 14px;
             margin-bottom: $space-xs;
         }
 
         .description,
         .gfm-setting-desc {
-            font-size: 12px;
+            font-size: 12.5px;
             color: $text-muted;
-            margin-top: $space-xs;
-            font-style: italic;
+            margin-top: 8px;
             display: block;
-            line-height: 1.6;
+            line-height: normal;
+        }
+    }
+
+    // Premium Toggle Switch
+    .gfm-switch {
+        position: relative;
+        display: inline-block;
+        width: 44px;
+        height: 24px;
+        vertical-align: middle;
+
+        input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+
+            &:checked + .slider {
+                background: $primary;
+                border-color: $primary;
+
+                &:before {
+                    transform: translateX(20px);
+                    background: $white;
+                }
+            }
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: $bg;
+            border: 2px solid $border;
+            transition: .4s;
+            border-radius: 34px;
+
+            &:before {
+                position: absolute;
+                content: "";
+                height: 14px;
+                width: 14px;
+                left: 3px;
+                bottom: 3px;
+                background-color: $text-light;
+                transition: .4s;
+                border-radius: 50%;
+            }
+        }
+    }
+
+    // Modern Checkboxes & Radio Buttons
+    input[type="checkbox"]:not(.gfm-setter-check),
+    input[type="radio"] {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border: 2px solid $border-dark;
+        background: $white;
+        margin: 0;
+        cursor: pointer;
+        position: relative;
+        transition: $transition-base;
+        vertical-align: middle;
+        margin-right: 8px;
+
+        &:checked {
+            background: $primary;
+            border-color: $primary;
+            box-shadow: 0 4px 6px -1px rgba($primary, 0.2);
+
+            &::after {
+                transform: rotate(45deg) scale(1);
+            }
+        }
+        
+        &:hover {
+            border-color: $primary;
+        }
+    }
+
+    input[type="checkbox"]:not(.gfm-setter-check) {
+        border-radius: 4px;
+
+        &::after {
+            content: "";
+            position: absolute;
+            left: 4.5px;
+            top: 1px;
+            width: 5px;
+            height: 9px;
+            border: solid $white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg) scale(0);
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+    }
+
+    input[type="radio"] {
+        border-radius: 50%;
+
+        &::after {
+            content: "";
+            position: absolute;
+            left: 4px;
+            top: 4px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: $white;
+            transform: scale(0);
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        &:checked::after {
+            transform: scale(1);
         }
     }
 
@@ -82,12 +226,18 @@
         .gfm-col {
             display: flex;
             flex-direction: column;
-            gap: 0; // Handled by label margin or description margin
 
-            // Inputs inside grid columns should also be full width of the column
             input, select, textarea {
                 width: 100%;
             }
         }
+
+        &.two-cols {
+            grid-template-columns: 1fr 1fr;
+        }
     }
+
+    // Spacing Helpers
+    .mt-0 { margin-top: 0 !important; }
+    .mb-0 { margin-bottom: 0 !important; }
 }

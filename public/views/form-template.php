@@ -16,7 +16,7 @@ $genform_bweight = esc_attr( $settings['base_font_weight'] ?? '400' );
 $genform_balign  = esc_attr( $settings['submit_align'] ?? 'left' );
 ?>
 
-<div class="gfm-form-container" id="gfm-form-<?php echo esc_attr( $form->id ); ?>" data-size="<?php echo esc_attr( $genform_bsize ); ?>" data-weight="<?php echo esc_attr( $genform_bweight ); ?>">
+<div class="gfm-form-container" id="gfm-form-<?php echo esc_attr( $form->id ); ?>">
 	<form class="gfm-form gfm-form-js" data-id="<?php echo esc_attr( $form->id ); ?>">
 		<input type="hidden" name="genform_id" value="<?php echo esc_attr( $form->id ); ?>">
 		<input type="hidden" name="genform_nonce" value="<?php echo esc_attr( $nonce ); ?>">
@@ -67,10 +67,10 @@ $genform_balign  = esc_attr( $settings['submit_align'] ?? 'left' );
 							case 'radio':
 							case 'checkbox':
 								if ( ! empty( $genform_f['options'] ) ) {
-									echo '<div class="gfm-options-group">';
+									echo '<div class="gfm-options-list">';
 									foreach ( $genform_f['options'] as $genform_o ) {
 										printf(
-											'<label class="gfm-option-label"><input type="%1$s" name="%2$s" value="%3$s" %4$s> %5$s</label>',
+											'<label class="gfm-choice-label"><input type="%1$s" name="%2$s" value="%3$s" class="gfm-input-choice" %4$s> <span class="gfm-choice-text">%5$s</span></label>',
 											esc_attr( $genform_f['type'] ),
 											( $genform_f['type'] === 'checkbox' ? esc_attr( "{$genform_n}[]" ) : esc_attr( $genform_n ) ),
 											esc_attr( $genform_o['value'] ),

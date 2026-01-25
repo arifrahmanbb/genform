@@ -1,0 +1,33 @@
+@use '../abstracts' as *;
+
+/**
+ * Gutenberg Block Preview
+ */
+.gfm-block-preview {
+    padding: $space-md;
+    background: #f8fafc;
+    border: 1px solid $border;
+    border-radius: $radius-md;
+    text-align: center;
+    box-shadow: $shadow-sm;
+
+    h3 {
+        margin: $space-xs 0;
+        font-weight: 700;
+        color: $text-main;
+    }
+
+    p {
+        color: $text-muted;
+        font-size: 13px;
+        margin: 0;
+    }
+}
+
+.gfm-block-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: $primary;
+    margin-bottom: $space-xs;
+}

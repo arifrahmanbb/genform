@@ -53,19 +53,8 @@
                     )
                 ),
                 el('div', { className: props.className },
-                    el('div', {
-                        style: {
-                            padding: '20px',
-                            background: '#f5f5f5',
-                            border: '1px solid #ddd',
-                            borderRadius: '4px',
-                            textAlign: 'center'
-                        }
-                    },
-                        el('span', {
-                            className: 'dashicons dashicons-feedback',
-                            style: { fontSize: '48px', color: '#0073aa' }
-                        }),
+                    el('div', { className: 'gfm-block-preview' },
+                        el('span', { className: 'dashicons dashicons-feedback gfm-block-icon' }),
                         el('h3', {}, i18n.title || 'GenForm'),
                         formId > 0
                             ? el('p', {}, (i18n.formIdLabel || 'Form ID: ') + formId)

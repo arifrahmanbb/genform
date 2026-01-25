@@ -6,13 +6,15 @@
 
 .gfm-builder-header-main {
     @include flex-between;
-    margin-bottom: 32px;
+    margin-bottom: $space-lg;
+    padding: $space-sm 0;
 
     h1 {
-        font-size: 28px;
+        font-size: 32px;
         font-weight: 800;
         margin: 0;
-        background: linear-gradient(135deg, $primary, #a855f7);
+        letter-spacing: -0.03em;
+        background: linear-gradient(135deg, $primary 0%, #7C3AED 100%);
         -webkit-background-clip: text;
         background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -21,177 +23,237 @@
 
 .gfm-builder-tabs {
     display: flex;
-    gap: 4px;
-    background: #f1f5f9;
+    gap: 6px;
+    background: color-mix(in srgb, $bg, $text-main 5%);
     padding: 6px;
-    border-radius: 14px;
+    border-radius: $radius-lg;
+    border: 1px solid $border;
 }
 
 .gfm-tab-link {
     background: transparent;
     border: none;
-    padding: 10px 24px;
-    border-radius: 10px;
-    font-weight: 600;
+    padding: 10px 28px;
+    border-radius: $radius-md;
+    font-weight: $weight-bold;
     cursor: pointer;
     color: $text-muted;
-    @include transition;
+    transition: $transition-base;
+    font-size: $size-base;
+
+    &:hover:not(.active) {
+        color: $text-main;
+        background: rgba($white, 0.5);
+    }
 
     &.active {
         background: $white;
         color: $primary;
-        box-shadow: $shadow-sm;
+        box-shadow: $shadow-md;
+        transform: translateY(0);
     }
 }
 
 .gfm-builder-top {
     @include flex-between;
     align-items: stretch;
-    gap: 24px;
-    margin-bottom: 32px;
+    gap: $space-md;
+    margin-bottom: $space-lg;
 }
 
 .gfm-name-card {
     flex: 1;
     margin-bottom: 0;
-    padding: 20px 28px;
+    padding: $space-md $space-lg;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    background: $white;
+    border: 1px solid $border;
+    border-radius: $radius;
+    box-shadow: $shadow-sm;
 
     label {
         display: block;
-        font-weight: 600;
-        margin-bottom: 8px;
-        color: $text-muted;
+        font-weight: $weight-bold;
+        margin-bottom: 6px;
+        color: $text-light;
         text-transform: uppercase;
-        font-size: 11px;
-        letter-spacing: 0.05em;
+        font-size: 10px;
+        letter-spacing: 0.1em;
     }
 
     input {
-        font-size: 18px;
-        font-weight: 600;
+        font-size: 20px;
+        font-weight: 700;
         border: none !important;
         padding: 0 !important;
         box-shadow: none !important;
         background: transparent !important;
+        color: $text-main;
+        letter-spacing: -0.02em;
 
         &:focus {
             outline: none;
+        }
+
+        &::placeholder {
+            color: $border-dark;
         }
     }
 }
 
 .gfm-builder-layout {
     display: grid;
-    grid-template-columns: 320px 1fr;
-    gap: 32px;
+    grid-template-columns: 280px 1fr;
+    gap: $space-lg;
+    align-items: start;
 }
 
 .gfm-sidebar .gfm-card {
     position: sticky;
-    top: 64px;
+    top: 32px;
+    padding: $space-md;
+    border-radius: $radius-lg;
+    
+    h3 {
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 0;
+        color: $text-muted;
+        margin-bottom: $space-md;
+    }
 }
 
 .gfm-field-buttons {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    grid-template-columns: 1fr;
+    gap: 12px;
 }
 
 .gfm-add-field {
-    @include flex-center;
-    flex-direction: column;
-    gap: 8px;
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
     background: $white;
     border: 1px solid $border;
-    padding: 16px 8px;
-    border-radius: $radius;
-    text-align: center;
+    padding: 14px $space-sm;
+    border-radius: $radius-md;
+    text-align: left;
     cursor: pointer;
-    @include transition;
-    font-weight: 500;
-    font-size: 12px;
+    transition: $transition-bounce;
+    font-weight: $weight-medium;
+    font-size: $size-base;
+    color: $text-main;
 
     .dashicons {
         font-size: 20px;
         width: 20px;
         height: 20px;
         color: $primary;
+        transition: $transition-bounce;
     }
 
     &:hover {
         border-color: $primary;
         background: $primary-light;
-        transform: translateY(-2px);
-        box-shadow: $shadow-sm;
+        transform: translateX(4px);
+        box-shadow: $shadow-md;
+
+        .dashicons {
+            transform: scale(1.2);
+        }
     }
 }
 
 .gfm-canvas {
-    background: #fcfcfd;
-    border: 2px dashed #e2e8f0;
+    background-color: #f8fafc;
+    background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+    background-size: 20px 20px;
+    border: 2px dashed $border-dark;
     border-radius: $radius-lg;
-    min-height: 600px;
-    padding: 32px;
+    min-height: 700px;
+    padding: $space-lg;
+    transition: $transition-base;
+
+    &.ui-sortable-hover {
+        border-color: $primary;
+        background-color: $primary-light;
+    }
 
     .gfm-empty-canvas {
         @include flex-center;
         flex-direction: column;
-        height: 100%;
+        height: 400px;
         color: $text-muted;
+        text-align: center;
 
         .dashicons {
-            font-size: 48px;
-            width: 48px;
-            height: 48px;
-            margin-bottom: 16px;
-            opacity: 0.3;
+            font-size: 64px;
+            width: 64px;
+            height: 64px;
+            margin-bottom: $space-md;
+            opacity: 0.2;
+            color: $primary;
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: $text-main;
+        }
+
+        p {
+            font-size: $size-base;
+            max-width: 280px;
         }
     }
 }
 
 .gfm-field-node {
-    margin-bottom: 20px;
+    margin-bottom: $space-md;
+    background: $white;
     border: 1px solid $border;
     overflow: hidden;
     border-radius: $radius;
-    @include transition(all, 0.3s, cubic-bezier(0.4, 0, 0.2, 1));
+    box-shadow: $shadow-sm;
+    transition: $transition-base;
 
     &:hover {
-        border-color: $primary;
-        transform: translateY(-2px);
+        border-color: $primary-alt;
         box-shadow: $shadow-lg;
     }
 
     &.active {
         border-color: $primary;
         box-shadow: $shadow-xl;
+        transform: scale(1.01);
     }
 }
 
 .gfm-field-header {
     background: $white;
-    padding: 20px 24px;
+    padding: $space-sm $space-md;
     display: flex;
     align-items: center;
 }
 
 .gfm-field-drag-handle {
     cursor: move;
-    margin-right: 20px;
-    color: #94a3b8;
+    margin-right: $space-sm;
+    color: $text-light;
     @include flex-center;
-    width: 36px;
-    height: 36px;
-    background: #f1f5f9;
-    border-radius: 8px;
-    @include transition;
+    width: 32px;
+    height: 32px;
+    background: $bg;
+    border-radius: $radius-sm;
+    transition: $transition-base;
 
     &:hover {
         color: $primary;
-        background: #eef2ff;
+        background: $primary-light;
     }
 }
 
@@ -199,116 +261,153 @@
     flex: 1;
 
     strong {
-        font-size: 16px;
+        font-size: 15px;
         color: $text-main;
         font-weight: 700;
     }
 
     small {
-        color: $text-muted;
-        font-weight: 600;
-        margin-left: 12px;
-        background: #f1f5f9;
-        padding: 3px 10px;
-        border-radius: 6px;
+        color: $primary;
+        font-weight: 700;
+        margin-left: $space-sm;
+        background: $primary-light;
+        padding: 4px 10px;
+        border-radius: $radius-full;
         text-transform: uppercase;
-        font-size: 10px;
+        font-size: 9px;
         letter-spacing: 0.05em;
+        border: 1px solid rgba($primary, 0.1);
     }
 }
 
 .gfm-field-actions {
     display: flex;
-    gap: 10px;
+    gap: 8px;
 
     button {
-        background: #f8fafc;
+        background: $bg;
         border: 1px solid $border;
         cursor: pointer;
         color: $text-muted;
-        @include transition;
-        width: 36px;
-        height: 36px;
-        border-radius: 8px;
+        transition: $transition-base;
+        width: 34px;
+        height: 34px;
+        border-radius: $radius-sm;
         @include flex-center;
     }
 
     .gfm-delete-btn:hover {
         color: $danger;
-        background: #fef2f2;
-        border-color: #fecaca;
+        background: color-mix(in srgb, $white, $danger 8%);
+        border-color: rgba($danger, 0.2);
     }
 
     .gfm-edit-btn:hover {
         color: $primary;
         background: $primary-light;
-        border-color: #ddd6fe;
+        border-color: rgba($primary, 0.2);
     }
 }
 
 .gfm-field-node.active .gfm-edit-btn {
-    color: $primary;
-    background: $primary-light;
-    border-color: #ddd6fe;
+    color: $white;
+    background: $primary;
+    border-color: $primary;
+}
+
+.gfm-field-node.gfm-removing {
+    opacity: 0;
+    transform: scale(0.95);
+    transition: all 0.3s ease;
 }
 
 .gfm-field-settings-panel {
-    background: #f8fafc;
+    background: #FAFAFB;
     border-top: 1px solid $border;
-    padding: 32px;
+    padding: $space-lg;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $space-md;
+
+    &.gfm-hidden {
+        display: none !important;
+    }
+
+    .gfm-form-group {
+        margin-bottom: 0;
+        
+        &.full-width {
+            grid-column: span 2;
+        }
+    }
+}
+
+.gfm-required-toggle-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.gfm-required-label {
+    font-weight: 600;
+    font-size: 13px;
+    color: $text-main;
 }
 
 .gfm-options-setter {
-    margin-top: 32px;
-    padding-top: 24px;
-    border-top: 1px dashed #e2e8f0;
+    grid-column: span 2;
+    margin-top: $space-sm;
+    padding-top: $space-md;
+    border-top: 1px dashed $border-dark;
 
     h4 {
-        font-size: 13px;
+        font-size: 12px;
         text-transform: uppercase;
-        color: $text-main;
-        margin: 0 0 20px 0;
-        letter-spacing: 0.1em;
-        font-weight: 800;
+        color: $text-muted;
+        margin: 0 0 $space-sm 0;
+        letter-spacing: 0.05em;
+        font-weight: 700;
     }
 }
 
 .gfm-opt-row {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: $space-sm;
     background: $white;
-    padding: 12px;
-    border-radius: 10px;
+    padding: $space-sm;
+    border-radius: $radius-md;
     border: 1px solid $border;
-    margin-bottom: 12px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    margin-bottom: $space-sm;
+    box-shadow: $shadow-sm;
 
     input {
-        background: #f8fafc !important;
-        @include transition;
+        background: $bg !important;
+        transition: $transition-base;
 
         &:focus {
             background: $white !important;
+            border-color: $primary;
         }
     }
 }
 
 .gfm-opt-drag {
-    color: #94a3b8;
+    color: $text-light;
     cursor: move;
 }
 
 .gfm-opt-btn {
     border: none;
-    background: #f1f5f9;
+    background: $bg;
     color: $text-muted;
     width: 32px;
     height: 32px;
-    border-radius: 8px;
+    border-radius: $radius-sm;
     cursor: pointer;
     @include flex-center;
-    @include transition;
+    transition: $transition-base;
 
     &:hover {
         background: $primary;
@@ -321,33 +420,35 @@
 }
 
 .gfm-add-opt-btn {
-    margin-top: 12px;
+    margin-top: $space-sm;
     font-size: 13px;
-    font-weight: 700;
+    font-weight: $weight-bold;
     color: $primary;
     background: $white;
-    border: 2px dashed $primary;
+    border: 2px dashed rgba($primary, 0.4);
     width: 100%;
-    padding: 12px;
-    border-radius: 10px;
+    padding: $space-sm;
+    border-radius: $radius-md;
     cursor: pointer;
-    @include transition;
+    transition: $transition-bounce;
     @include flex-center;
-    gap: 10px;
+    gap: 8px;
 
     &:hover {
         background: $primary-light;
-        border-style: solid;
-        transform: translateY(-1px);
+        border-color: $primary;
+        color: $primary-dark;
+        transform: translateY(-2px);
     }
 }
 
 .gfm-width-selector {
     display: flex;
     gap: 4px;
-    background: #f1f5f9;
+    background: $bg;
     padding: 4px;
-    border-radius: 10px;
+    border-radius: $radius-md;
+    border: 1px solid $border;
 }
 
 .gfm-width-btn {
@@ -357,13 +458,20 @@
     padding: 8px;
     font-size: 11px;
     font-weight: 700;
-    border-radius: 8px;
+    border-radius: $radius-sm;
     cursor: pointer;
-    @include transition;
+    transition: $transition-base;
+    text-transform: uppercase;
+    color: $text-muted;
 
     &.active {
         background: $white;
         color: $primary;
         box-shadow: $shadow-sm;
     }
+
+    &:hover:not(.active) {
+        background: rgba($white, 0.5);
+    }
 }
+

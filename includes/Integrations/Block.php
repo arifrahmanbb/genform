@@ -30,6 +30,7 @@ final class Block {
 			'genform/form-block',
 			array(
 				'editor_script'   => 'genform-block',
+				'editor_style'    => 'genform-admin',
 				'render_callback' => array( $this, 'render' ),
 			)
 		);

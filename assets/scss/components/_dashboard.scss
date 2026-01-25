@@ -7,21 +7,29 @@
 .gfm-dashboard-widget {
     .gfm-db-stats {
         display: flex;
-        gap: $space-md;
+        gap: $space-lg;
         margin-bottom: $space-md;
-        border-bottom: 1px solid $border;
         padding-bottom: $space-sm;
 
         .stat {
             strong {
                 display: block;
-                font-size: 20px;
-                color: $primary;
+                font-size: 24px;
+                color: $text-main;
+                font-weight: 800;
+                letter-spacing: -0.02em;
             }
 
             span {
-                font-size: 12px;
+                font-size: 11px;
                 color: $text-muted;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                font-weight: $weight-bold;
+            }
+            
+            &:first-child strong {
+                color: $primary;
             }
             
             &:last-child strong {
@@ -31,8 +39,12 @@
     }
 
     h4 {
-        margin: 0 0 $space-xs 0;
+        margin: $space-sm 0 $space-xs 0;
         font-weight: 700;
+        font-size: 13px;
+        color: $text-light;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
     }
 
     ul {
@@ -41,34 +53,52 @@
         list-style: none;
 
         li {
-            padding: $space-xs 0;
-            border-bottom: 1px solid $bg;
+            padding: 12px 0;
+            border-bottom: 1px solid $border;
             font-size: 13px;
             @include flex-between;
+            transition: $transition-base;
+
+            &:last-child {
+                border-bottom: none;
+            }
 
             .entry-info {
                 strong {
                     color: $text-main;
+                    font-weight: 600;
                 }
                 span {
                     color: $text-muted;
-                    margin-left: 4px;
+                    margin-left: 6px;
+                    font-size: 12px;
                 }
             }
 
             .gfm-view-link {
                 text-decoration: none;
-                font-weight: 600;
+                font-weight: 700;
                 color: $primary;
+                font-size: 11px;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
 
                 &:hover {
-                    text-decoration: underline;
+                    color: $primary-dark;
                 }
             }
         }
     }
 
     .gfm-db-footer {
-        margin-top: $space-sm;
+        margin-top: $space-md;
+        padding-top: $space-sm;
+        border-top: 1px solid $border;
+        @include flex-between;
+
+        .gfm-btn {
+            padding: 8px 16px;
+            font-size: 11px;
+        }
     }
 }

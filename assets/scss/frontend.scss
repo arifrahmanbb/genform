@@ -71,25 +71,101 @@
 }
 
 // ========================================
-// Checkboxes & Radio Buttons
+// Checkboxes & Radio Buttons (Premium Design)
 // ========================================
 
-.gfm-checkbox-label,
-.gfm-radio-label {
-  @include gfm-flex-row-center;
-  gap: 8px;
-  margin-bottom: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  user-select: none;
+.gfm-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
 }
 
-.gfm-checkbox,
-.gfm-radio {
-  width: 18px;
-  height: 18px;
+.gfm-choice-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   cursor: pointer;
+  user-select: none;
+  transition: $transition-base;
+
+  &:hover .gfm-input-choice {
+    border-color: $primary;
+    box-shadow: 0 0 0 4px rgba($primary, 0.08);
+  }
+
+  .gfm-choice-text {
+    font-size: 14.5px;
+    color: $text-main;
+    font-weight: 500;
+  }
+}
+
+.gfm-input-choice {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid $border-dark;
+  background: $white;
+  margin: 0;
+  cursor: pointer;
+  position: relative;
+  transition: $transition-base;
   flex-shrink: 0;
+
+  &[type="checkbox"] {
+    border-radius: 6px;
+    
+    &::after {
+      content: "";
+      position: absolute;
+      left: 5px;
+      top: 1px;
+      width: 6px;
+      height: 11px;
+      border: solid $white;
+      border-width: 0 2.5px 2.5px 0;
+      transform: rotate(45deg) scale(0);
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+  }
+
+  &[type="radio"] {
+    border-radius: 50%;
+
+    &::after {
+      content: "";
+      position: absolute;
+      left: 4px;
+      top: 4px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: $white;
+      transform: scale(0);
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+  }
+
+  &:checked {
+    background: $primary;
+    border-color: $primary;
+    box-shadow: 0 0 0 4px rgba($primary, 0.1);
+
+    &::after {
+      transform: rotate(45deg) scale(1);
+    }
+
+    &[type="radio"]::after {
+      transform: scale(1);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid $primary-alt;
+    outline-offset: 2px;
+  }
 }
 
 // ========================================

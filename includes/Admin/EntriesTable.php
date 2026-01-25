@@ -256,7 +256,7 @@ class EntriesTable extends \WP_List_Table {
 		}
 
 		return sprintf(
-			'<div class="gfm-table-actions"><a href="#" class="gfm-view-entry gfm-action-icon" data-payload=\'%1$s\' data-metadata=\'%2$s\' data-form=\'%3$s\' title="%4$s"><span class="dashicons dashicons-visibility"></span></a><a href="%5$s" class="gfm-action-icon gfm-action-trash-simple" title="%6$s"><span class="dashicons dashicons-trash"></span></a></div>',
+			'<div class="gfm-table-actions"><a href="#" class="gfm-view-entry gfm-action-icon" data-payload="%1$s" data-metadata="%2$s" data-form="%3$s" title="%4$s"><span class="dashicons dashicons-visibility"></span></a><a href="%5$s" class="gfm-action-icon gfm-action-trash-simple" title="%6$s"><span class="dashicons dashicons-trash"></span></a></div>',
 			esc_attr( wp_json_encode( $r_d ) ),
 			esc_attr( $item->entry_metadata ?: '{}' ),
 			esc_attr( $item->form_name ?: esc_html__( 'Deleted Form', 'genform' ) ),
