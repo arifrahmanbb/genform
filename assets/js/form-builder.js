@@ -78,13 +78,18 @@ class GenFormBuilder {
                     'gfm-from-email': s.from_email || '',
                     'gfm-reply-to': s.reply_to || '{field_email}',
                     'gfm-email-subject': s.email_subject || '',
-                    'gfm-email-body': s.email_body || ''
+                    'gfm-email-body': s.email_body || '',
+                    'gfm-gdpr-text': s.gdpr_text || 'I consent to having this website store my submitted information.'
                 };
 
                 for (const id in mapping) {
                     const el = document.getElementById(id);
                     if (el) el.value = mapping[id];
                 }
+
+                // Handle GDPR checkbox separately (checked state, not value).
+                const gdprCheckbox = document.getElementById('gfm-gdpr-enabled');
+                if (gdprCheckbox) gdprCheckbox.checked = !!s.gdpr_enabled;
             }
         }
 
@@ -453,6 +458,8 @@ class GenFormBuilder {
             reply_to: document.getElementById('gfm-reply-to')?.value,
             email_subject: document.getElementById('gfm-email-subject')?.value,
             email_body: document.getElementById('gfm-email-body')?.value,
+            gdpr_enabled: document.getElementById('gfm-gdpr-enabled')?.checked ? '1' : '',
+            gdpr_text: document.getElementById('gfm-gdpr-text')?.value,
         };
 
         if (this.dataInput) this.dataInput.value = JSON.stringify({ fields: this.fields });

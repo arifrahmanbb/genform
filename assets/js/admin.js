@@ -11,6 +11,15 @@
 	let confirmPromise = null;
 
 	/**
+	 * Escape HTML entities to prevent XSS in innerHTML.
+	 */
+	const escapeHtml = (str) => {
+		const div = document.createElement('div');
+		div.textContent = String(str);
+		return div.innerHTML;
+	};
+
+	/**
 	 * Modal Helpers
 	 */
 	const openModal = (selector) => {
@@ -132,16 +141,16 @@
 
 				let html = `<div class="gfm-modal-data-wrapper"><div class="gfm-modal-section-title"><span class="dashicons dashicons-database"></span> Submission Data</div><div class="gfm-details-modern-list">`;
 				for (const [label, value] of Object.entries(data)) {
-					const val = Array.isArray(value) ? value.join(', ') : value;
-					html += `<div class="gfm-detail-item"><div class="gfm-detail-label">${label}</div><div class="gfm-detail-value">${val || '—'}</div></div>`;
+					const val = Array.isArray(value) ? value.map(escapeHtml).join(', ') : escapeHtml(value);
+					html += `<div class="gfm-detail-item"><div class="gfm-detail-label">${escapeHtml(label)}</div><div class="gfm-detail-value">${val || '—'}</div></div>`;
 				}
 				html += `</div>`;
 
 				// Meta info
 				html += `<div class="gfm-system-info-box"><div class="gfm-modal-section-title"><span class="dashicons dashicons-admin-generic"></span> Meta Information</div><div class="gfm-system-grid">`;
-				if (metadata.ip) html += `<div class="gfm-system-row"><span class="dashicons dashicons-networking"></span> <span>IP: <code>${metadata.ip}</code></span></div>`;
-				if (metadata.browser) html += `<div class="gfm-system-row"><span class="dashicons dashicons-desktop"></span> <span>Device: <strong>${metadata.browser}</strong> on <strong>${metadata.os || 'Unknown'}</strong></span></div>`;
-				if (metadata.url) html += `<div class="gfm-system-row"><span class="dashicons dashicons-admin-links"></span> <span>Source: <a href="${metadata.url}" target="_blank" class="gfm-source-link">${metadata.url}</a></span></div>`;
+				if (metadata.ip) html += `<div class="gfm-system-row"><span class="dashicons dashicons-networking"></span> <span>IP: <code>${escapeHtml(metadata.ip)}</code></span></div>`;
+				if (metadata.browser) html += `<div class="gfm-system-row"><span class="dashicons dashicons-desktop"></span> <span>Device: <strong>${escapeHtml(metadata.browser)}</strong> on <strong>${escapeHtml(metadata.os || 'Unknown')}</strong></span></div>`;
+				if (metadata.url) html += `<div class="gfm-system-row"><span class="dashicons dashicons-admin-links"></span> <span>Source: <a href="${escapeHtml(metadata.url)}" target="_blank" rel="noopener noreferrer" class="gfm-source-link">${escapeHtml(metadata.url)}</a></span></div>`;
 				html += `</div></div></div>`;
 
 				const body = document.getElementById('gfm-modal-body');
@@ -215,14 +224,25 @@
 			// 5. Copy Shortcode
 			const copyBtn = target.closest('.gfm-copy-btn');
 			if (copyBtn) {
-				const input = document.createElement('input');
-				input.value = copyBtn.dataset.code;
-				document.body.appendChild(input);
-				input.select();
-				document.execCommand('copy');
-				document.body.removeChild(input);
-				copyBtn.classList.replace('dashicons-admin-page', 'dashicons-yes');
-				setTimeout(() => copyBtn.classList.replace('dashicons-yes', 'dashicons-admin-page'), 2000);
+				const text = copyBtn.dataset.code;
+				if (navigator.clipboard && navigator.clipboard.writeText) {
+					navigator.clipboard.writeText(text).then(() => {
+						copyBtn.classList.replace('dashicons-admin-page', 'dashicons-yes');
+						setTimeout(() => copyBtn.classList.replace('dashicons-yes', 'dashicons-admin-page'), 2000);
+					});
+				} else {
+					// Fallback for older browsers
+					const input = document.createElement('textarea');
+					input.value = text;
+					input.style.position = 'fixed';
+					input.style.opacity = '0';
+					document.body.appendChild(input);
+					input.select();
+					document.execCommand('copy');
+					document.body.removeChild(input);
+					copyBtn.classList.replace('dashicons-admin-page', 'dashicons-yes');
+					setTimeout(() => copyBtn.classList.replace('dashicons-yes', 'dashicons-admin-page'), 2000);
+				}
 				return;
 			}
 
