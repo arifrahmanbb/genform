@@ -31,6 +31,7 @@ final class Renderer
         $categories = Manager::getCategories();
         $templates  = Manager::getAll();
 
+        self::renderCreateFormModal();
         self::renderLibraryModal($categories, $templates);
         self::renderPreviewModal();
     }
@@ -169,6 +170,80 @@ final class Renderer
                         <span class="dashicons dashicons-plus-alt2"></span>
                         <?php esc_html_e('Use This Template', 'genform'); ?>
                     </button>
+                </div>
+            </div>
+        </div>
+    <?php
+    }
+
+    /**
+     * Render the "Create a New Form" chooser modal.
+     *
+     * Presents two paths: start from a blank form or browse the
+     * template library. Displayed when clicking "Add New Form".
+     */
+    private static function renderCreateFormModal(): void
+    {
+        $blank_url = admin_url('admin.php?page=genform-builder');
+    ?>
+        <!-- Create New Form Chooser Modal -->
+        <div id="gfm-create-form-modal" class="gfm-modal gfm-hidden">
+            <div class="gfm-modal-content gfm-modal-create-form">
+                <div class="gfm-modal-header">
+                    <div class="gfm-templates-header-left">
+                        <span class="dashicons dashicons-plus-alt"></span>
+                        <h3><?php esc_html_e('Create a New Form', 'genform'); ?></h3>
+                    </div>
+                    <span class="gfm-close-modal dashicons dashicons-no" title="<?php esc_attr_e('Close', 'genform'); ?>"></span>
+                </div>
+
+                <div class="gfm-modal-body gfm-create-form-body">
+                    <div class="gfm-create-form-grid">
+
+                        <!-- Option 1: New Blank Form -->
+                        <a href="<?php echo esc_url($blank_url); ?>" class="gfm-create-option-card" id="gfm-create-blank">
+                            <div class="gfm-create-option-illustration gfm-illustration-blank">
+                                <svg viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg" class="gfm-create-svg">
+                                    <rect x="20" y="10" width="80" height="80" rx="8" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="2" stroke-dasharray="6 4" />
+                                    <circle cx="60" cy="46" r="16" fill="#EEF2FF" stroke="#C7D2FE" stroke-width="1.5" />
+                                    <path d="M60 38V54M52 46H68" stroke="#4F46E5" stroke-width="2.5" stroke-linecap="round" />
+                                    <rect x="35" y="70" width="50" height="6" rx="3" fill="#E5E7EB" />
+                                </svg>
+                            </div>
+                            <div class="gfm-create-option-info">
+                                <h4><?php esc_html_e('New Blank Form', 'genform'); ?></h4>
+                                <p><?php esc_html_e('Start from scratch and build your form field by field.', 'genform'); ?></p>
+                            </div>
+                        </a>
+
+                        <!-- Option 2: Choose a Template -->
+                        <button type="button" class="gfm-create-option-card" id="gfm-create-from-template">
+                            <div class="gfm-create-option-illustration gfm-illustration-template">
+                                <svg viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg" class="gfm-create-svg">
+                                    <rect x="10" y="14" width="44" height="72" rx="6" fill="#EEF2FF" stroke="#C7D2FE" stroke-width="1.5" />
+                                    <rect x="18" y="24" width="28" height="4" rx="2" fill="#818CF8" />
+                                    <rect x="18" y="32" width="20" height="3" rx="1.5" fill="#C7D2FE" />
+                                    <rect x="18" y="40" width="28" height="10" rx="3" fill="#fff" stroke="#E5E7EB" stroke-width="1" />
+                                    <rect x="18" y="54" width="28" height="10" rx="3" fill="#fff" stroke="#E5E7EB" stroke-width="1" />
+                                    <rect x="22" y="70" width="20" height="8" rx="4" fill="#4F46E5" />
+                                    <rect x="66" y="14" width="44" height="72" rx="6" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1.5" />
+                                    <rect x="74" y="24" width="28" height="4" rx="2" fill="#34D399" />
+                                    <rect x="74" y="32" width="20" height="3" rx="1.5" fill="#BBF7D0" />
+                                    <rect x="74" y="40" width="28" height="10" rx="3" fill="#fff" stroke="#E5E7EB" stroke-width="1" />
+                                    <rect x="74" y="54" width="28" height="10" rx="3" fill="#fff" stroke="#E5E7EB" stroke-width="1" />
+                                    <rect x="78" y="70" width="20" height="8" rx="4" fill="#10B981" />
+                                </svg>
+                            </div>
+                            <div class="gfm-create-option-info">
+                                <h4><?php esc_html_e('Choose a Template', 'genform'); ?></h4>
+                                <p><?php esc_html_e('Pick a pre-made template and customize it to your needs.', 'genform'); ?></p>
+                            </div>
+                            <span class="gfm-create-option-badge">
+                                <?php echo (int) Manager::count(); ?> <?php esc_html_e('templates', 'genform'); ?>
+                            </span>
+                        </button>
+
+                    </div>
                 </div>
             </div>
         </div>

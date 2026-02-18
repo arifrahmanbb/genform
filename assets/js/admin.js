@@ -78,16 +78,17 @@
 		if (spinner) spinner.classList.remove('show');
 	};
 
-	const showNotice = (msg) => {
+	const showNotice = (msg, type = 'success') => {
 		const notice = document.createElement('div');
-		notice.className = 'gfm-builder-notice';
-		notice.textContent = msg;
+		notice.className = `gfm-builder-notice gfm-notice-${type}`;
+		const icon = type === 'error' ? 'warning' : 'yes-alt';
+		notice.innerHTML = `<span class="dashicons dashicons-${icon}"></span> ${escapeHtml(msg)}`;
 		document.body.appendChild(notice);
 		setTimeout(() => notice.classList.add('show'), 10);
 		setTimeout(() => {
 			notice.classList.remove('show');
 			setTimeout(() => notice.remove(), 400);
-		}, 3000);
+		}, 3500);
 	};
 
 	/**
@@ -188,12 +189,19 @@
 	};
 
 	/**
-	 * Apply a template: save via AJAX and redirect to the builder.
+	 * Apply a template: confirm, save via AJAX, and redirect to the builder.
 	 */
 	const useTemplate = async (index) => {
 		const templates = genform.templates || [];
 		const tpl = templates[index];
 		if (!tpl) return;
+
+		// Confirm before creating.
+		const confirmed = await gfmConfirm(
+			`Create "${tpl.name}"?`,
+			`A new form with ${tpl.fields.length} fields will be created and opened in the builder.`
+		);
+		if (!confirmed) return;
 
 		showSpinner();
 
@@ -209,7 +217,7 @@
 			showNotice('Template applied! Redirecting to the builder...');
 			setTimeout(() => { window.location.href = res.data.redirect; }, 600);
 		} else {
-			showNotice(res.data?.message || 'Something went wrong.');
+			showNotice(res.data?.message || 'Failed to create form. Please try again.', 'error');
 		}
 	};
 
@@ -248,9 +256,33 @@
 	};
 
 	/**
+	 * Reset the template library modal to its default state.
+	 */
+	const resetTemplateLibrary = () => {
+		const searchField = document.getElementById('gfm-template-search');
+		if (searchField) searchField.value = '';
+		const allFilterBtn = document.querySelector('.gfm-filter-btn[data-category="all"]');
+		if (allFilterBtn) {
+			document.querySelectorAll('.gfm-filter-btn').forEach(b => b.classList.remove('active'));
+			allFilterBtn.classList.add('active');
+		}
+		document.querySelectorAll('.gfm-template-card').forEach(c => c.classList.remove('gfm-hidden'));
+		const emptyEl = document.getElementById('gfm-templates-empty');
+		if (emptyEl) emptyEl.classList.add('gfm-hidden');
+	};
+
+	/**
 	 * Main Administration Event Controller
 	 */
 	const init = () => {
+
+		// ── ESC Key to Close Any Open Modal ───────────────────
+		document.addEventListener('keydown', (e) => {
+			if (e.key === 'Escape') {
+				const openModals = document.querySelectorAll('.gfm-modal.show');
+				openModals.forEach((modal) => closeModal('#' + modal.id));
+			}
+		});
 
 		// ── Template Library: Search Input ────────────────────
 		const searchInput = document.getElementById('gfm-template-search');
@@ -271,9 +303,28 @@
 		document.addEventListener('click', async function (e) {
 			const target = e.target;
 
-			// ── Template Library: Open Modal ──────────────────
+			// ── Add New Form: Open Create Form Chooser ───────
+			if (target.closest('#gfm-add-new-form')) {
+				e.preventDefault();
+				openModal('#gfm-create-form-modal');
+				return;
+			}
+
+			// ── Create Form Chooser: Choose a Template ───────
+			if (target.closest('#gfm-create-from-template')) {
+				e.preventDefault();
+				closeModal('#gfm-create-form-modal');
+				setTimeout(() => {
+					resetTemplateLibrary();
+					openModal('#gfm-templates-modal');
+				}, 350);
+				return;
+			}
+
+			// ── Template Library: Open Modal (from empty state / direct) ──
 			if (target.closest('#gfm-open-templates')) {
 				e.preventDefault();
+				resetTemplateLibrary();
 				openModal('#gfm-templates-modal');
 				return;
 			}
@@ -295,11 +346,13 @@
 
 			// ── Template Library: Use Template Button ─────────
 			const useBtn = target.closest('.gfm-template-use-btn');
-			if (useBtn) {
+			if (useBtn && !useBtn.disabled) {
 				e.preventDefault();
 				const index = parseInt(useBtn.dataset.index, 10);
 				closeModal('#gfm-templates-modal');
+				useBtn.disabled = true;
 				await useTemplate(index);
+				useBtn.disabled = false;
 				return;
 			}
 
@@ -319,11 +372,14 @@
 			}
 
 			// ── Template Preview: Use This Template ───────────
-			if (target.closest('#gfm-preview-use')) {
+			const previewUseBtn = target.closest('#gfm-preview-use');
+			if (previewUseBtn && !previewUseBtn.disabled) {
 				e.preventDefault();
 				closeModal('#gfm-template-preview-modal');
 				if (activeTemplateIndex !== null) {
+					previewUseBtn.disabled = true;
 					await useTemplate(activeTemplateIndex);
+					previewUseBtn.disabled = false;
 				}
 				return;
 			}

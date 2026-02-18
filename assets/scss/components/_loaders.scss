@@ -34,7 +34,9 @@
 }
 
 @keyframes gfm-spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /**
@@ -54,9 +56,39 @@
     z-index: 999999;
     @include transition;
     opacity: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 90vw;
+    white-space: nowrap;
+
+    .dashicons {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+    }
 
     &.show {
         transform: translateX(-50%) translateY(0);
         opacity: 1;
+    }
+
+    // Success variant (default)
+    &.gfm-notice-success {
+        border-left: 4px solid $success;
+
+        .dashicons {
+            color: $success;
+        }
+    }
+
+    // Error variant
+    &.gfm-notice-error {
+        border-left: 4px solid $danger;
+
+        .dashicons {
+            color: $danger;
+        }
     }
 }

@@ -160,6 +160,13 @@
         margin-left: auto;
         margin-right: auto;
     }
+
+    .gfm-empty-state-actions {
+        display: flex;
+        justify-content: center;
+        gap: $space-sm;
+        flex-wrap: wrap;
+    }
 }
 
 .gfm-header-flex {
@@ -179,4 +186,3 @@
         gap: $space-sm;
     }
 }
-

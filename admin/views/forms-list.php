@@ -26,13 +26,10 @@ $genform_fs = $wpdb->get_results("SELECT f.*, (SELECT COUNT(*) FROM {$wpdb->pref
 	<div class="gfm-header-flex">
 		<h1><?php esc_html_e('All Forms', 'genform'); ?></h1>
 		<div class="gfm-header-actions">
-			<button type="button" class="gfm-btn gfm-btn-outline" id="gfm-open-templates">
-				<span class="dashicons dashicons-layout"></span>
-				<?php esc_html_e('Use a Template', 'genform'); ?>
-			</button>
-			<a href="<?php echo esc_url(admin_url('admin.php?page=genform-builder')); ?>" class="gfm-btn gfm-btn-primary">
+			<button type="button" class="gfm-btn gfm-btn-primary" id="gfm-add-new-form">
+				<span class="dashicons dashicons-plus-alt2"></span>
 				<?php esc_html_e('Add New Form', 'genform'); ?>
-			</a>
+			</button>
 		</div>
 	</div>
 
@@ -49,10 +46,16 @@ $genform_fs = $wpdb->get_results("SELECT f.*, (SELECT COUNT(*) FROM {$wpdb->pref
 		<?php if (empty($genform_fs)) : ?>
 			<div class="gfm-empty-state">
 				<span class="dashicons dashicons-forms"></span>
-				<p><?php esc_html_e('No forms yet.', 'genform'); ?></p>
-				<a href="<?php echo esc_url(admin_url('admin.php?page=genform-builder')); ?>" class="gfm-btn gfm-btn-outline">
-					<?php esc_html_e('Create Your First Form', 'genform'); ?>
-				</a>
+				<p><?php esc_html_e('No forms yet. Start from scratch or pick a ready-made template.', 'genform'); ?></p>
+				<div class="gfm-empty-state-actions">
+					<button type="button" class="gfm-btn gfm-btn-outline" id="gfm-open-templates">
+						<span class="dashicons dashicons-layout"></span>
+						<?php esc_html_e('Browse Templates', 'genform'); ?>
+					</button>
+					<a href="<?php echo esc_url(admin_url('admin.php?page=genform-builder')); ?>" class="gfm-btn gfm-btn-primary">
+						<?php esc_html_e('Create Your First Form', 'genform'); ?>
+					</a>
+				</div>
 			</div>
 		<?php else : ?>
 			<table class="wp-list-table widefat fixed striped">
