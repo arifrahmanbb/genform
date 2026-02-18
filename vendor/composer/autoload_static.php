@@ -7,14 +7,14 @@ namespace Composer\Autoload;
 class ComposerStaticInit665efa7c3b92eb926415146a7d1ea3c4
 {
     public static $prefixLengthsPsr4 = array (
-        'G' =>
+        'G' => 
         array (
             'GenForm\\' => 8,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'GenForm\\' =>
+        'GenForm\\' => 
         array (
             0 => __DIR__ . '/../..' . '/includes',
         ),
@@ -23,12 +23,24 @@ class ComposerStaticInit665efa7c3b92eb926415146a7d1ea3c4
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'GenForm\\Admin\\Builder' => __DIR__ . '/../..' . '/includes/Admin/Builder.php',
+        'GenForm\\Admin\\EntriesTable' => __DIR__ . '/../..' . '/includes/Admin/EntriesTable.php',
         'GenForm\\Admin\\Settings' => __DIR__ . '/../..' . '/includes/Admin/Settings.php',
         'GenForm\\Core' => __DIR__ . '/../..' . '/includes/Core.php',
+        'GenForm\\Handlers\\ExportHandler' => __DIR__ . '/../..' . '/includes/Handlers/ExportHandler.php',
         'GenForm\\Handlers\\FormHandler' => __DIR__ . '/../..' . '/includes/Handlers/FormHandler.php',
         'GenForm\\Integrations\\Block' => __DIR__ . '/../..' . '/includes/Integrations/Block.php',
         'GenForm\\Integrations\\Email' => __DIR__ . '/../..' . '/includes/Integrations/Email.php',
         'GenForm\\Integrations\\Shortcode' => __DIR__ . '/../..' . '/includes/Integrations/Shortcode.php',
+        'GenForm\\Templates\\Library\\Booking' => __DIR__ . '/../..' . '/includes/Templates/Library/Booking.php',
+        'GenForm\\Templates\\Library\\Business' => __DIR__ . '/../..' . '/includes/Templates/Library/Business.php',
+        'GenForm\\Templates\\Library\\Education' => __DIR__ . '/../..' . '/includes/Templates/Library/Education.php',
+        'GenForm\\Templates\\Library\\Feedback' => __DIR__ . '/../..' . '/includes/Templates/Library/Feedback.php',
+        'GenForm\\Templates\\Library\\General' => __DIR__ . '/../..' . '/includes/Templates/Library/General.php',
+        'GenForm\\Templates\\Library\\Healthcare' => __DIR__ . '/../..' . '/includes/Templates/Library/Healthcare.php',
+        'GenForm\\Templates\\Library\\Marketing' => __DIR__ . '/../..' . '/includes/Templates/Library/Marketing.php',
+        'GenForm\\Templates\\Manager' => __DIR__ . '/../..' . '/includes/Templates/Manager.php',
+        'GenForm\\Templates\\Renderer' => __DIR__ . '/../..' . '/includes/Templates/Renderer.php',
+        'GenForm\\Utils\\DetectionHelper' => __DIR__ . '/../..' . '/includes/Utils/DetectionHelper.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

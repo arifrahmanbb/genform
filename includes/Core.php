@@ -22,6 +22,8 @@ use GenForm\Handlers\FormHandler;
 use GenForm\Handlers\ExportHandler;
 use GenForm\Integrations\Block;
 use GenForm\Integrations\Shortcode;
+use GenForm\Templates\Manager as TemplateManager;
+use GenForm\Templates\Renderer as TemplateRenderer;
 
 final class Core
 {
@@ -176,6 +178,7 @@ final class Core
 		new ExportHandler();
 		new Block();
 		new Shortcode();
+		TemplateManager::registerHooks();
 	}
 
 	/**
@@ -266,6 +269,11 @@ final class Core
 				</div>
 			</div>
 		</div>
+
+		<?php
+		// Template Library Modals.
+		TemplateRenderer::render();
+		?>
 <?php
 	}
 
@@ -353,9 +361,12 @@ final class Core
 			'genform-admin',
 			'genform',
 			array(
-				'ajax_url' => admin_url('admin-ajax.php'),
-				'nonce'    => wp_create_nonce('genform_admin_nonce'),
-				'i18n'     => array(
+				'ajax_url'     => admin_url('admin-ajax.php'),
+				'nonce'        => wp_create_nonce('genform_admin_nonce'),
+				'builder_url'  => admin_url('admin.php?page=genform-builder'),
+				'edit_nonce'   => wp_create_nonce('genform_edit_form'),
+				'templates'    => TemplateManager::getAll(),
+				'i18n'         => array(
 					'confirm_delete' => esc_html__('Are you sure?', 'genform'),
 					'entry_details'  => esc_html__('Entry Details', 'genform'),
 				),

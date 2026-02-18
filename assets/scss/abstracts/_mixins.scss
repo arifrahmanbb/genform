@@ -43,7 +43,7 @@
 @mixin card {
     background: vars.$white;
     border-radius: vars.$radius;
-    padding: $space-md;
+    padding: vars.$space-md;
     box-shadow: vars.$shadow-md;
     border: 1px solid vars.$border;
     transition: vars.$transition-base;
@@ -60,7 +60,7 @@
     transition: vars.$transition-base;
     background: vars.$white;
     color: vars.$text-main;
-    
+
     &::placeholder {
         color: vars.$text-muted;
         opacity: 0.6;

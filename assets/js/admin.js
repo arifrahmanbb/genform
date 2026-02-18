@@ -111,12 +111,222 @@
 	// Export helpers to window for other scripts (like form-builder.js)
 	window.gfmAdmin = { openModal, closeModal, showSpinner, hideSpinner, showNotice, gfmConfirm };
 
+	// ── Template Library Helpers ─────────────────────────────────
+
+	/** Field type → Dashicons icon map. */
+	const fieldIconMap = {
+		text: 'dashicons-editor-textcolor',
+		email: 'dashicons-email',
+		textarea: 'dashicons-editor-paragraph',
+		number: 'dashicons-performance',
+		select: 'dashicons-arrow-down-alt2',
+		radio: 'dashicons-marker',
+		checkbox: 'dashicons-yes-alt',
+		date: 'dashicons-calendar',
+		url: 'dashicons-admin-links',
+		tel: 'dashicons-phone',
+	};
+
+	/** Active template index for the preview modal. */
+	let activeTemplateIndex = null;
+
+	/**
+	 * Render the detailed preview body for a template.
+	 */
+	const renderPreview = (tpl) => {
+		const body = document.getElementById('gfm-preview-body');
+		const title = document.getElementById('gfm-preview-title');
+		if (!body || !title) return;
+
+		title.textContent = tpl.name;
+
+		let html = `<div class="gfm-preview-info"><p class="gfm-preview-desc">${escapeHtml(tpl.description)}</p></div>`;
+
+		html += `<div class="gfm-preview-fields-title"><span class="dashicons dashicons-editor-ul"></span> Fields (${tpl.fields.length})</div>`;
+		html += `<div class="gfm-preview-fields-list">`;
+
+		tpl.fields.forEach((field) => {
+			const icon = fieldIconMap[field.type] || 'dashicons-admin-generic';
+			const badge = field.required
+				? `<span class="gfm-preview-field-required">Required</span>`
+				: `<span class="gfm-preview-field-optional">Optional</span>`;
+
+			let extra = '';
+			if (field.options && field.options.length) {
+				extra = ` — ${field.options.length} options`;
+			}
+
+			html += `<div class="gfm-preview-field-item">
+				<div class="gfm-preview-field-icon"><span class="dashicons ${escapeHtml(icon)}"></span></div>
+				<div class="gfm-preview-field-info">
+					<strong>${escapeHtml(field.label)}</strong>
+					<span>${escapeHtml(field.type)}${extra}</span>
+				</div>
+				${badge}
+			</div>`;
+		});
+
+		html += `</div>`;
+
+		// Settings summary
+		if (tpl.settings) {
+			html += `<div class="gfm-preview-settings">`;
+			html += `<div class="gfm-preview-fields-title"><span class="dashicons dashicons-admin-settings"></span> Settings</div>`;
+			if (tpl.settings.submit_text) {
+				html += `<div class="gfm-preview-setting-row"><span class="dashicons dashicons-button"></span> <span>Button: <strong>${escapeHtml(tpl.settings.submit_text)}</strong></span></div>`;
+			}
+			if (tpl.settings.success_message) {
+				html += `<div class="gfm-preview-setting-row"><span class="dashicons dashicons-yes-alt"></span> <span>Success: <strong>${escapeHtml(tpl.settings.success_message)}</strong></span></div>`;
+			}
+			if (tpl.settings.gdpr_enabled) {
+				html += `<div class="gfm-preview-setting-row"><span class="dashicons dashicons-shield"></span> <span>GDPR consent <strong>enabled</strong></span></div>`;
+			}
+			html += `</div>`;
+		}
+
+		body.innerHTML = html;
+	};
+
+	/**
+	 * Apply a template: save via AJAX and redirect to the builder.
+	 */
+	const useTemplate = async (index) => {
+		const templates = genform.templates || [];
+		const tpl = templates[index];
+		if (!tpl) return;
+
+		showSpinner();
+
+		const res = await gfmFetch('genform_create_from_template', {
+			template_name: tpl.name,
+			template_fields: JSON.stringify(tpl.fields),
+			template_settings: JSON.stringify(tpl.settings),
+		});
+
+		hideSpinner();
+
+		if (res.success && res.data && res.data.redirect) {
+			showNotice('Template applied! Redirecting to the builder...');
+			setTimeout(() => { window.location.href = res.data.redirect; }, 600);
+		} else {
+			showNotice(res.data?.message || 'Something went wrong.');
+		}
+	};
+
+	/**
+	 * Filter template cards by search text and active category.
+	 */
+	const filterTemplates = () => {
+		const search = (document.getElementById('gfm-template-search')?.value || '').toLowerCase();
+		const activeFilter = document.querySelector('.gfm-filter-btn.active')?.dataset.category || 'all';
+		const cards = document.querySelectorAll('.gfm-template-card');
+		let visible = 0;
+
+		cards.forEach((card) => {
+			const cat = card.dataset.category;
+			const title = card.querySelector('.gfm-template-card-title')?.textContent?.toLowerCase() || '';
+			const desc = card.querySelector('.gfm-template-card-desc')?.textContent?.toLowerCase() || '';
+			const matchesCat = activeFilter === 'all' || cat === activeFilter;
+			const matchesSearch = !search || title.includes(search) || desc.includes(search) || cat.includes(search);
+
+			if (matchesCat && matchesSearch) {
+				card.classList.remove('gfm-hidden');
+				visible++;
+			} else {
+				card.classList.add('gfm-hidden');
+			}
+		});
+
+		const empty = document.getElementById('gfm-templates-empty');
+		if (empty) {
+			if (visible === 0) {
+				empty.classList.remove('gfm-hidden');
+			} else {
+				empty.classList.add('gfm-hidden');
+			}
+		}
+	};
+
 	/**
 	 * Main Administration Event Controller
 	 */
 	const init = () => {
+
+		// ── Template Library: Search Input ────────────────────
+		const searchInput = document.getElementById('gfm-template-search');
+		if (searchInput) {
+			searchInput.addEventListener('input', filterTemplates);
+		}
+
+		// ── Template Library: Category Filters ────────────────
+		const filterBtns = document.querySelectorAll('.gfm-filter-btn');
+		filterBtns.forEach((btn) => {
+			btn.addEventListener('click', () => {
+				filterBtns.forEach((b) => b.classList.remove('active'));
+				btn.classList.add('active');
+				filterTemplates();
+			});
+		});
+
 		document.addEventListener('click', async function (e) {
 			const target = e.target;
+
+			// ── Template Library: Open Modal ──────────────────
+			if (target.closest('#gfm-open-templates')) {
+				e.preventDefault();
+				openModal('#gfm-templates-modal');
+				return;
+			}
+
+			// ── Template Library: Preview Button ──────────────
+			const previewBtn = target.closest('.gfm-template-preview-btn');
+			if (previewBtn) {
+				e.preventDefault();
+				const index = parseInt(previewBtn.dataset.index, 10);
+				const templates = genform.templates || [];
+				if (templates[index]) {
+					activeTemplateIndex = index;
+					renderPreview(templates[index]);
+					closeModal('#gfm-templates-modal');
+					setTimeout(() => openModal('#gfm-template-preview-modal'), 350);
+				}
+				return;
+			}
+
+			// ── Template Library: Use Template Button ─────────
+			const useBtn = target.closest('.gfm-template-use-btn');
+			if (useBtn) {
+				e.preventDefault();
+				const index = parseInt(useBtn.dataset.index, 10);
+				closeModal('#gfm-templates-modal');
+				await useTemplate(index);
+				return;
+			}
+
+			// ── Template Preview: Back to Library ─────────────
+			if (target.closest('#gfm-preview-back')) {
+				e.preventDefault();
+				closeModal('#gfm-template-preview-modal');
+				setTimeout(() => openModal('#gfm-templates-modal'), 350);
+				return;
+			}
+
+			// ── Template Preview: Cancel ──────────────────────
+			if (target.closest('#gfm-preview-cancel')) {
+				e.preventDefault();
+				closeModal('#gfm-template-preview-modal');
+				return;
+			}
+
+			// ── Template Preview: Use This Template ───────────
+			if (target.closest('#gfm-preview-use')) {
+				e.preventDefault();
+				closeModal('#gfm-template-preview-modal');
+				if (activeTemplateIndex !== null) {
+					await useTemplate(activeTemplateIndex);
+				}
+				return;
+			}
 
 			// 1. Eye Icon: View Details Modal
 			const viewBtn = target.closest('.gfm-view-entry');

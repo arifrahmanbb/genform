@@ -1,0 +1,530 @@
+@use '../abstracts' as *;
+
+// ========================================
+// Template Library Modal
+// ========================================
+.gfm-modal-templates {
+    width: 960px;
+    max-width: 95vw;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.gfm-templates-header-left {
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+
+    > .dashicons {
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+        color: $primary;
+    }
+
+    h3 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 800;
+        color: $text-main;
+        letter-spacing: -0.02em;
+    }
+}
+
+.gfm-templates-count {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    color: $primary;
+    background: $primary-light;
+    border-radius: $radius-full;
+    margin-left: $space-xs;
+}
+
+// ── Toolbar ──────────────────────────────
+.gfm-templates-toolbar {
+    padding: $space-sm $space-lg;
+    border-bottom: 1px solid $border;
+    background: $bg;
+    display: flex;
+    flex-direction: column;
+    gap: $space-sm;
+    flex-shrink: 0;
+}
+
+.gfm-templates-search {
+    position: relative;
+
+    .dashicons {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        color: $text-light;
+        pointer-events: none;
+    }
+
+    input {
+        width: 100%;
+        height: 42px;
+        padding: 0 $space-sm 0 42px;
+        border: 1px solid $border;
+        border-radius: $radius-md;
+        font-size: $size-base;
+        color: $text-main;
+        background: $white;
+        transition: $transition-base;
+
+        &::placeholder {
+            color: $text-light;
+        }
+
+        &:focus {
+            border-color: $primary;
+            box-shadow: 0 0 0 4px rgba($primary, 0.1);
+            outline: none;
+        }
+    }
+}
+
+.gfm-templates-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.gfm-filter-btn {
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid $border;
+    border-radius: $radius-full;
+    background: $white;
+    color: $text-muted;
+    cursor: pointer;
+    transition: $transition-base;
+
+    &:hover {
+        border-color: $primary-alt;
+        color: $primary;
+        background: $primary-light;
+    }
+
+    &.active {
+        background: $primary;
+        color: $white;
+        border-color: $primary;
+        box-shadow: 0 2px 8px rgba($primary, 0.3);
+    }
+}
+
+// ── Grid Body ────────────────────────────
+.gfm-templates-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: $space-lg !important;
+}
+
+.gfm-templates-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: $space-md;
+
+    @media (max-width: 768px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 520px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+// ── Template Card ────────────────────────
+.gfm-template-card {
+    border: 1px solid $border;
+    border-radius: $radius;
+    overflow: hidden;
+    background: $white;
+    transition: $transition-base;
+    display: flex;
+    flex-direction: column;
+
+    &:hover {
+        border-color: $primary-alt;
+        box-shadow: $shadow-lg;
+        transform: translateY(-3px);
+
+        .gfm-template-preview-area {
+            border-bottom-color: rgba($primary, 0.2);
+        }
+
+        .gfm-template-icon-wrap {
+            background: $primary;
+            color: $white;
+            transform: scale(1.1);
+        }
+    }
+
+    &.gfm-hidden {
+        display: none !important;
+    }
+}
+
+.gfm-template-preview-area {
+    background: linear-gradient(135deg, $bg 0%, $primary-light 100%);
+    padding: $space-md;
+    border-bottom: 1px solid $border;
+    display: flex;
+    align-items: flex-start;
+    gap: $space-sm;
+    min-height: 120px;
+    transition: $transition-base;
+}
+
+.gfm-template-icon-wrap {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: $radius-md;
+    background: rgba($primary, 0.12);
+    color: $primary;
+    @include flex-center;
+    transition: $transition-bounce;
+
+    .dashicons {
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+    }
+}
+
+// ── Mini field preview inside card ───────
+.gfm-template-field-preview {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.gfm-tpl-field-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.gfm-tpl-field-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: $text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    min-width: 60px;
+}
+
+.gfm-tpl-field-bar {
+    flex: 1;
+    height: 8px;
+    background: rgba($primary, 0.08);
+    border-radius: $radius-full;
+    border: 1px solid rgba($primary, 0.12);
+}
+
+.gfm-tpl-field-more {
+    font-size: 10px;
+    font-weight: 600;
+    color: $primary;
+    margin-top: 2px;
+}
+
+// ── Card body ────────────────────────────
+.gfm-template-card-body {
+    padding: $space-sm;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.gfm-template-card-title {
+    margin: 0 0 4px;
+    font-size: $size-base;
+    font-weight: 700;
+    color: $text-main;
+    letter-spacing: -0.01em;
+}
+
+.gfm-template-card-desc {
+    margin: 0 0 $space-sm;
+    font-size: $size-sm;
+    color: $text-muted;
+    line-height: 1.5;
+    flex: 1;
+
+    // Clamp to 2 lines
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.gfm-template-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: $space-sm;
+}
+
+.gfm-tpl-meta-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    color: $text-muted;
+    background: $bg;
+    padding: 3px 8px;
+    border-radius: $radius-full;
+    border: 1px solid $border;
+
+    .dashicons {
+        font-size: 12px;
+        width: 12px;
+        height: 12px;
+    }
+}
+
+.gfm-tpl-cat-badge {
+    color: $primary;
+    background: $primary-light;
+    border-color: rgba($primary, 0.15);
+}
+
+// ── Card action buttons ──────────────────
+.gfm-template-card-actions {
+    display: flex;
+    gap: 6px;
+
+    .gfm-btn {
+        flex: 1;
+        justify-content: center;
+        font-size: 12px;
+        padding: 7px 10px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+
+        .dashicons {
+            font-size: 14px;
+            width: 14px;
+            height: 14px;
+        }
+    }
+}
+
+// ── Empty state ──────────────────────────
+.gfm-templates-empty {
+    text-align: center;
+    padding: $space-xl $space-md;
+    color: $text-light;
+
+    .dashicons {
+        font-size: 48px;
+        width: 48px;
+        height: 48px;
+        margin-bottom: $space-sm;
+        opacity: 0.4;
+    }
+
+    p {
+        font-size: $size-base;
+        color: $text-muted;
+    }
+}
+
+// ========================================
+// Template Preview Modal (Detail View)
+// ========================================
+.gfm-preview-back-btn {
+    background: none;
+    border: 1px solid $border;
+    border-radius: $radius-sm;
+    padding: 4px;
+    cursor: pointer;
+    color: $text-muted;
+    @include flex-center;
+    transition: $transition-base;
+
+    .dashicons {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+    }
+
+    &:hover {
+        background: $bg;
+        color: $primary;
+        border-color: $primary;
+    }
+}
+
+.gfm-preview-footer {
+    padding: $space-sm $space-lg;
+    border-top: 1px solid $border;
+    background: $bg;
+    display: flex;
+    justify-content: flex-end;
+    gap: $space-sm;
+
+    .gfm-btn .dashicons {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        margin-right: 4px;
+    }
+}
+
+// ── Preview field list ───────────────────
+.gfm-preview-info {
+    margin-bottom: $space-lg;
+}
+
+.gfm-preview-desc {
+    font-size: $size-base;
+    color: $text-muted;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.gfm-preview-fields-title {
+    font-size: 13px;
+    font-weight: $weight-bold;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: $text-muted;
+    margin-bottom: $space-sm;
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+
+    .dashicons {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        color: $primary;
+    }
+}
+
+.gfm-preview-fields-list {
+    display: grid;
+    gap: $space-xs;
+}
+
+.gfm-preview-field-item {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+    padding: 14px $space-sm;
+    background: $bg;
+    border: 1px solid $border;
+    border-radius: $radius-md;
+    transition: $transition-base;
+
+    &:hover {
+        border-color: $primary-alt;
+        background: $white;
+        box-shadow: $shadow-sm;
+    }
+}
+
+.gfm-preview-field-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: $radius-sm;
+    background: $primary-light;
+    color: $primary;
+    @include flex-center;
+    flex-shrink: 0;
+
+    .dashicons {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+    }
+}
+
+.gfm-preview-field-info {
+    flex: 1;
+
+    strong {
+        display: block;
+        font-size: $size-base;
+        font-weight: $weight-bold;
+        color: $text-main;
+    }
+
+    span {
+        font-size: $size-sm;
+        color: $text-light;
+    }
+}
+
+.gfm-preview-field-required {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: $radius-full;
+    background: rgba($danger, 0.08);
+    color: $danger;
+    border: 1px solid rgba($danger, 0.15);
+}
+
+.gfm-preview-field-optional {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: $radius-full;
+    background: $bg;
+    color: $text-light;
+    border: 1px solid $border;
+}
+
+// ── Preview settings box ─────────────────
+.gfm-preview-settings {
+    margin-top: $space-lg;
+    padding: $space-md;
+    background: #fcfdfe;
+    border: 1px solid $border;
+    border-radius: $radius;
+}
+
+.gfm-preview-setting-row {
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+    padding: $space-xs 0;
+    font-size: $size-sm;
+    color: $text-muted;
+
+    & + & {
+        border-top: 1px solid rgba($border, 0.5);
+    }
+
+    .dashicons {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        color: $primary;
+    }
+
+    strong {
+        color: $text-main;
+    }
+}
