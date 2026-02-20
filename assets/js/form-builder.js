@@ -22,6 +22,20 @@ class GenFormBuilder {
     }
 
     /**
+     * Return i18n strings from server with sensible fallbacks.
+     */
+    get i18n() {
+        return window.genformBuilder?.i18n || {};
+    }
+
+    /**
+     * Resolve a single i18n string with a fallback.
+     */
+    t(key, fallback) {
+        return this.i18n[key] || fallback;
+    }
+
+    /**
      * Initializes the builder environment and loads initial data.
      */
     init() {
@@ -63,23 +77,23 @@ class GenFormBuilder {
             this.fields = window.genformBuilder.initialData?.fields || [];
 
             if (window.genformBuilder.initialSettings) {
-                const s = window.genformBuilder.initialSettings;
+                const initialSettings = window.genformBuilder.initialSettings;
                 const mapping = {
-                    'gfm-submit-text': s.submit_text || 'Submit',
-                    'gfm-submit-align': s.submit_align || 'left',
-                    'gfm-con-type': s.con_type || 'message',
-                    'gfm-success-message': s.success_message || '',
-                    'gfm-error-message': s.error_message || '',
-                    'gfm-redirect-url': s.redirect_url || '',
-                    'gfm-base-font-size': s.base_font_size || '16',
-                    'gfm-base-font-weight': s.base_font_weight || '400',
-                    'gfm-admin-email': s.admin_email || '{admin_email}',
-                    'gfm-from-name': s.from_name || '',
-                    'gfm-from-email': s.from_email || '',
-                    'gfm-reply-to': s.reply_to || '{field_email}',
-                    'gfm-email-subject': s.email_subject || '',
-                    'gfm-email-body': s.email_body || '',
-                    'gfm-gdpr-text': s.gdpr_text || 'I consent to having this website store my submitted information.'
+                    'gfm-submit-text': initialSettings.gfm_submit_text || 'Submit',
+                    'gfm-submit-align': initialSettings.gfm_submit_align || 'left',
+                    'gfm-con-type': initialSettings.gfm_con_type || 'message',
+                    'gfm-success-message': initialSettings.gfm_success_message || '',
+                    'gfm-error-message': initialSettings.gfm_error_message || '',
+                    'gfm-redirect-url': initialSettings.gfm_redirect_url || '',
+                    'gfm-base-font-size': initialSettings.gfm_base_font_size || '16',
+                    'gfm-base-font-weight': initialSettings.gfm_base_font_weight || '400',
+                    'gfm-admin-email': initialSettings.gfm_admin_email || '{admin_email}',
+                    'gfm-from-name': initialSettings.gfm_from_name || '',
+                    'gfm-from-email': initialSettings.gfm_from_email || '',
+                    'gfm-reply-to': initialSettings.gfm_reply_to || '{field_email}',
+                    'gfm-email-subject': initialSettings.gfm_email_subject || '',
+                    'gfm-email-body': initialSettings.gfm_email_body || '',
+                    'gfm-gdpr-text': initialSettings.gfm_gdpr_text || 'I consent to having this website store my submitted information.'
                 };
 
                 for (const id in mapping) {
@@ -89,7 +103,7 @@ class GenFormBuilder {
 
                 // Handle GDPR checkbox separately (checked state, not value).
                 const gdprCheckbox = document.getElementById('gfm-gdpr-enabled');
-                if (gdprCheckbox) gdprCheckbox.checked = !!s.gdpr_enabled;
+                if (gdprCheckbox) gdprCheckbox.checked = !!initialSettings.gfm_gdpr_enabled;
             }
         }
 
@@ -165,14 +179,18 @@ class GenFormBuilder {
             label: label,
             name: this.slugify(label) + '_' + this.counter,
             placeholder: this.getExamplePlaceholder(type),
+            help_text: '',
             required: false,
             css_class: '',
             default_value: '',
             width: '100',
             options: this.isOptionField(type) ? [
-                { label: 'Option 1', value: 'option_1' },
-                { label: 'Option 2', value: 'option_2' }
-            ] : []
+                { label: this.t('option_1', 'Option 1'), value: 'option_1' },
+                { label: this.t('option_2', 'Option 2'), value: 'option_2' }
+            ] : [],
+            // Type-specific defaults.
+            ...(type === 'textarea' ? { rows: 4 } : {}),
+            ...(type === 'number' ? { min: '', max: '', step: '' } : {}),
         };
 
         this.fields.push(field);
@@ -188,6 +206,31 @@ class GenFormBuilder {
         }, 100);
     }
 
+    /**
+     * Duplicate a field by deep-cloning its config and assigning a new ID.
+     */
+    duplicateField(original) {
+        this.counter++;
+        const clone = JSON.parse(JSON.stringify(original));
+        clone.id = `field_${this.counter}`;
+        clone.name = this.slugify(clone.label) + '_' + this.counter;
+
+        const idx = this.fields.indexOf(original);
+        this.fields.splice(idx + 1, 0, clone);
+        this.render();
+
+        setTimeout(() => {
+            const node = this.container.querySelector(`[data-id="${clone.id}"]`);
+            if (node) {
+                node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 100);
+
+        if (window.gfmAdmin) {
+            window.gfmAdmin.showNotice(this.t('field_duplicated', 'Field duplicated.'));
+        }
+    }
+
     slugify(text) {
         return text.toString().toLowerCase()
             .replace(/\s+/g, '_')
@@ -198,7 +241,7 @@ class GenFormBuilder {
     }
 
     getDefaultLabel(type) {
-        const labels = {
+        return this.t(`label_${type}`, {
             text: 'Text Field',
             email: 'Email Address',
             textarea: 'Paragraph',
@@ -208,13 +251,21 @@ class GenFormBuilder {
             number: 'Number',
             date: 'Date',
             url: 'Website',
-            tel: 'Phone Number'
-        };
-        return labels[type] || 'New Field';
+            tel: 'Phone Number',
+            hidden: 'Hidden Field',
+            password: 'Password',
+        }[type] || 'New Field');
     }
 
     isOptionField(type) {
         return ['select', 'radio', 'checkbox'].includes(type);
+    }
+
+    /**
+     * Returns true if the type should have no visible settings panel.
+     */
+    isMinimalField(type) {
+        return type === 'hidden';
     }
 
     updateOrder() {
@@ -232,8 +283,14 @@ class GenFormBuilder {
         if (this.fields.length === 0) {
             this.container.innerHTML = `
                 <div class="gfm-empty-canvas">
-                    <span class="dashicons dashicons-plus-alt"></span>
-                    <p>Add fields here.</p>
+                    <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:0.15; margin-bottom:16px;">
+                        <rect x="8" y="16" width="64" height="48" rx="6" stroke="currentColor" stroke-width="3" fill="none"/>
+                        <line x1="20" y1="32" x2="60" y2="32" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="20" y1="44" x2="48" y2="44" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="20" y1="56" x2="36" y2="56" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
+                    <h2>${this.t('empty_title', 'Start Building Your Form')}</h2>
+                    <p>${this.t('empty_desc', 'Click a field type from the sidebar to get started.')}</p>
                 </div>`;
             return;
         }
@@ -243,78 +300,182 @@ class GenFormBuilder {
     }
 
     getExamplePlaceholder(type) {
+        const prefix = this.t('example_prefix', 'e.g.');
         const examples = {
             text: 'Type something...',
             email: 'john@example.com',
             url: 'https://yoursite.com',
             number: '123',
-            tel: '+1 234 567 890'
+            tel: '+1 234 567 890',
+            password: '••••••••'
         };
-        return 'e.g. ' + (examples[type] || 'Enter value...');
+        return examples[type] ? `${prefix} ${examples[type]}` : '';
+    }
+
+    /**
+     * Render type-specific settings (textarea rows, number min/max, etc.).
+     */
+    renderTypeSpecificSettings(f) {
+        let html = '';
+
+        if (f.type === 'textarea') {
+            html += `
+                <div class="gfm-grid">
+                    <div class="gfm-col">
+                        <label>${this.t('rows', 'Rows')}</label>
+                        <input type="number" class="gfm-setter" data-prop="rows" value="${f.rows || 4}" min="2" max="20">
+                    </div>
+                    <div class="gfm-col"></div>
+                </div>`;
+        }
+
+        if (f.type === 'number') {
+            html += `
+                <div class="gfm-grid">
+                    <div class="gfm-col">
+                        <label>${this.t('min_value', 'Min Value')}</label>
+                        <input type="number" class="gfm-setter" data-prop="min" value="${this.escape(f.min || '')}">
+                    </div>
+                    <div class="gfm-col">
+                        <label>${this.t('max_value', 'Max Value')}</label>
+                        <input type="number" class="gfm-setter" data-prop="max" value="${this.escape(f.max || '')}">
+                    </div>
+                </div>
+                <div class="gfm-grid">
+                    <div class="gfm-col">
+                        <label>${this.t('step', 'Step')}</label>
+                        <input type="number" class="gfm-setter" data-prop="step" value="${this.escape(f.step || '')}" placeholder="${this.t('example_prefix', 'e.g.')} 0.01">
+                    </div>
+                    <div class="gfm-col"></div>
+                </div>`;
+        }
+
+        return html;
+    }
+
+    /**
+     * Width option data.
+     */
+    getWidthOptions() {
+        return [
+            { value: '100', label: this.t('width_full', 'Full') },
+            { value: '75', label: '3/4' },
+            { value: '67', label: '2/3' },
+            { value: '50', label: '1/2' },
+            { value: '33', label: '1/3' },
+            { value: '25', label: '1/4' },
+        ];
     }
 
     createFieldNode(f) {
-        const i18n = window.genformBuilder?.i18n || {};
         const div = document.createElement('div');
         div.className = 'gfm-field-node gfm-card';
         div.dataset.id = f.id;
+
+        const isHidden = f.type === 'hidden';
+        const fieldIcon = this.getFieldIcon(f.type);
+
+        const widthButtons = this.getWidthOptions().map(opt =>
+            `<button type="button" class="gfm-width-btn ${f.width === opt.value ? 'active' : ''}" data-width="${opt.value}">${opt.label}</button>`
+        ).join('');
+
+        // Build settings panel — hidden fields get a minimal panel.
+        let settingsPanel = '';
+
+        if (isHidden) {
+            settingsPanel = `
+                <div class="gfm-field-settings-panel gfm-hidden">
+                    <div class="gfm-grid">
+                        <div class="gfm-col">
+                            <label>${this.t('label', 'Label')}</label>
+                            <input type="text" class="gfm-setter" data-prop="label" value="${this.escape(f.label)}">
+                        </div>
+                        <div class="gfm-col">
+                            <label>${this.t('field_name', 'Field Name')}</label>
+                            <input type="text" class="gfm-setter" data-prop="name" value="${this.escape(f.name)}">
+                        </div>
+                    </div>
+                    <div class="gfm-grid">
+                        <div class="gfm-col">
+                            <label>${this.t('default_value', 'Default Value')}</label>
+                            <input type="text" class="gfm-setter" data-prop="default_value" value="${this.escape(f.default_value)}">
+                            <span class="gfm-setting-desc">${this.t('hidden_desc', 'This value is sent with the form but not visible to users.')}</span>
+                        </div>
+                    </div>
+                </div>`;
+        } else {
+            settingsPanel = `
+                <div class="gfm-field-settings-panel gfm-hidden">
+                    <div class="gfm-field-settings-header">
+                        <span class="dashicons dashicons-${fieldIcon}"></span>
+                        <span>${this.escape(this.getDefaultLabel(f.type))} ${this.t('settings', 'Settings')}</span>
+                    </div>
+                    <div class="gfm-grid">
+                        <div class="gfm-col">
+                            <label>${this.t('label', 'Label')}</label>
+                            <input type="text" class="gfm-setter" data-prop="label" value="${this.escape(f.label)}">
+                        </div>
+                        <div class="gfm-col">
+                            <label>${this.t('field_name', 'Field Name')}</label>
+                            <input type="text" class="gfm-setter" data-prop="name" value="${this.escape(f.name)}">
+                            <span class="gfm-setting-desc">${this.t('field_name_desc', 'Used in submissions and email tags.')}</span>
+                        </div>
+                    </div>
+                    <div class="gfm-grid">
+                        <div class="gfm-col">
+                            <label>${this.t('placeholder', 'Placeholder')}</label>
+                            <input type="text" class="gfm-setter" data-prop="placeholder" value="${this.escape(f.placeholder)}">
+                        </div>
+                        <div class="gfm-col">
+                            <label>${this.t('default_value', 'Default Value')}</label>
+                            <input type="text" class="gfm-setter" data-prop="default_value" value="${this.escape(f.default_value)}">
+                        </div>
+                    </div>
+                    <div class="gfm-grid">
+                        <div class="gfm-col" style="grid-column: span 2;">
+                            <label>${this.t('help_text', 'Help Text')}</label>
+                            <input type="text" class="gfm-setter" data-prop="help_text" value="${this.escape(f.help_text || '')}" placeholder="${this.t('help_text_placeholder', 'Displayed below the field to guide the user.')}">
+                        </div>
+                    </div>
+                    ${this.renderTypeSpecificSettings(f)}
+                    <div class="gfm-grid">
+                        <div class="gfm-col">
+                            <label>${this.t('width', 'Width')}</label>
+                            <div class="gfm-width-selector">
+                                ${widthButtons}
+                            </div>
+                        </div>
+                        <div class="gfm-col">
+                            <label>${this.t('css_class', 'CSS Class')}</label>
+                            <input type="text" class="gfm-setter" data-prop="css_class" value="${this.escape(f.css_class)}">
+                        </div>
+                    </div>
+                    <div class="gfm-grid">
+                        <div class="gfm-col">
+                            <div class="gfm-required-toggle-wrap">
+                                <label class="gfm-switch">
+                                    <input type="checkbox" class="gfm-setter-check" data-prop="required" ${f.required ? 'checked' : ''}>
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="gfm-required-label">${this.t('required', 'Required')}</span>
+                            </div>
+                        </div>
+                    </div>
+                    ${this.renderOptionsSetter(f)}
+                </div>`;
+        }
 
         div.innerHTML = `
             <div class="gfm-field-header">
                 <span class="gfm-field-drag-handle dashicons dashicons-move"></span>
                 <span class="gfm-field-title"><strong>${this.escape(f.label)}</strong> <small>${this.escape(f.type)}</small></span>
                 <div class="gfm-field-actions">
-                    <button type="button" class="gfm-edit-btn gfm-opt-btn dashicons dashicons-admin-generic"></button>
-                    <button type="button" class="gfm-delete-btn gfm-opt-btn dashicons dashicons-trash"></button>
+                    <button type="button" class="gfm-duplicate-btn gfm-opt-btn" title="${this.t('duplicate', 'Duplicate')}"><span class="dashicons dashicons-admin-page"></span></button>
+                    <button type="button" class="gfm-edit-btn gfm-opt-btn" title="${this.t('edit', 'Edit')}"><span class="dashicons dashicons-admin-generic"></span></button>
+                    <button type="button" class="gfm-delete-btn gfm-opt-btn" title="${this.t('delete', 'Delete')}"><span class="dashicons dashicons-trash"></span></button>
                 </div>
             </div>
-            <div class="gfm-field-settings-panel gfm-hidden">
-                <div class="gfm-grid">
-                    <div class="gfm-col">
-                        <label>${i18n.label || 'Label'}</label>
-                        <input type="text" class="gfm-setter" data-prop="label" value="${this.escape(f.label)}">
-                    </div>
-                    <div class="gfm-col">
-                        <label>Meta Key</label>
-                        <input type="text" class="gfm-setter" data-prop="name" value="${this.escape(f.name)}">
-                    </div>
-                </div>
-                <div class="gfm-grid">
-                    <div class="gfm-col">
-                        <label>Placeholder</label>
-                        <input type="text" class="gfm-setter" data-prop="placeholder" value="${this.escape(f.placeholder)}">
-                    </div>
-                    <div class="gfm-col">
-                        <label>Default</label>
-                        <input type="text" class="gfm-setter" data-prop="default_value" value="${this.escape(f.default_value)}">
-                    </div>
-                </div>
-                <div class="gfm-grid">
-                    <div class="gfm-col">
-                        <label>Width</label>
-                        <div class="gfm-width-selector">
-                            <button type="button" class="gfm-width-btn ${f.width === '100' ? 'active' : ''}" data-width="100">Full</button>
-                            <button type="button" class="gfm-width-btn ${f.width === '50' ? 'active' : ''}" data-width="50">Half</button>
-                        </div>
-                    </div>
-                    <div class="gfm-col">
-                        <label>Class</label>
-                        <input type="text" class="gfm-setter" data-prop="css_class" value="${this.escape(f.css_class)}">
-                    </div>
-                </div>
-                <div class="gfm-grid">
-                    <div class="gfm-col">
-                        <div class="gfm-required-toggle-wrap">
-                            <label class="gfm-switch">
-                                <input type="checkbox" class="gfm-setter-check" data-prop="required" ${f.required ? 'checked' : ''}>
-                                <span class="slider"></span>
-                            </label>
-                            <span class="gfm-required-label">${i18n.required || 'Required'}</span>
-                        </div>
-                    </div>
-                </div>
-                ${this.renderOptionsSetter(f)}
-            </div>`;
+            ${settingsPanel}`;
 
         // Event: Width
         div.querySelectorAll('.gfm-width-btn').forEach(btn => {
@@ -338,9 +499,18 @@ class GenFormBuilder {
             }
         });
 
+        // Event: Duplicate
+        div.querySelector('.gfm-duplicate-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.duplicateField(f);
+        });
+
         // Event: Delete
         div.querySelector('.gfm-delete-btn').addEventListener('click', async () => {
-            const confirmed = await window.gfmAdmin.gfmConfirm('Delete Field?', 'This field and its configuration will be removed from the builder.');
+            const confirmed = await window.gfmAdmin.gfmConfirm(
+                this.t('delete_field_title', 'Delete Field?'),
+                this.t('delete_field_desc', 'This field and its configuration will be removed from the builder.')
+            );
             if (confirmed) {
                 window.gfmAdmin.showSpinner();
                 setTimeout(() => {
@@ -349,7 +519,7 @@ class GenFormBuilder {
                     setTimeout(() => {
                         this.render();
                         window.gfmAdmin.hideSpinner();
-                        window.gfmAdmin.showNotice('Field removed successfully.');
+                        window.gfmAdmin.showNotice(this.t('field_removed', 'Field removed successfully.'));
                     }, 300);
                 }, 500);
             }
@@ -376,7 +546,7 @@ class GenFormBuilder {
         const addOptBtn = div.querySelector('.gfm-add-opt-btn');
         if (addOptBtn) {
             addOptBtn.addEventListener('click', () => {
-                f.options.push({ label: 'New Option', value: 'opt' });
+                f.options.push({ label: this.t('new_option', 'New Option'), value: 'opt' });
                 this.updateOptionsUI(div, f);
             });
         }
@@ -401,6 +571,27 @@ class GenFormBuilder {
         return div;
     }
 
+    /**
+     * Get the dashicon name for a field type.
+     */
+    getFieldIcon(type) {
+        const icons = {
+            text: 'edit',
+            email: 'email',
+            textarea: 'text',
+            number: 'calculator',
+            select: 'menu-alt',
+            radio: 'marker',
+            checkbox: 'yes',
+            date: 'calendar-alt',
+            url: 'admin-links',
+            tel: 'phone',
+            hidden: 'hidden',
+            password: 'lock',
+        };
+        return icons[type] || 'admin-generic';
+    }
+
     updateOptionsUI(node, f) {
         const list = node.querySelector('.gfm-options-list');
         if (!list) return;
@@ -410,8 +601,8 @@ class GenFormBuilder {
             row.className = 'gfm-opt-row';
             row.innerHTML = `
                 <span class="dashicons dashicons-menu gfm-opt-drag"></span>
-                <input type="text" class="gfm-opt-label" data-index="${i}" value="${this.escape(o.label)}" placeholder="Label">
-                <input type="text" class="gfm-opt-value" data-index="${i}" value="${this.escape(o.value)}" placeholder="Value">
+                <input type="text" class="gfm-opt-label" data-index="${i}" value="${this.escape(o.label)}" placeholder="${this.t('opt_label', 'Label')}">
+                <input type="text" class="gfm-opt-value" data-index="${i}" value="${this.escape(o.value)}" placeholder="${this.t('opt_value', 'Value')}">
                 <button type="button" class="gfm-opt-btn gfm-opt-remove" data-index="${i}">
                     <span class="dashicons dashicons-no-alt"></span>
                 </button>`;
@@ -424,8 +615,8 @@ class GenFormBuilder {
         const listHtml = f.options.map((o, i) => `
             <div class="gfm-opt-row">
                 <span class="dashicons dashicons-menu gfm-opt-drag"></span>
-                <input type="text" class="gfm-opt-label" data-index="${i}" value="${this.escape(o.label)}" placeholder="Label">
-                <input type="text" class="gfm-opt-value" data-index="${i}" value="${this.escape(o.value)}" placeholder="Value">
+                <input type="text" class="gfm-opt-label" data-index="${i}" value="${this.escape(o.label)}" placeholder="${this.t('opt_label', 'Label')}">
+                <input type="text" class="gfm-opt-value" data-index="${i}" value="${this.escape(o.value)}" placeholder="${this.t('opt_value', 'Value')}">
                 <button type="button" class="gfm-opt-btn gfm-opt-remove" data-index="${i}">
                     <span class="dashicons dashicons-no-alt"></span>
                 </button>
@@ -433,33 +624,33 @@ class GenFormBuilder {
 
         return `
             <div class="gfm-options-setter">
-                <h4>Options</h4>
+                <h4>${this.t('options_title', 'Options')}</h4>
                 <div class="gfm-options-list">${listHtml}</div>
                 <button type="button" class="gfm-add-opt-btn">
                     <span class="dashicons dashicons-plus-alt2"></span>
-                    ${window.genformBuilder?.i18n?.add_option || 'Add Option'}
+                    ${this.t('add_option', 'Add Option')}
                 </button>
             </div>`;
     }
 
     save() {
         const settings = {
-            submit_text: document.getElementById('gfm-submit-text')?.value,
-            submit_align: document.getElementById('gfm-submit-align')?.value,
-            con_type: document.getElementById('gfm-con-type')?.value,
-            success_message: document.getElementById('gfm-success-message')?.value,
-            error_message: document.getElementById('gfm-error-message')?.value,
-            redirect_url: document.getElementById('gfm-redirect-url')?.value,
-            base_font_size: document.getElementById('gfm-base-font-size')?.value,
-            base_font_weight: document.getElementById('gfm-base-font-weight')?.value,
-            admin_email: document.getElementById('gfm-admin-email')?.value,
-            from_name: document.getElementById('gfm-from-name')?.value,
-            from_email: document.getElementById('gfm-from-email')?.value,
-            reply_to: document.getElementById('gfm-reply-to')?.value,
-            email_subject: document.getElementById('gfm-email-subject')?.value,
-            email_body: document.getElementById('gfm-email-body')?.value,
-            gdpr_enabled: document.getElementById('gfm-gdpr-enabled')?.checked ? '1' : '',
-            gdpr_text: document.getElementById('gfm-gdpr-text')?.value,
+            gfm_submit_text: document.getElementById('gfm-submit-text')?.value,
+            gfm_submit_align: document.getElementById('gfm-submit-align')?.value,
+            gfm_con_type: document.getElementById('gfm-con-type')?.value,
+            gfm_success_message: document.getElementById('gfm-success-message')?.value,
+            gfm_error_message: document.getElementById('gfm-error-message')?.value,
+            gfm_redirect_url: document.getElementById('gfm-redirect-url')?.value,
+            gfm_base_font_size: document.getElementById('gfm-base-font-size')?.value,
+            gfm_base_font_weight: document.getElementById('gfm-base-font-weight')?.value,
+            gfm_admin_email: document.getElementById('gfm-admin-email')?.value,
+            gfm_from_name: document.getElementById('gfm-from-name')?.value,
+            gfm_from_email: document.getElementById('gfm-from-email')?.value,
+            gfm_reply_to: document.getElementById('gfm-reply-to')?.value,
+            gfm_email_subject: document.getElementById('gfm-email-subject')?.value,
+            gfm_email_body: document.getElementById('gfm-email-body')?.value,
+            gfm_gdpr_enabled: document.getElementById('gfm-gdpr-enabled')?.checked ? '1' : '',
+            gfm_gdpr_text: document.getElementById('gfm-gdpr-text')?.value,
         };
 
         if (this.dataInput) this.dataInput.value = JSON.stringify({ fields: this.fields });

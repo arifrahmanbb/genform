@@ -17,12 +17,13 @@ if (! defined('ABSPATH')) {
 final class Shortcode
 {
 
+
 	/**
 	 * Map the shortcode to the render function.
 	 */
 	public function __construct()
 	{
-		add_shortcode('genform', [$this, 'render']);
+		add_shortcode('genform', array($this, 'render'));
 	}
 
 	/**
@@ -30,7 +31,7 @@ final class Shortcode
 	 */
 	public function render(array $atts): string
 	{
-		$atts = shortcode_atts(['id' => 0], $atts, 'genform');
+		$atts = shortcode_atts(array('id' => 0), $atts, 'genform');
 		$id   = (int) $atts['id'];
 
 		if (! $id) {
@@ -60,9 +61,9 @@ final class Shortcode
 		$nonce    = wp_create_nonce("genform_submit_{$form->id}");
 
 		// Dynamic styles for this specific form instance.
-		$base_font_size   = (int) ($settings['base_font_size'] ?? 16);
-		$base_font_weight = (int) ($settings['base_font_weight'] ?? 400);
-		$custom_css = "
+		$base_font_size   = (int) ($settings['gfm_base_font_size'] ?? 16);
+		$base_font_weight = (int) ($settings['gfm_base_font_weight'] ?? 400);
+		$custom_css       = "
 			#gfm-form-{$form->id} {
 				--gfm-base-size: {$base_font_size}px;
 				font-weight: {$base_font_weight};

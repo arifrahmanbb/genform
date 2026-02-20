@@ -20,18 +20,19 @@ use GenForm\Utils\DetectionHelper;
 final class FormHandler
 {
 
+
 	/**
 	 * Setup hooks for AJAX actions.
 	 */
 	public function __construct()
 	{
-		add_action('wp_ajax_genform_submit', [$this, 'handleSubmission']);
-		add_action('wp_ajax_nopriv_genform_submit', [$this, 'handleSubmission']);
-		add_action('wp_ajax_genform_delete_entry', [$this, 'handleDeleteEntry']);
-		add_action('wp_ajax_genform_trash_entry', [$this, 'handleTrashEntry']);
-		add_action('wp_ajax_genform_delete_form', [$this, 'handleDeleteFormAjax']);
-		add_action('wp_ajax_genform_mark_as_read', [$this, 'handleMarkAsRead']);
-		add_action('admin_init', [$this, 'processBulkActions']);
+		add_action('wp_ajax_genform_submit', array($this, 'handleSubmission'));
+		add_action('wp_ajax_nopriv_genform_submit', array($this, 'handleSubmission'));
+		add_action('wp_ajax_genform_delete_entry', array($this, 'handleDeleteEntry'));
+		add_action('wp_ajax_genform_trash_entry', array($this, 'handleTrashEntry'));
+		add_action('wp_ajax_genform_delete_form', array($this, 'handleDeleteFormAjax'));
+		add_action('wp_ajax_genform_mark_as_read', array($this, 'handleMarkAsRead'));
+		add_action('admin_init', array($this, 'processBulkActions'));
 	}
 
 	/**
@@ -51,7 +52,7 @@ final class FormHandler
 		$honeypot = isset($_POST['genform_website_url']) ? sanitize_text_field(wp_unslash($_POST['genform_website_url'])) : '';
 		if (! empty($honeypot)) {
 			// Silently reject — do NOT reveal bot detection to attackers.
-			wp_send_json_success(['message' => esc_html__('Thank you! Your submission has been received.', 'genform')]);
+			wp_send_json_success(array('message' => esc_html__('Thank you! Your submission has been received.', 'genform')));
 		}
 
 		// Rate limiting (5 submissions per minute per IP).
@@ -71,7 +72,7 @@ final class FormHandler
 		$gdpr_form = $wpdb->get_row($wpdb->prepare("SELECT form_settings FROM {$wpdb->prefix}genform_forms WHERE id = %d", $form_id));
 		if ($gdpr_form) {
 			$gdpr_settings = json_decode($gdpr_form->form_settings, true);
-			if (! empty($gdpr_settings['gdpr_enabled']) && empty($gdpr_field)) {
+			if (! empty($gdpr_settings['gfm_gdpr_enabled']) && empty($gdpr_field)) {
 				$this->sendError(esc_html__('You must agree to the privacy terms to submit this form.', 'genform'), $form_id);
 			}
 		}
@@ -92,37 +93,37 @@ final class FormHandler
 			$this->sendError(esc_html__('Form not found.', 'genform'));
 		}
 
-		$entry_data   = $this->getSanitizedData();
-		$device_info  = DetectionHelper::getInfo();
-		$entry_meta   = [
+		$entry_data  = $this->getSanitizedData();
+		$device_info = DetectionHelper::getInfo();
+		$entry_meta  = array(
 			'browser' => $device_info['browser'],
 			'os'      => $device_info['os'],
 			'ip'      => sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'] ?? '')),
 			'url'     => esc_url_raw(wp_unslash($_SERVER['HTTP_REFERER'] ?? '')),
-		];
+		);
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$wpdb->insert(
 			"{$wpdb->prefix}genform_entries",
-			[
+			array(
 				'form_id'        => $form_id,
 				'entry_data'     => wp_json_encode($entry_data),
 				'entry_metadata' => wp_json_encode($entry_meta),
 				'user_ip'        => $entry_meta['ip'],
 				'user_agent'     => sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'] ?? '')),
-			]
+			)
 		);
 
 		// Send email notification.
 		Email::send($wpdb->insert_id, $form_id, $entry_data);
 
 		$form_settings = json_decode($form->form_settings, true);
-		$response      = [
-			'message' => $form_settings['success_message'] ?? esc_html__('Thank you for your submission.', 'genform'),
-		];
+		$response      = array(
+			'message' => $form_settings['gfm_success_message'] ?? esc_html__('Thank you for your submission.', 'genform'),
+		);
 
-		if (($form_settings['con_type'] ?? '') === 'redirect' && ! empty($form_settings['redirect_url'])) {
-			$response['redirect'] = esc_url_raw($form_settings['redirect_url']);
+		if (($form_settings['gfm_con_type'] ?? '') === 'redirect' && ! empty($form_settings['gfm_redirect_url'])) {
+			$response['redirect'] = esc_url_raw($form_settings['gfm_redirect_url']);
 		}
 
 		wp_send_json_success($response);
@@ -139,12 +140,12 @@ final class FormHandler
 			$form_row = $wpdb->get_row($wpdb->prepare("SELECT form_settings FROM {$wpdb->prefix}genform_forms WHERE id = %d", $form_id));
 			if ($form_row) {
 				$form_settings = json_decode($form_row->form_settings, true);
-				if (! empty($form_settings['error_message'])) {
-					$message = $form_settings['error_message'];
+				if (! empty($form_settings['gfm_error_message'])) {
+					$message = $form_settings['gfm_error_message'];
 				}
 			}
 		}
-		wp_send_json_error(['message' => $message]);
+		wp_send_json_error(array('message' => $message));
 	}
 
 	/**
@@ -156,10 +157,10 @@ final class FormHandler
 	private function getSanitizedData(): array
 	{
 		// phpcs:disable WordPress.Security.NonceVerification.Missing
-		$clean_data = [];
+		$clean_data = array();
 		foreach ($_POST as $key => $value) {
 			if (str_starts_with($key, 'gfm_')) {
-				$field_key               = str_replace('gfm_', '', $key);
+				$field_key                = str_replace('gfm_', '', $key);
 				$clean_data[$field_key] = is_array($value) ? array_map('sanitize_text_field', wp_unslash($value)) : sanitize_text_field(wp_unslash($value));
 			}
 		}
@@ -174,13 +175,13 @@ final class FormHandler
 	{
 		check_ajax_referer('genform_admin_nonce', 'nonce');
 		if (! current_user_can('manage_options')) {
-			wp_send_json_error(['message' => esc_html__('Unauthorized', 'genform')]);
+			wp_send_json_error(array('message' => esc_html__('Unauthorized', 'genform')));
 		}
 		$entry_id = isset($_POST['entry_id']) ? absint(wp_unslash($_POST['entry_id'])) : 0;
 		if ($entry_id) {
 			global $wpdb;
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->delete("{$wpdb->prefix}genform_entries", ['id' => $entry_id]);
+			$wpdb->delete("{$wpdb->prefix}genform_entries", array('id' => $entry_id));
 			wp_send_json_success();
 		}
 		wp_send_json_error();
@@ -193,13 +194,13 @@ final class FormHandler
 	{
 		check_ajax_referer('genform_admin_nonce', 'nonce');
 		if (! current_user_can('manage_options')) {
-			wp_send_json_error(['message' => esc_html__('Unauthorized', 'genform')]);
+			wp_send_json_error(array('message' => esc_html__('Unauthorized', 'genform')));
 		}
 		$entry_id = isset($_POST['entry_id']) ? absint(wp_unslash($_POST['entry_id'])) : 0;
 		if ($entry_id) {
 			global $wpdb;
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->update("{$wpdb->prefix}genform_entries", ['status' => 'trash'], ['id' => $entry_id]);
+			$wpdb->update("{$wpdb->prefix}genform_entries", array('status' => 'trash'), array('id' => $entry_id));
 			wp_send_json_success();
 		}
 		wp_send_json_error();
@@ -212,15 +213,15 @@ final class FormHandler
 	{
 		check_ajax_referer('genform_admin_nonce', 'nonce');
 		if (! current_user_can('manage_options')) {
-			wp_send_json_error(['message' => esc_html__('Unauthorized', 'genform')]);
+			wp_send_json_error(array('message' => esc_html__('Unauthorized', 'genform')));
 		}
 		$form_id = isset($_POST['form_id']) ? absint(wp_unslash($_POST['form_id'])) : 0;
 		if ($form_id) {
 			global $wpdb;
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->delete("{$wpdb->prefix}genform_forms", ['id' => $form_id]);
+			$wpdb->delete("{$wpdb->prefix}genform_forms", array('id' => $form_id));
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->delete("{$wpdb->prefix}genform_entries", ['form_id' => $form_id]);
+			$wpdb->delete("{$wpdb->prefix}genform_entries", array('form_id' => $form_id));
 			wp_send_json_success();
 		}
 		wp_send_json_error();
@@ -240,7 +241,7 @@ final class FormHandler
 		}
 
 		$bulk_action = $action ?: $action2;
-		if (! in_array($bulk_action, ['trash', 'restore', 'delete'], true)) {
+		if (! in_array($bulk_action, array('trash', 'restore', 'delete'), true)) {
 			return;
 		}
 
@@ -250,7 +251,7 @@ final class FormHandler
 
 		check_admin_referer('bulk-entries');
 
-		$entry_ids = isset($_GET['entry']) ? array_map('absint', (array) wp_unslash($_GET['entry'])) : [];
+		$entry_ids = isset($_GET['entry']) ? array_map('absint', (array) wp_unslash($_GET['entry'])) : array();
 		if (! empty($entry_ids)) {
 			global $wpdb;
 			$status_label = '';
@@ -272,7 +273,7 @@ final class FormHandler
 				$status_label = 'deleted';
 			}
 
-			$redirect_url = add_query_arg([$status_label => count($entry_ids)], admin_url('admin.php?page=genform-entries'));
+			$redirect_url = add_query_arg(array($status_label => count($entry_ids)), admin_url('admin.php?page=genform-entries'));
 			if ('trash' !== $bulk_action) {
 				$redirect_url = add_query_arg('status', 'trash', $redirect_url);
 			}
@@ -294,7 +295,7 @@ final class FormHandler
 		if ($entry_id) {
 			global $wpdb;
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->update("{$wpdb->prefix}genform_entries", ['status' => 'read'], ['id' => $entry_id]);
+			$wpdb->update("{$wpdb->prefix}genform_entries", array('status' => 'read'), array('id' => $entry_id));
 			wp_send_json_success();
 		}
 		wp_send_json_error();

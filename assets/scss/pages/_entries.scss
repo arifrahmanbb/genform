@@ -186,3 +186,36 @@
         gap: $space-sm;
     }
 }
+
+// ========================================
+// Entry Detail Layout
+// ========================================
+
+.gfm-entry-detail-layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+    }
+
+    h3 {
+        margin-top: 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: $text-main;
+    }
+}
+
+.gfm-entry-meta {
+    line-height: 2;
+
+    p {
+        margin: 0 0 $space-xs 0;
+    }
+}
+
+.gfm-entry-sidebar-card {
+    margin-bottom: $space-md;
+}

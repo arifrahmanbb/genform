@@ -1,346 +1,1143 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
+# Copyright (C) 2026 Arif Rahman
+# This file is distributed under the GPL v3 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-23 20:01+0600\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Project-Id-Version: GenForm - Drag & Drop Form Builder 1.2.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/genform\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-02-20T10:23:53+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: genform\n"
 
-#: includes/Admin/Settings.php:25
-msgid "General Settings"
+#. Plugin Name of the plugin
+#: genform.php
+msgid "GenForm - Drag & Drop Form Builder"
 msgstr ""
 
-#: includes/Admin/Settings.php:29
-msgid "reCAPTCHA Site Key"
+#. Plugin URI of the plugin
+#: genform.php
+msgid "https://wordpress.org/plugins/genform/"
 msgstr ""
 
-#: includes/Admin/Builder.php:39 includes/Handlers/FormHandler.php:34
-#: admin/views/entries-list.php:22
-msgid "Security check failed."
+#. Description of the plugin
+#: genform.php
+msgid "Build beautiful, responsive forms effortlessly with drag-and-drop interface."
 msgstr ""
 
-#: includes/Admin/Builder.php:43 admin/views/entries-list.php:13
-#: admin/views/forms-list.php:13
+#. Author of the plugin
+#: genform.php
+msgid "Arif Rahman"
+msgstr ""
+
+#. Author URI of the plugin
+#: genform.php
+msgid "https://profiles.wordpress.org/arifrahman1/"
+msgstr ""
+
+#: admin/views/entries-list.php:15
+#: admin/views/entry-detail.php:16
+#: admin/views/form-preview.php:16
+#: admin/views/forms-list.php:16
+#: admin/views/settings.php:15
+#: includes/Admin/Builder.php:92
+#: includes/Handlers/ExportHandler.php:37
 msgid "Unauthorized."
 msgstr ""
 
-#: includes/Admin/Builder.php:79
-msgid "Form updated successfully."
+#: admin/views/entries-list.php:28
+msgid "Form Entries"
 msgstr ""
 
-#: includes/Integrations/Shortcode.php:32
-msgid "No form ID provided."
+#: admin/views/entries-list.php:31
+msgid "Export to CSV"
 msgstr ""
 
-#: includes/Integrations/Shortcode.php:40 includes/Handlers/FormHandler.php:49
-msgid "Form not found."
+#: admin/views/entries-list.php:35
+msgid "View All"
 msgstr ""
 
-#: includes/Handlers/FormHandler.php:73
-msgid "Thank you for your submission."
+#. translators: %d: number of items deleted
+#: admin/views/entries-list.php:45
+#, php-format
+msgid "%d deleted."
 msgstr ""
 
-#: includes/Handlers/FormHandler.php:106
-msgid "Unauthorized"
+#. translators: %d: number of items trashed
+#: admin/views/entries-list.php:47
+#, php-format
+msgid "%d trashed."
 msgstr ""
 
-#: includes/Core.php:76 includes/Core.php:77 includes/Core.php:137
-msgid "GenForm"
+#. translators: %d: number of items restored
+#: admin/views/entries-list.php:49
+#, php-format
+msgid "%d restored."
 msgstr ""
 
-#: includes/Core.php:85 admin/views/forms-list.php:26
-msgid "All Forms"
+#: admin/views/entries-list.php:67
+msgid "Search"
 msgstr ""
 
-#: includes/Core.php:86
-msgid "Add New"
+#: admin/views/entry-detail.php:21
+#: includes/Admin/Builder.php:88
+#: includes/Handlers/ExportHandler.php:42
+#: includes/Handlers/FormHandler.php:47
+msgid "Security check failed."
 msgstr ""
 
-#: includes/Core.php:87 admin/views/forms-list.php:43
-msgid "Entries"
+#: admin/views/entry-detail.php:28
+msgid "No entry ID provided."
 msgstr ""
 
-#: includes/Core.php:88 includes/Core.php:207 admin/views/form-builder.php:25
-msgid "Settings"
+#: admin/views/entry-detail.php:42
+msgid "Entry not found."
 msgstr ""
 
-#: includes/Core.php:138
-msgid "Select Form"
+#. translators: %d: Entry ID
+#: admin/views/entry-detail.php:79
+#, php-format
+msgid "Entry #%d"
 msgstr ""
 
-#: includes/Core.php:139
-msgid "Select a form"
+#: admin/views/entry-detail.php:84
+msgid "Back to Entries"
 msgstr ""
 
-#: includes/Core.php:140 admin/views/form-builder.php:122
-msgid "Form Settings"
+#: admin/views/entry-detail.php:92
+msgid "Submission Data"
 msgstr ""
 
-#: includes/Core.php:141
-msgid "Form ID:"
+#: admin/views/entry-detail.php:96
+msgid "Field"
 msgstr ""
 
-#: includes/Core.php:142
-msgid "Please select a form from the sidebar."
-msgstr ""
-
-#: includes/Core.php:192
-msgid "Text Field"
-msgstr ""
-
-#: includes/Core.php:193
-msgid "Email Address"
-msgstr ""
-
-#: includes/Core.php:194 admin/views/form-builder.php:64
-msgid "Paragraph Text"
-msgstr ""
-
-#: includes/Core.php:195 admin/views/form-builder.php:68
-msgid "Number"
-msgstr ""
-
-#: includes/Core.php:196 admin/views/form-builder.php:72
-msgid "Dropdown"
-msgstr ""
-
-#: includes/Core.php:197 admin/views/form-builder.php:76
-msgid "Multiple Choice"
-msgstr ""
-
-#: includes/Core.php:198 admin/views/form-builder.php:80
-msgid "Checkboxes"
-msgstr ""
-
-#: includes/Core.php:199 admin/views/form-builder.php:84
-#: admin/views/entries-list.php:61
-msgid "Date"
-msgstr ""
-
-#: includes/Core.php:200 admin/views/form-builder.php:88
-msgid "Website"
-msgstr ""
-
-#: includes/Core.php:201 admin/views/form-builder.php:92
-msgid "Phone"
-msgstr ""
-
-#: includes/Core.php:202
-msgid "New Field"
-msgstr ""
-
-#: includes/Core.php:203
-msgid "Option"
-msgstr ""
-
-#: includes/Core.php:204
+#: admin/views/entry-detail.php:97
+#: includes/Core.php:385
 msgid "Value"
 msgstr ""
 
-#: includes/Core.php:205
-msgid "Label"
+#: admin/views/entry-detail.php:122
+msgid "Entry Info"
 msgstr ""
 
-#: includes/Core.php:206
-msgid "Required"
+#: admin/views/entry-detail.php:125
+msgid "Form:"
 msgstr ""
 
-#: includes/Core.php:208 admin/views/entries-list.php:79
-#: admin/views/forms-list.php:74
-msgid "Delete"
+#: admin/views/entry-detail.php:126
+#: includes/Admin/EntriesTable.php:200
+#: includes/Admin/EntriesTable.php:271
+#: includes/Core.php:145
+msgid "Deleted Form"
 msgstr ""
 
-#: includes/Core.php:221
-msgid "Are you sure?"
+#: admin/views/entry-detail.php:129
+msgid "Date:"
 msgstr ""
 
-#: admin/views/settings.php:18
-msgid "You do not have sufficient permissions to access this page."
+#: admin/views/entry-detail.php:133
+msgid "Status:"
 msgstr ""
 
-#: admin/views/settings.php:23
-msgid "GenForm Settings"
+#: admin/views/entry-detail.php:142
+msgid "Metadata"
 msgstr ""
 
-#: admin/views/form-builder.php:22
-msgid "Edit Form"
+#: admin/views/entry-detail.php:145
+msgid "IP Address:"
 msgstr ""
 
-#: admin/views/form-builder.php:22
-msgid "Create New Form"
+#: admin/views/entry-detail.php:150
+msgid "Browser:"
 msgstr ""
 
-#: admin/views/form-builder.php:24
-msgid "Fields"
+#: admin/views/entry-detail.php:156
+msgid "OS:"
+msgstr ""
+
+#: admin/views/entry-detail.php:162
+msgid "Source Page:"
 msgstr ""
 
 #: admin/views/form-builder.php:26
+#: admin/views/form-preview.php:48
+msgid "Edit Form"
+msgstr ""
+
+#: admin/views/form-builder.php:26
+msgid "Create Form"
+msgstr ""
+
+#: admin/views/form-builder.php:28
+msgid "Fields"
+msgstr ""
+
+#: admin/views/form-builder.php:29
+#: includes/Core.php:194
+#: includes/Core.php:374
+msgid "Settings"
+msgstr ""
+
+#: admin/views/form-builder.php:30
 msgid "Notifications"
 msgstr ""
 
-#: admin/views/form-builder.php:35 admin/views/entries-list.php:58
-#: admin/views/forms-list.php:41
-msgid "Form Name"
-msgstr ""
-
-#: admin/views/form-builder.php:36
-msgid "e.g. Contact Us"
+#: admin/views/form-builder.php:39
+msgid "Form Title"
 msgstr ""
 
 #: admin/views/form-builder.php:40
+msgid "e.g. Contact Us"
+msgstr ""
+
+#: admin/views/form-builder.php:44
 msgid "Save Form"
 msgstr ""
 
-#: admin/views/form-builder.php:42
+#: admin/views/form-builder.php:49
+#: includes/Templates/Renderer.php:120
+msgid "Preview"
+msgstr ""
+
+#: admin/views/form-builder.php:53
+#: includes/Core.php:253
+#: includes/Templates/Renderer.php:164
 msgid "Cancel"
 msgstr ""
 
-#: admin/views/form-builder.php:51
-msgid "Add Fields"
+#: admin/views/form-builder.php:63
+msgid "Available Fields"
 msgstr ""
 
-#: admin/views/form-builder.php:56
-msgid "Single Line Text"
+#: admin/views/form-builder.php:95
+msgid "Add fields here."
 msgstr ""
 
-#: admin/views/form-builder.php:60
-msgid "Email"
+#: admin/views/form-builder.php:105
+msgid "Confirmation"
 msgstr ""
 
-#: admin/views/form-builder.php:112
-msgid "Click a field on the left to add it to your form."
+#: admin/views/form-builder.php:108
+msgid "Type"
 msgstr ""
 
-#: admin/views/form-builder.php:124
-msgid "Submit Button Text"
+#: admin/views/form-builder.php:110
+msgid "Message"
 msgstr ""
 
-#: admin/views/form-builder.php:125 public/views/form-template.php:116
-msgid "Submit"
+#: admin/views/form-builder.php:111
+msgid "Redirect"
 msgstr ""
 
-#: admin/views/form-builder.php:128
+#: admin/views/form-builder.php:115
+msgid "URL"
+msgstr ""
+
+#: admin/views/form-builder.php:121
 msgid "Success Message"
 msgstr ""
 
-#: admin/views/form-builder.php:129
-msgid "Thank you for your message. We will get back to you soon."
+#: admin/views/form-builder.php:125
+msgid "Error Message"
 msgstr ""
 
 #: admin/views/form-builder.php:132
-msgid "Redirect URL (Optional)"
+msgid "Submit Button"
+msgstr ""
+
+#: admin/views/form-builder.php:135
+msgid "Button Text"
+msgstr ""
+
+#: admin/views/form-builder.php:136
+#: public/views/form-template.php:176
+msgid "Submit"
+msgstr ""
+
+#: admin/views/form-builder.php:139
+msgid "Button Alignment"
 msgstr ""
 
 #: admin/views/form-builder.php:141
-msgid "Email Notifications"
+msgid "Left"
+msgstr ""
+
+#: admin/views/form-builder.php:142
+msgid "Center"
 msgstr ""
 
 #: admin/views/form-builder.php:143
+msgid "Right"
+msgstr ""
+
+#: admin/views/form-builder.php:144
+msgid "Full Width"
+msgstr ""
+
+#: admin/views/form-builder.php:151
+msgid "Typography & Spacing"
+msgstr ""
+
+#: admin/views/form-builder.php:154
+msgid "Base Font Size (px)"
+msgstr ""
+
+#: admin/views/form-builder.php:158
+msgid "Font Weight"
+msgstr ""
+
+#: admin/views/form-builder.php:160
+msgid "Light (300)"
+msgstr ""
+
+#: admin/views/form-builder.php:161
+msgid "Regular (400)"
+msgstr ""
+
+#: admin/views/form-builder.php:162
+msgid "Medium (500)"
+msgstr ""
+
+#: admin/views/form-builder.php:163
+msgid "Semi-Bold (600)"
+msgstr ""
+
+#: admin/views/form-builder.php:164
+msgid "Bold (700)"
+msgstr ""
+
+#: admin/views/form-builder.php:171
+msgid "GDPR / Consent"
+msgstr ""
+
+#: admin/views/form-builder.php:176
+msgid "Enable GDPR Consent Checkbox"
+msgstr ""
+
+#: admin/views/form-builder.php:182
+msgid "Consent Text"
+msgstr ""
+
+#: admin/views/form-builder.php:183
+#: public/views/form-template.php:167
+msgid "I consent to having this website store my submitted information."
+msgstr ""
+
+#: admin/views/form-builder.php:192
+msgid "Email Notifications"
+msgstr ""
+
+#: admin/views/form-builder.php:195
 msgid "Send To Email"
 msgstr ""
 
-#: admin/views/form-builder.php:145
-msgid "You can use {admin_email} for the site admin."
+#: admin/views/form-builder.php:197
+msgid "Use {admin_email} for site admin email."
 msgstr ""
 
-#: admin/views/form-builder.php:148
+#: admin/views/form-builder.php:200
+msgid "From Name"
+msgstr ""
+
+#: admin/views/form-builder.php:206
+msgid "From Email"
+msgstr ""
+
+#: admin/views/form-builder.php:210
+msgid "Reply-To Email"
+msgstr ""
+
+#: admin/views/form-builder.php:215
 msgid "Email Subject"
 msgstr ""
 
-#: admin/views/form-builder.php:149
+#: admin/views/form-builder.php:216
+#: includes/Integrations/Email.php:48
 msgid "New Submission: {form_name}"
 msgstr ""
 
-#: admin/views/form-builder.php:152
+#: admin/views/form-builder.php:219
 msgid "Email Body"
 msgstr ""
 
-#: admin/views/form-builder.php:153
+#: admin/views/form-builder.php:220
 msgid ""
 "{all_fields}\n"
 "\n"
 "Sent from {site_title}"
 msgstr ""
 
-#: admin/views/form-builder.php:154
-msgid "Use {all_fields} to include all form data."
+#: admin/views/form-builder.php:221
+msgid "Tags: {all_fields}, {form_name}, {site_title}, {field_ID}"
 msgstr ""
 
-#: admin/views/entries-list.php:41
-msgid "Form Entries"
+#: admin/views/form-preview.php:23
+#: includes/Integrations/Shortcode.php:38
+msgid "No form ID provided."
 msgstr ""
 
-#: admin/views/entries-list.php:43
-msgid "View All Entries"
+#: admin/views/form-preview.php:31
+#: includes/Handlers/FormHandler.php:93
+#: includes/Integrations/Shortcode.php:46
+msgid "Form not found."
 msgstr ""
 
-#: admin/views/entries-list.php:51
-msgid "No entries found yet."
+#. translators: %s: Form name
+#: admin/views/form-preview.php:43
+#, php-format
+msgid "Preview: %s"
 msgstr ""
 
-#: admin/views/entries-list.php:57
-msgid "ID"
+#: admin/views/form-preview.php:51
+msgid "Back to All Forms"
 msgstr ""
 
-#: admin/views/entries-list.php:59
-msgid "Submission Highlights"
-msgstr ""
-
-#: admin/views/entries-list.php:60
-msgid "IP Address"
-msgstr ""
-
-#: admin/views/entries-list.php:62 admin/views/forms-list.php:46
-msgid "Actions"
-msgstr ""
-
-#: admin/views/entries-list.php:73
-msgid "Deleted Form"
-msgstr ""
-
-#: admin/views/entries-list.php:78
-msgid "View"
-msgstr ""
-
-#: admin/views/entries-list.php:93
-msgid "Entry Details"
+#: admin/views/form-preview.php:60
+msgid "Preview Mode – Submissions are disabled"
 msgstr ""
 
 #: admin/views/forms-list.php:27
+#: includes/Admin/EntriesTable.php:293
+#: includes/Core.php:191
+msgid "All Forms"
+msgstr ""
+
+#: admin/views/forms-list.php:31
+#: includes/Admin/EntriesTable.php:313
+#: includes/Core.php:85
 msgid "Add New Form"
 msgstr ""
 
-#: admin/views/forms-list.php:34
-msgid "You haven't created any forms yet."
+#: admin/views/forms-list.php:41
+msgid "Form duplicated successfully."
 msgstr ""
 
-#: admin/views/forms-list.php:35
+#: admin/views/forms-list.php:49
+msgid "No forms yet. Start from scratch or pick a ready-made template."
+msgstr ""
+
+#: admin/views/forms-list.php:53
+msgid "Browse Templates"
+msgstr ""
+
+#: admin/views/forms-list.php:56
 msgid "Create Your First Form"
 msgstr ""
 
-#: admin/views/forms-list.php:42
+#: admin/views/forms-list.php:64
+msgid "Name"
+msgstr ""
+
+#: admin/views/forms-list.php:65
 msgid "Shortcode"
 msgstr ""
 
-#: admin/views/forms-list.php:44
+#: admin/views/forms-list.php:66
+#: includes/Core.php:193
+msgid "Entries"
+msgstr ""
+
+#: admin/views/forms-list.php:67
 msgid "Status"
 msgstr ""
 
-#: admin/views/forms-list.php:45
+#: admin/views/forms-list.php:68
 msgid "Created"
 msgstr ""
 
-#: admin/views/forms-list.php:73
+#: admin/views/forms-list.php:69
+#: includes/Admin/EntriesTable.php:155
+msgid "Actions"
+msgstr ""
+
+#: admin/views/forms-list.php:101
+#: includes/Core.php:391
 msgid "Edit"
+msgstr ""
+
+#: admin/views/forms-list.php:104
+#: includes/Core.php:390
+msgid "Duplicate"
+msgstr ""
+
+#: admin/views/forms-list.php:107
+#: includes/Core.php:392
+msgid "Delete"
+msgstr ""
+
+#: admin/views/settings.php:21
+msgid "GenForm Settings"
+msgstr ""
+
+#: includes/Admin/Builder.php:59
+msgid "Copy"
+msgstr ""
+
+#: includes/Admin/Builder.php:137
+msgid "Invalid JSON in form field data."
+msgstr ""
+
+#: includes/Admin/Builder.php:142
+msgid "Invalid JSON in form settings."
+msgstr ""
+
+#: includes/Admin/Builder.php:159
+msgid "Form updated successfully."
+msgstr ""
+
+#: includes/Admin/EntriesTable.php:139
+msgid "All"
+msgstr ""
+
+#: includes/Admin/EntriesTable.php:140
+msgid "Unread"
+msgstr ""
+
+#: includes/Admin/EntriesTable.php:141
+msgid "Trash"
+msgstr ""
+
+#: includes/Admin/EntriesTable.php:151
+msgid "ID"
+msgstr ""
+
+#: includes/Admin/EntriesTable.php:152
+msgid "Form Name"
+msgstr ""
+
+#: includes/Admin/EntriesTable.php:153
+msgid "Entry Preview"
+msgstr ""
+
+#: includes/Admin/EntriesTable.php:154
+#: includes/Core.php:357
+#: includes/Handlers/ExportHandler.php:95
+msgid "Date"
+msgstr ""
+
+#: includes/Admin/EntriesTable.php:177
+#: includes/Admin/EntriesTable.php:254
+msgid "Restore"
+msgstr ""
+
+#: includes/Admin/EntriesTable.php:178
+msgid "Delete permanently"
+msgstr ""
+
+#: includes/Admin/EntriesTable.php:181
+#: includes/Admin/EntriesTable.php:274
+msgid "Move to Trash"
+msgstr ""
+
+#: includes/Admin/EntriesTable.php:256
+msgid "Delete Permanently"
+msgstr ""
+
+#: includes/Admin/EntriesTable.php:268
+msgid "View full detail"
+msgstr ""
+
+#: includes/Admin/EntriesTable.php:272
+msgid "Quick view"
+msgstr ""
+
+#: includes/Admin/EntriesTable.php:298
+msgid "Filter"
+msgstr ""
+
+#: includes/Admin/EntriesTable.php:310
+msgid "No submissions yet"
+msgstr ""
+
+#: includes/Admin/EntriesTable.php:311
+msgid "Once people start filling out your forms, they will appear here."
+msgstr ""
+
+#: includes/Admin/Settings.php:41
+msgid "General Configuration"
+msgstr ""
+
+#: includes/Admin/Settings.php:42
+msgid "Manage branding and security keys."
+msgstr ""
+
+#: includes/Admin/Settings.php:48
+msgid "reCAPTCHA Site Key"
+msgstr ""
+
+#: includes/Admin/Settings.php:49
+msgid "Enter your Google reCAPTCHA site key."
+msgstr ""
+
+#: includes/Admin/Settings.php:56
+msgid "reCAPTCHA Secret Key"
+msgstr ""
+
+#: includes/Admin/Settings.php:57
+msgid "Secret key for server-side verification."
+msgstr ""
+
+#: includes/Admin/Settings.php:64
+msgid "Brand Primary Color"
+msgstr ""
+
+#: includes/Admin/Settings.php:65
+msgid "Choose the accent color for buttons and active states."
+msgstr ""
+
+#: includes/Admin/Settings.php:73
+msgid "Default Email Identity"
+msgstr ""
+
+#: includes/Admin/Settings.php:74
+msgid "Global fallbacks for email notifications."
+msgstr ""
+
+#: includes/Admin/Settings.php:80
+msgid "Global Sender Name"
+msgstr ""
+
+#: includes/Admin/Settings.php:81
+msgid "e.g. Your Business Name"
+msgstr ""
+
+#: includes/Admin/Settings.php:88
+msgid "Global Sender Email"
+msgstr ""
+
+#: includes/Admin/Settings.php:89
+msgid "e.g. support@yourdomain.com"
+msgstr ""
+
+#: includes/Admin/Settings.php:97
+msgid "Advanced & Performance"
+msgstr ""
+
+#: includes/Admin/Settings.php:98
+msgid "Technical optimizations."
+msgstr ""
+
+#: includes/Admin/Settings.php:104
+msgid "Asset Optimization"
+msgstr ""
+
+#: includes/Admin/Settings.php:105
+msgid "Don't load default CSS/JS (theme mode)."
+msgstr ""
+
+#: includes/Core.php:94
+msgid "View Entries"
+msgstr ""
+
+#: includes/Core.php:106
+msgid "GenForm Overview"
+msgstr ""
+
+#: includes/Core.php:128
+msgid "Total Forms"
+msgstr ""
+
+#: includes/Core.php:132
+msgid "Total Entries"
+msgstr ""
+
+#: includes/Core.php:136
+msgid "Recent Entries"
+msgstr ""
+
+#: includes/Core.php:139
+msgid "No entries yet."
+msgstr ""
+
+#: includes/Core.php:149
+msgid "View"
+msgstr ""
+
+#: includes/Core.php:156
+msgid "All Entries"
+msgstr ""
+
+#: includes/Core.php:182
+#: includes/Core.php:297
+msgid "GenForm"
+msgstr ""
+
+#: includes/Core.php:192
+msgid "Add New"
+msgstr ""
+
+#: includes/Core.php:197
+msgid "Form Preview"
+msgstr ""
+
+#: includes/Core.php:198
+msgid "Entry Detail"
+msgstr ""
+
+#: includes/Core.php:250
+#: includes/Core.php:416
+msgid "Are you sure?"
+msgstr ""
+
+#: includes/Core.php:251
+msgid "This action cannot be undone."
+msgstr ""
+
+#: includes/Core.php:254
+msgid "Yes, Delete"
+msgstr ""
+
+#: includes/Core.php:298
+msgid "Select Form"
+msgstr ""
+
+#: includes/Core.php:299
+msgid "Select a form"
+msgstr ""
+
+#: includes/Core.php:300
+msgid "Form Settings"
+msgstr ""
+
+#: includes/Core.php:301
+msgid "Form ID:"
+msgstr ""
+
+#: includes/Core.php:302
+msgid "Please select a form from the sidebar."
+msgstr ""
+
+#: includes/Core.php:350
+msgid "Text Field"
+msgstr ""
+
+#: includes/Core.php:351
+msgid "Email Address"
+msgstr ""
+
+#: includes/Core.php:352
+msgid "Paragraph"
+msgstr ""
+
+#: includes/Core.php:353
+msgid "Number"
+msgstr ""
+
+#: includes/Core.php:354
+msgid "Dropdown"
+msgstr ""
+
+#: includes/Core.php:355
+msgid "Single Choice"
+msgstr ""
+
+#: includes/Core.php:356
+msgid "Checkboxes"
+msgstr ""
+
+#: includes/Core.php:358
+msgid "Website"
+msgstr ""
+
+#: includes/Core.php:359
+msgid "Phone Number"
+msgstr ""
+
+#: includes/Core.php:360
+msgid "Hidden Field"
+msgstr ""
+
+#: includes/Core.php:361
+msgid "Password"
+msgstr ""
+
+#: includes/Core.php:363
+#: includes/Core.php:384
+msgid "Label"
+msgstr ""
+
+#: includes/Core.php:364
+msgid "Field Name"
+msgstr ""
+
+#: includes/Core.php:365
+msgid "Used in submissions and email tags."
+msgstr ""
+
+#: includes/Core.php:366
+msgid "Placeholder"
+msgstr ""
+
+#: includes/Core.php:367
+msgid "Default Value"
+msgstr ""
+
+#: includes/Core.php:368
+msgid "Help Text"
+msgstr ""
+
+#: includes/Core.php:369
+msgid "Displayed below the field to guide the user."
+msgstr ""
+
+#: includes/Core.php:370
+msgid "Width"
+msgstr ""
+
+#: includes/Core.php:371
+msgid "Full"
+msgstr ""
+
+#: includes/Core.php:372
+msgid "CSS Class"
+msgstr ""
+
+#: includes/Core.php:373
+msgid "Required"
+msgstr ""
+
+#: includes/Core.php:376
+msgid "Rows"
+msgstr ""
+
+#: includes/Core.php:377
+msgid "Min Value"
+msgstr ""
+
+#: includes/Core.php:378
+msgid "Max Value"
+msgstr ""
+
+#: includes/Core.php:379
+msgid "Step"
+msgstr ""
+
+#: includes/Core.php:380
+msgid "This value is sent with the form but not visible to users."
+msgstr ""
+
+#: includes/Core.php:382
+msgid "Options"
+msgstr ""
+
+#: includes/Core.php:383
+msgid "Add Option"
+msgstr ""
+
+#: includes/Core.php:386
+msgid "Option 1"
+msgstr ""
+
+#: includes/Core.php:387
+msgid "Option 2"
+msgstr ""
+
+#: includes/Core.php:388
+msgid "New Option"
+msgstr ""
+
+#: includes/Core.php:393
+msgid "Field duplicated."
+msgstr ""
+
+#: includes/Core.php:394
+msgid "Field removed successfully."
+msgstr ""
+
+#: includes/Core.php:395
+msgid "Delete Field?"
+msgstr ""
+
+#: includes/Core.php:396
+msgid "This field and its configuration will be removed from the builder."
+msgstr ""
+
+#: includes/Core.php:398
+msgid "Start Building Your Form"
+msgstr ""
+
+#: includes/Core.php:399
+msgid "Click a field type from the sidebar to get started."
+msgstr ""
+
+#: includes/Core.php:400
+msgid "e.g."
+msgstr ""
+
+#: includes/Core.php:417
+msgid "Entry Details"
+msgstr ""
+
+#: includes/Core.php:482
+msgid "Submitting..."
+msgstr ""
+
+#: includes/Core.php:483
+msgid "Please select at least one option for required checkbox fields."
+msgstr ""
+
+#: includes/Core.php:484
+msgid "Please accept the consent checkbox to proceed."
+msgstr ""
+
+#: includes/Core.php:485
+msgid "An error occurred."
+msgstr ""
+
+#: includes/Core.php:486
+msgid "An unknown error occurred."
+msgstr ""
+
+#: includes/Handlers/ExportHandler.php:86
+msgid "Failed to open output stream."
+msgstr ""
+
+#: includes/Handlers/ExportHandler.php:94
+msgid "IP Address"
+msgstr ""
+
+#: includes/Handlers/FormHandler.php:55
+msgid "Thank you! Your submission has been received."
+msgstr ""
+
+#: includes/Handlers/FormHandler.php:63
+msgid "Too many submissions. Please try again later."
+msgstr ""
+
+#: includes/Handlers/FormHandler.php:76
+msgid "You must agree to the privacy terms to submit this form."
+msgstr ""
+
+#: includes/Handlers/FormHandler.php:122
+msgid "Thank you for your submission."
+msgstr ""
+
+#: includes/Handlers/FormHandler.php:178
+#: includes/Handlers/FormHandler.php:197
+#: includes/Handlers/FormHandler.php:216
+#: includes/Templates/Manager.php:202
+msgid "Unauthorized"
+msgstr ""
+
+#: includes/Templates/Library/Booking.php:38
+msgid "Restaurant Reservation"
+msgstr ""
+
+#: includes/Templates/Library/Booking.php:39
+msgid "Table reservation form with date, time, guest count, and special requests for restaurants."
+msgstr ""
+
+#: includes/Templates/Library/Booking.php:97
+msgid "Appointment Booking"
+msgstr ""
+
+#: includes/Templates/Library/Booking.php:98
+msgid "Service appointment scheduling form with service type, preferred date, and notes."
+msgstr ""
+
+#: includes/Templates/Library/Booking.php:156
+msgid "Hotel Reservation"
+msgstr ""
+
+#: includes/Templates/Library/Booking.php:157
+msgid "Room booking form with check-in/out dates, room type, and guest preferences."
+msgstr ""
+
+#: includes/Templates/Library/Business.php:38
+msgid "Support Ticket"
+msgstr ""
+
+#: includes/Templates/Library/Business.php:39
+msgid "Submit support requests with priority, department, and description fields for help desks."
+msgstr ""
+
+#: includes/Templates/Library/Business.php:91
+msgid "Job Application"
+msgstr ""
+
+#: includes/Templates/Library/Business.php:92
+msgid "Employment application form with personal details, position, experience, and availability."
+msgstr ""
+
+#: includes/Templates/Library/Business.php:156
+msgid "Request a Quote"
+msgstr ""
+
+#: includes/Templates/Library/Business.php:157
+msgid "Quote request form for service-based businesses with budget range and project details."
+msgstr ""
+
+#: includes/Templates/Library/Business.php:215
+msgid "Bug Report"
+msgstr ""
+
+#: includes/Templates/Library/Business.php:216
+msgid "Software bug report form with severity, steps to reproduce, and environment details."
+msgstr ""
+
+#: includes/Templates/Library/Education.php:37
+msgid "Course Enrollment"
+msgstr ""
+
+#: includes/Templates/Library/Education.php:38
+msgid "Student enrollment form with personal info, course selection, and prerequisites."
+msgstr ""
+
+#: includes/Templates/Library/Feedback.php:37
+msgid "Customer Feedback"
+msgstr ""
+
+#: includes/Templates/Library/Feedback.php:38
+msgid "Gather customer feedback with satisfaction rating, comments, and improvement suggestions."
+msgstr ""
+
+#: includes/Templates/Library/General.php:38
+msgid "Simple Contact Form"
+msgstr ""
+
+#: includes/Templates/Library/General.php:39
+msgid "A clean, minimal contact form with name, email, and message fields. Perfect for any website."
+msgstr ""
+
+#: includes/Templates/Library/General.php:77
+msgid "Event RSVP"
+msgstr ""
+
+#: includes/Templates/Library/General.php:78
+msgid "Event registration and RSVP form with attendance confirmation and dietary needs."
+msgstr ""
+
+#: includes/Templates/Library/General.php:134
+msgid "Volunteer Signup"
+msgstr ""
+
+#: includes/Templates/Library/General.php:135
+msgid "Volunteer registration form with availability, skills, and areas of interest."
+msgstr ""
+
+#: includes/Templates/Library/Healthcare.php:37
+msgid "Patient Intake Form"
+msgstr ""
+
+#: includes/Templates/Library/Healthcare.php:38
+msgid "Medical intake form with patient info, insurance, allergies, and health history."
+msgstr ""
+
+#: includes/Templates/Library/Marketing.php:38
+msgid "Newsletter Signup"
+msgstr ""
+
+#: includes/Templates/Library/Marketing.php:39
+msgid "Quick email subscription form to grow your mailing list. Minimal and effective."
+msgstr ""
+
+#: includes/Templates/Library/Marketing.php:65
+msgid "Lead Generation"
+msgstr ""
+
+#: includes/Templates/Library/Marketing.php:66
+msgid "Capture leads with company, role, and interest fields for sales and marketing funnels."
+msgstr ""
+
+#: includes/Templates/Library/Marketing.php:118
+msgid "Event Registration"
+msgstr ""
+
+#: includes/Templates/Library/Marketing.php:119
+msgid "Full event registration with attendee details, ticket type, and payment method."
+msgstr ""
+
+#: includes/Templates/Manager.php:79
+msgid "All Templates"
+msgstr ""
+
+#: includes/Templates/Manager.php:215
+msgid "Invalid template data."
+msgstr ""
+
+#: includes/Templates/Manager.php:222
+msgid "Invalid field configuration."
+msgstr ""
+
+#: includes/Templates/Manager.php:243
+msgid "Failed to create form."
+msgstr ""
+
+#: includes/Templates/Manager.php:277
+msgid "New Field"
+msgstr ""
+
+#: includes/Templates/Renderer.php:52
+msgid "Template Library"
+msgstr ""
+
+#: includes/Templates/Renderer.php:53
+msgid "Templates"
+msgstr ""
+
+#: includes/Templates/Renderer.php:55
+#: includes/Templates/Renderer.php:157
+#: includes/Templates/Renderer.php:193
+msgid "Close"
+msgstr ""
+
+#: includes/Templates/Renderer.php:61
+msgid "Search templates..."
+msgstr ""
+
+#: includes/Templates/Renderer.php:99
+msgid "more fields"
+msgstr ""
+
+#: includes/Templates/Renderer.php:111
+msgid "fields"
+msgstr ""
+
+#: includes/Templates/Renderer.php:124
+msgid "Use Template"
+msgstr ""
+
+#: includes/Templates/Renderer.php:134
+msgid "No templates match your search."
+msgstr ""
+
+#: includes/Templates/Renderer.php:152
+msgid "Back to Library"
+msgstr ""
+
+#: includes/Templates/Renderer.php:168
+msgid "Use This Template"
+msgstr ""
+
+#: includes/Templates/Renderer.php:191
+msgid "Create a New Form"
+msgstr ""
+
+#: includes/Templates/Renderer.php:210
+msgid "New Blank Form"
+msgstr ""
+
+#: includes/Templates/Renderer.php:211
+msgid "Start from scratch and build your form field by field."
+msgstr ""
+
+#: includes/Templates/Renderer.php:234
+msgid "Choose a Template"
+msgstr ""
+
+#: includes/Templates/Renderer.php:235
+msgid "Pick a pre-made template and customize it to your needs."
+msgstr ""
+
+#: includes/Templates/Renderer.php:238
+msgid "templates"
+msgstr ""
+
+#: public/views/form-template.php:158
+msgid "Website URL"
 msgstr ""

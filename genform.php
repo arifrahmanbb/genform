@@ -4,7 +4,7 @@
  * Plugin Name: GenForm - Drag & Drop Form Builder
  * Plugin URI: https://wordpress.org/plugins/genform/
  * Description: Build beautiful, responsive forms effortlessly with drag-and-drop interface.
- * Version: 1.1.0
+ * Version: 1.2.0
  * Author: Arif Rahman
  * Author URI: https://profiles.wordpress.org/arifrahman1/
  * License: GPL v3 or later
@@ -27,7 +27,7 @@ if (file_exists(__DIR__ . '/vendor/autoload.php')) {
 /**
  * Define plugin constants.
  */
-define('GENFORM_VERSION', '1.1.0');
+define('GENFORM_VERSION', '1.2.0');
 define('GENFORM_PATH', plugin_dir_path(__FILE__));
 define('GENFORM_URL', plugin_dir_url(__FILE__));
 
@@ -39,6 +39,9 @@ register_activation_hook(__FILE__, array('GenForm\Core', 'activate'));
 /**
  * Load the core plugin engine.
  */
-add_action('plugins_loaded', function () {
-	GenForm\Core::instance();
-});
+add_action(
+	'plugins_loaded',
+	function () {
+		GenForm\Core::instance();
+	}
+);

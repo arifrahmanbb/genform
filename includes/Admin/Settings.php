@@ -76,7 +76,7 @@ final class Settings {
 		);
 
 		add_settings_field(
-			'genform_from_name',
+			'gfm_from_name',
 			esc_html__( 'Global Sender Name', 'genform' ),
 			fn() => $this->renderField( 'from_name', esc_html__( 'e.g. Your Business Name', 'genform' ) ),
 			'genform_settings',
@@ -84,7 +84,7 @@ final class Settings {
 		);
 
 		add_settings_field(
-			'genform_from_email',
+			'gfm_from_email',
 			esc_html__( 'Global Sender Email', 'genform' ),
 			fn() => $this->renderField( 'from_email', esc_html__( 'e.g. support@yourdomain.com', 'genform' ) ),
 			'genform_settings',
@@ -96,7 +96,7 @@ final class Settings {
 			'genform_advanced',
 			esc_html__( 'Advanced & Performance', 'genform' ),
 			fn() => print( '<p class="gfm-section-desc">' . esc_html__( 'Technical optimizations.', 'genform' ) . '</p>' ),
-			'genform_settings' 
+			'genform_settings'
 		);
 
 		add_settings_field(

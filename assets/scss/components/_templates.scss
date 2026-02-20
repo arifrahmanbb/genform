@@ -44,7 +44,7 @@
     margin-left: $space-xs;
 }
 
-// ── Toolbar ──────────────────────────────
+
 .gfm-templates-toolbar {
     padding: $space-sm $space-lg;
     border-bottom: 1px solid $border;
@@ -124,7 +124,7 @@
     }
 }
 
-// ── Grid Body ────────────────────────────
+
 .gfm-templates-body {
     flex: 1;
     overflow-y: auto;
@@ -145,7 +145,7 @@
     }
 }
 
-// ── Template Card ────────────────────────
+
 .gfm-template-card {
     border: 1px solid $border;
     border-radius: $radius;
@@ -204,7 +204,7 @@
     }
 }
 
-// ── Mini field preview inside card ───────
+
 .gfm-template-field-preview {
     flex: 1;
     display: flex;
@@ -243,7 +243,7 @@
     margin-top: 2px;
 }
 
-// ── Card body ────────────────────────────
+
 .gfm-template-card-body {
     padding: $space-sm;
     display: flex;
@@ -305,7 +305,7 @@
     border-color: rgba($primary, 0.15);
 }
 
-// ── Card action buttons ──────────────────
+
 .gfm-template-card-actions {
     display: flex;
     gap: 6px;
@@ -327,7 +327,7 @@
     }
 }
 
-// ── Empty state ──────────────────────────
+
 .gfm-templates-empty {
     text-align: center;
     padding: $space-xl $space-md;
@@ -389,7 +389,7 @@
     }
 }
 
-// ── Preview field list ───────────────────
+
 .gfm-preview-info {
     margin-bottom: $space-lg;
 }
@@ -496,7 +496,7 @@
     border: 1px solid $border;
 }
 
-// ── Preview settings box ─────────────────
+
 .gfm-preview-settings {
     margin-top: $space-lg;
     padding: $space-md;

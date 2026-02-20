@@ -115,7 +115,7 @@
     top: 32px;
     padding: $space-md;
     border-radius: $radius-lg;
-    
+
     h3 {
         font-size: 13px;
         text-transform: uppercase;
@@ -307,6 +307,12 @@
         background: $primary-light;
         border-color: rgba($primary, 0.2);
     }
+
+    .gfm-duplicate-btn:hover {
+        color: $success;
+        background: color-mix(in srgb, $white, $success 8%);
+        border-color: rgba($success, 0.2);
+    }
 }
 
 .gfm-field-node.active .gfm-edit-btn {
@@ -335,11 +341,41 @@
 
     .gfm-form-group {
         margin-bottom: 0;
-        
+
         &.full-width {
             grid-column: span 2;
         }
     }
+}
+
+.gfm-field-settings-header {
+    grid-column: span 2;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: $weight-bold;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $text-muted;
+    padding-bottom: $space-sm;
+    margin-bottom: $space-xs;
+    border-bottom: 1px solid $border;
+
+    .dashicons {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        color: $primary;
+    }
+}
+
+.gfm-setting-desc {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+    color: $text-light;
+    line-height: 1.4;
 }
 
 .gfm-required-toggle-wrap {
@@ -444,9 +480,9 @@
 
 .gfm-width-selector {
     display: flex;
-    gap: 4px;
+    gap: 3px;
     background: $bg;
-    padding: 4px;
+    padding: 3px;
     border-radius: $radius-md;
     border: 1px solid $border;
 }
@@ -455,14 +491,15 @@
     flex: 1;
     border: none;
     background: transparent;
-    padding: 8px;
-    font-size: 11px;
+    padding: 6px 4px;
+    font-size: 10px;
     font-weight: 700;
     border-radius: $radius-sm;
     cursor: pointer;
     transition: $transition-base;
-    text-transform: uppercase;
     color: $text-muted;
+    white-space: nowrap;
+    min-width: 0;
 
     &.active {
         background: $white;
@@ -474,4 +511,3 @@
         background: rgba($white, 0.5);
     }
 }
-

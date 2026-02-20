@@ -34,7 +34,7 @@
 				}
 			});
 			if (!checkboxValid) {
-				msg.textContent = 'Please select at least one option for required checkbox fields.';
+				msg.textContent = genform.i18n?.checkbox_error || 'Please select at least one option for required checkbox fields.';
 				msg.className = 'gfm-message error';
 				return;
 			}
@@ -42,7 +42,7 @@
 			// Validate GDPR consent checkbox if present.
 			const gdprCheckbox = form.querySelector('.gfm-gdpr-checkbox');
 			if (gdprCheckbox && !gdprCheckbox.checked) {
-				msg.textContent = 'Please accept the consent checkbox to proceed.';
+				msg.textContent = genform.i18n?.gdpr_error || 'Please accept the consent checkbox to proceed.';
 				msg.className = 'gfm-message error';
 				gdprCheckbox.closest('.gfm-gdpr-field').style.outline = '2px solid #e74c3c';
 				gdprCheckbox.closest('.gfm-gdpr-field').style.borderRadius = '4px';
@@ -57,12 +57,13 @@
 			}
 
 			const btn = form.querySelector('.gfm-submit');
-			const originalText = btn.textContent;
+			const originalHTML = btn.innerHTML;
 			const formData = new FormData(form);
+			const submittingText = genform.i18n?.submitting || 'Submitting...';
 
-			// Prepare UI for submission state
+			// Prepare UI for submission state.
 			btn.disabled = true;
-			btn.textContent = '...';
+			btn.innerHTML = '<span class="gfm-spinner"></span> ' + submittingText;
 			msg.textContent = '';
 			msg.className = 'gfm-message gfm-hidden';
 
@@ -83,16 +84,16 @@
 					}
 					form.reset();
 				} else {
-					msg.textContent = result.data.message || 'An error occurred.';
+					msg.textContent = result.data.message || genform.i18n?.generic_error || 'An error occurred.';
 					msg.className = 'gfm-message error';
 				}
 			} catch (error) {
 				console.error('GenForm Submission Error:', error);
-				msg.textContent = 'An unknown error occurred.';
+				msg.textContent = genform.i18n?.unknown_error || 'An unknown error occurred.';
 				msg.className = 'gfm-message error';
 			} finally {
 				btn.disabled = false;
-				btn.textContent = originalText;
+				btn.innerHTML = originalHTML;
 			}
 		});
 	});

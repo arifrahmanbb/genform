@@ -26,16 +26,44 @@
 }
 
 // ========================================
-// Fields Container & Layout
+// Fields Container & Multi-Column Layout
 // ========================================
 
 .gfm-fields {
-  @include gfm-flex-column;
+  display: flex;
+  flex-wrap: wrap;
   gap: 20px;
 }
 
-.gfm-field {
-  @include gfm-flex-column;
+.gfm-form-field {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+// Width utility classes for multi-column layouts.
+.gfm-w-100 {
+  width: 100%;
+}
+
+.gfm-w-75 {
+  width: calc(75% - 10px);
+}
+
+.gfm-w-67 {
+  width: calc(66.666% - 10px);
+}
+
+.gfm-w-50 {
+  width: calc(50% - 10px);
+}
+
+.gfm-w-33 {
+  width: calc(33.333% - 14px);
+}
+
+.gfm-w-25 {
+  width: calc(25% - 15px);
 }
 
 // ========================================
@@ -50,7 +78,7 @@
   color: $gfm-color-text;
 }
 
-.gfm-required {
+.gfm-required-mark {
   color: $danger;
   margin-left: 2px;
 }
@@ -116,7 +144,7 @@
 
   &[type="checkbox"] {
     border-radius: 6px;
-    
+
     &::after {
       content: "";
       position: absolute;
@@ -169,37 +197,60 @@
 }
 
 // ========================================
-// Field Description
+// Field Description / Help Text
 // ========================================
 
 .gfm-field-description {
-  margin-top: 5px;
+  margin-top: 6px;
   font-size: 13px;
   color: $gfm-color-text-secondary;
-  font-style: italic;
+  line-height: 1.4;
 }
 
 // ========================================
 // Submit Button
 // ========================================
 
-.gfm-submit-wrapper {
+.gfm-submit-wrap {
+  width: 100%;
   margin-top: 24px;
 }
 
-.gfm-submit-btn {
+.gfm-submit {
   @include gfm-btn-primary;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+// Spinner for loading state.
+.gfm-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2.5px solid rgba(255, 255, 255, 0.3);
+  border-top-color: $white;
+  border-radius: 50%;
+  animation: gfm-spin 0.6s linear infinite;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+@keyframes gfm-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 // ========================================
-// Form Messages (Success/Error)
+// Form Messages (Success/Error) with animation
 // ========================================
 
 .gfm-message {
   margin-top: 20px;
   padding: 16px;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 14px;
+  animation: gfm-fade-in 0.3s ease;
 
   &.success {
     @include gfm-alert-success;
@@ -215,6 +266,18 @@
 
   &.info {
     @include gfm-alert($gfm-color-info, $gfm-color-info-text, $gfm-color-info-border);
+  }
+}
+
+@keyframes gfm-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -276,12 +339,17 @@
     padding: 20px;
   }
 
-  .gfm-submit-btn {
+  .gfm-submit {
     width: 100%;
   }
 
   .gfm-fields {
     gap: 12px;
+  }
+
+  // Stack all fields to full width on mobile.
+  .gfm-form-field {
+    width: 100% !important;
   }
 }
 
@@ -305,7 +373,7 @@
 // Error State Styling
 // ========================================
 
-.gfm-field {
+.gfm-form-field {
   &.error {
 
     .gfm-input,
@@ -334,7 +402,7 @@
 // Success State Styling
 // ========================================
 
-.gfm-field {
+.gfm-form-field {
   &.success {
 
     .gfm-input,

@@ -112,7 +112,7 @@
 	// Export helpers to window for other scripts (like form-builder.js)
 	window.gfmAdmin = { openModal, closeModal, showSpinner, hideSpinner, showNotice, gfmConfirm };
 
-	// ── Template Library Helpers ─────────────────────────────────
+
 
 	/** Field type → Dashicons icon map. */
 	const fieldIconMap = {
@@ -276,7 +276,7 @@
 	 */
 	const init = () => {
 
-		// ── ESC Key to Close Any Open Modal ───────────────────
+
 		document.addEventListener('keydown', (e) => {
 			if (e.key === 'Escape') {
 				const openModals = document.querySelectorAll('.gfm-modal.show');
@@ -284,13 +284,13 @@
 			}
 		});
 
-		// ── Template Library: Search Input ────────────────────
+
 		const searchInput = document.getElementById('gfm-template-search');
 		if (searchInput) {
 			searchInput.addEventListener('input', filterTemplates);
 		}
 
-		// ── Template Library: Category Filters ────────────────
+
 		const filterBtns = document.querySelectorAll('.gfm-filter-btn');
 		filterBtns.forEach((btn) => {
 			btn.addEventListener('click', () => {
@@ -303,14 +303,14 @@
 		document.addEventListener('click', async function (e) {
 			const target = e.target;
 
-			// ── Add New Form: Open Create Form Chooser ───────
+
 			if (target.closest('#gfm-add-new-form')) {
 				e.preventDefault();
 				openModal('#gfm-create-form-modal');
 				return;
 			}
 
-			// ── Create Form Chooser: Choose a Template ───────
+
 			if (target.closest('#gfm-create-from-template')) {
 				e.preventDefault();
 				closeModal('#gfm-create-form-modal');
@@ -321,7 +321,7 @@
 				return;
 			}
 
-			// ── Template Library: Open Modal (from empty state / direct) ──
+
 			if (target.closest('#gfm-open-templates')) {
 				e.preventDefault();
 				resetTemplateLibrary();
@@ -329,7 +329,7 @@
 				return;
 			}
 
-			// ── Template Library: Preview Button ──────────────
+
 			const previewBtn = target.closest('.gfm-template-preview-btn');
 			if (previewBtn) {
 				e.preventDefault();
@@ -344,7 +344,7 @@
 				return;
 			}
 
-			// ── Template Library: Use Template Button ─────────
+
 			const useBtn = target.closest('.gfm-template-use-btn');
 			if (useBtn && !useBtn.disabled) {
 				e.preventDefault();
@@ -356,7 +356,7 @@
 				return;
 			}
 
-			// ── Template Preview: Back to Library ─────────────
+
 			if (target.closest('#gfm-preview-back')) {
 				e.preventDefault();
 				closeModal('#gfm-template-preview-modal');
@@ -364,14 +364,14 @@
 				return;
 			}
 
-			// ── Template Preview: Cancel ──────────────────────
+
 			if (target.closest('#gfm-preview-cancel')) {
 				e.preventDefault();
 				closeModal('#gfm-template-preview-modal');
 				return;
 			}
 
-			// ── Template Preview: Use This Template ───────────
+
 			const previewUseBtn = target.closest('#gfm-preview-use');
 			if (previewUseBtn && !previewUseBtn.disabled) {
 				e.preventDefault();
