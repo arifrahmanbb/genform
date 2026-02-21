@@ -16,6 +16,7 @@ if ( ! current_user_can( 'manage_options' ) ) {
 }
 
 use GenForm\Admin\EntriesTable;
+use GenForm\Pro\FeatureGate;
 
 $genform_table_component = new EntriesTable();
 $genform_table_component->prepare_items();
@@ -34,6 +35,13 @@ $genform_fid = isset( $_GET['form_id'] ) ? absint( wp_unslash( $_GET['form_id'] 
 				<a href="<?php echo esc_url( admin_url( 'admin.php?page=genform-entries' ) ); ?>" class="gfm-btn gfm-btn-outline">
 					<?php esc_html_e( 'View All', 'genform' ); ?>
 				</a>
+			<?php endif; ?>
+			<?php if ( ! FeatureGate::has( 'visual_reports' ) ) : ?>
+				<button type="button" class="gfm-btn gfm-btn-outline gfm-pro-field-locked" data-pro="visual_reports">
+					<span class="dashicons dashicons-chart-bar"></span>
+					<?php esc_html_e( 'Visual Reports', 'genform' ); ?>
+					<?php echo FeatureGate::proBadge( 'visual_reports' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				</button>
 			<?php endif; ?>
 		</div>
 	</div>

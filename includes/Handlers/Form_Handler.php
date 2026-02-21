@@ -77,6 +77,15 @@ final class FormHandler
 			}
 		}
 
+		/**
+		 * Fires before the submission is processed.
+		 * Pro plugin uses this for file uploads and payment validation.
+		 *
+		 * @param int   $form_id The form ID.
+		 * @param array $post_data Raw POST data.
+		 */
+		do_action( 'genform_pre_submission', $form_id, $_POST ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
 		$this->processSubmission($form_id);
 	}
 
@@ -116,6 +125,16 @@ final class FormHandler
 
 		// Send email notification.
 		Email::send($wpdb->insert_id, $form_id, $entry_data);
+
+		/**
+		 * Fires after a submission is saved.
+		 * Pro plugin uses this for integrations (Mailchimp, Webhook, etc.).
+		 *
+		 * @param int   $entry_id   The newly created entry ID.
+		 * @param int   $form_id    The form ID.
+		 * @param array $entry_data Sanitized entry data.
+		 */
+		do_action( 'genform_post_submission', $wpdb->insert_id, $form_id, $entry_data );
 
 		$form_settings = json_decode($form->form_settings, true);
 		$response      = array(

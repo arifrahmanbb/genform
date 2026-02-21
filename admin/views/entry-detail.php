@@ -167,6 +167,16 @@ if ( empty( $genform_resolved ) ) {
 					<?php endif; ?>
 				</div>
 			</div>
+
+			<?php
+			/**
+			 * Fires in the entry detail sidebar.
+			 * Pro plugin uses this for file downloads, payment receipts, etc.
+			 *
+			 * @param object $genform_entry The entry object.
+			 */
+			do_action( 'genform_entry_detail_sidebar', $genform_entry );
+			?>
 		</div>
 	</div>
 </div>

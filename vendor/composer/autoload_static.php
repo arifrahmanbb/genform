@@ -6,31 +6,22 @@ namespace Composer\Autoload;
 
 class ComposerStaticInit665efa7c3b92eb926415146a7d1ea3c4
 {
-    public static $prefixLengthsPsr4 = array (
-        'G' => 
-        array (
-            'GenForm\\' => 8,
-        ),
-    );
-
-    public static $prefixDirsPsr4 = array (
-        'GenForm\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/includes',
-        ),
+    public static $files = array (
+        '8d50dc88e56bace65e1e72f6017983ed' => __DIR__ . '/..' . '/freemius/wordpress-sdk/start.php',
     );
 
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'GenForm\\Admin\\Builder' => __DIR__ . '/../..' . '/includes/Admin/Builder.php',
-        'GenForm\\Admin\\EntriesTable' => __DIR__ . '/../..' . '/includes/Admin/EntriesTable.php',
+        'GenForm\\Admin\\EntriesTable' => __DIR__ . '/../..' . '/includes/Admin/Entries_Table.php',
         'GenForm\\Admin\\Settings' => __DIR__ . '/../..' . '/includes/Admin/Settings.php',
         'GenForm\\Core' => __DIR__ . '/../..' . '/includes/Core.php',
-        'GenForm\\Handlers\\ExportHandler' => __DIR__ . '/../..' . '/includes/Handlers/ExportHandler.php',
-        'GenForm\\Handlers\\FormHandler' => __DIR__ . '/../..' . '/includes/Handlers/FormHandler.php',
+        'GenForm\\Handlers\\ExportHandler' => __DIR__ . '/../..' . '/includes/Handlers/Export_Handler.php',
+        'GenForm\\Handlers\\FormHandler' => __DIR__ . '/../..' . '/includes/Handlers/Form_Handler.php',
         'GenForm\\Integrations\\Block' => __DIR__ . '/../..' . '/includes/Integrations/Block.php',
         'GenForm\\Integrations\\Email' => __DIR__ . '/../..' . '/includes/Integrations/Email.php',
         'GenForm\\Integrations\\Shortcode' => __DIR__ . '/../..' . '/includes/Integrations/Shortcode.php',
+        'GenForm\\Pro\\FeatureGate' => __DIR__ . '/../..' . '/includes/Pro/Feature_Gate.php',
         'GenForm\\Templates\\Library\\Booking' => __DIR__ . '/../..' . '/includes/Templates/Library/Booking.php',
         'GenForm\\Templates\\Library\\Business' => __DIR__ . '/../..' . '/includes/Templates/Library/Business.php',
         'GenForm\\Templates\\Library\\Education' => __DIR__ . '/../..' . '/includes/Templates/Library/Education.php',
@@ -40,14 +31,12 @@ class ComposerStaticInit665efa7c3b92eb926415146a7d1ea3c4
         'GenForm\\Templates\\Library\\Marketing' => __DIR__ . '/../..' . '/includes/Templates/Library/Marketing.php',
         'GenForm\\Templates\\Manager' => __DIR__ . '/../..' . '/includes/Templates/Manager.php',
         'GenForm\\Templates\\Renderer' => __DIR__ . '/../..' . '/includes/Templates/Renderer.php',
-        'GenForm\\Utils\\DetectionHelper' => __DIR__ . '/../..' . '/includes/Utils/DetectionHelper.php',
+        'GenForm\\Utils\\DetectionHelper' => __DIR__ . '/../..' . '/includes/Utils/Detection_Helper.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit665efa7c3b92eb926415146a7d1ea3c4::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit665efa7c3b92eb926415146a7d1ea3c4::$prefixDirsPsr4;
             $loader->classMap = ComposerStaticInit665efa7c3b92eb926415146a7d1ea3c4::$classMap;
 
         }, null, ClassLoader::class);

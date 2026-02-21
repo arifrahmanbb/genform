@@ -112,6 +112,17 @@
 	// Export helpers to window for other scripts (like form-builder.js)
 	window.gfmAdmin = { openModal, closeModal, showSpinner, hideSpinner, showNotice, gfmConfirm };
 
+	/**
+	 * Pro Upgrade Modal handler.
+	 * Opens the Pro modal when locked items are clicked.
+	 */
+	const openProModal = () => {
+		const modal = document.getElementById('gfm-pro-modal');
+		if (modal) {
+			openModal('#gfm-pro-modal');
+		}
+	};
+
 
 
 	/** Field type → Dashicons icon map. */
@@ -275,6 +286,15 @@
 	 * Main Administration Event Controller
 	 */
 	const init = () => {
+
+		// Pro locked fields & tabs — open upgrade modal.
+		document.querySelectorAll('.gfm-pro-field-locked, .gfm-pro-tab-locked').forEach((el) => {
+			el.addEventListener('click', (e) => {
+				e.preventDefault();
+				e.stopPropagation();
+				openProModal();
+			});
+		});
 
 
 		document.addEventListener('keydown', (e) => {

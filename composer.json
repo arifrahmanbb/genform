@@ -10,12 +10,13 @@
         }
     ],
     "require": {
-        "php": ">=8.3"
+        "php": ">=8.3",
+        "freemius/wordpress-sdk": "^2.13"
     },
     "autoload": {
-        "psr-4": {
-            "GenForm\\": "includes/"
-        }
+        "classmap": [
+            "includes/"
+        ]
     },
     "config": {
         "optimize-autoloader": true,

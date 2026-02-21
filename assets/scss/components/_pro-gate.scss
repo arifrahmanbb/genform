@@ -1,0 +1,408 @@
+/**
+ * Pro Feature Gate Styles
+ *
+ * Styles for PRO badges, locked fields, upgrade modal,
+ * visual preview cards with blur effects, and upsell grid.
+ *
+ * @package GenForm
+ */
+
+@use '../abstracts' as *;
+
+/* ── PRO Badge ── */
+.gfm-pro-badge {
+	display: inline-flex;
+	align-items: center;
+	padding: 2px 8px;
+	font-size: 9px;
+	font-weight: 800;
+	letter-spacing: 0.8px;
+	text-transform: uppercase;
+	color: #fff;
+	background: linear-gradient(135deg, #f59e0b, #f97316);
+	border-radius: 4px;
+	line-height: 1.6;
+	vertical-align: middle;
+	box-shadow: 0 1px 3px rgba(245, 158, 11, 0.3);
+	animation: gfm-badge-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes gfm-badge-glow {
+	0% {
+		box-shadow: 0 1px 3px rgba(245, 158, 11, 0.3);
+	}
+
+	100% {
+		box-shadow: 0 2px 8px rgba(249, 115, 22, 0.5);
+	}
+}
+
+.gfm-pro-badge-lg {
+	padding: 4px 14px;
+	font-size: 11px;
+	border-radius: 6px;
+}
+
+/* ── Locked Tab ── */
+.gfm-pro-tab-locked {
+	position: relative;
+	opacity: 0.7;
+	cursor: pointer;
+	transition: opacity 0.2s;
+
+	&:hover {
+		opacity: 1;
+	}
+
+	.gfm-pro-badge {
+		margin-left: 6px;
+		font-size: 8px;
+		padding: 1px 6px;
+	}
+}
+
+/* ── Locked Field Button ── */
+.gfm-pro-field-locked {
+	cursor: pointer !important;
+}
+
+/* ── Visual Preview Card (Blurred Screenshot) ── */
+.gfm-pro-preview-card {
+	background: #fff;
+	border: 1px solid #e5e7eb;
+	border-radius: 12px;
+	overflow: hidden;
+	transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+
+	&:hover {
+		border-color: #c7d2fe;
+		box-shadow: 0 8px 24px rgba(99, 102, 241, 0.12);
+		transform: translateY(-2px);
+
+		.gfm-pro-preview-image img {
+			filter: blur(4px);
+		}
+
+		.gfm-pro-preview-lock {
+			transform: scale(1.1);
+		}
+	}
+}
+
+.gfm-pro-preview-image {
+	position: relative;
+	overflow: hidden;
+	height: 180px;
+
+	img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		filter: blur(6px);
+		transition: filter 0.4s ease;
+	}
+}
+
+.gfm-pro-preview-blur-overlay {
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(180deg,
+			rgba(255, 255, 255, 0.1) 0%,
+			rgba(255, 255, 255, 0.3) 60%,
+			rgba(255, 255, 255, 0.9) 100%);
+	pointer-events: none;
+}
+
+.gfm-pro-preview-lock {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 48px;
+	height: 48px;
+	background: rgba(99, 102, 241, 0.9);
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+	transition: transform 0.3s ease;
+
+	.dashicons {
+		color: #fff;
+		font-size: 22px;
+		width: 22px;
+		height: 22px;
+	}
+}
+
+.gfm-pro-preview-content {
+	padding: 16px;
+}
+
+.gfm-pro-preview-header {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 8px;
+
+	.dashicons {
+		color: #6366f1;
+		font-size: 18px;
+		width: 18px;
+		height: 18px;
+	}
+
+	h4 {
+		margin: 0;
+		font-size: 14px;
+		font-weight: 700;
+		color: #1f2937;
+		flex: 1;
+	}
+}
+
+.gfm-pro-preview-content p {
+	margin: 0 0 14px 0;
+	font-size: 12.5px;
+	line-height: 1.6;
+	color: #6b7280;
+}
+
+.gfm-pro-preview-content .gfm-btn-pro-upgrade {
+	width: 100%;
+	justify-content: center;
+	font-size: 12px;
+	padding: 8px 16px;
+}
+
+/* ── Preview Grid ── */
+.gfm-pro-preview-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: 20px;
+	margin-top: 20px;
+}
+
+/* ── Pro Locked Card (Simple version without image) ── */
+.gfm-pro-locked-card {
+	background: linear-gradient(135deg, #fefce8, #fef3c7);
+	border: 2px dashed #fbbf24;
+	border-radius: 12px;
+	padding: 24px;
+	text-align: center;
+}
+
+.gfm-pro-locked-inner {
+	max-width: 320px;
+	margin: 0 auto;
+}
+
+.gfm-pro-locked-icon {
+	width: 48px;
+	height: 48px;
+	margin: 0 auto 12px;
+	background: #fef3c7;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	.dashicons {
+		font-size: 24px;
+		width: 24px;
+		height: 24px;
+		color: #f59e0b;
+	}
+}
+
+.gfm-pro-locked-card h3 {
+	font-size: 16px;
+	font-weight: 700;
+	color: #92400e;
+	margin: 0 0 6px;
+}
+
+.gfm-pro-locked-card p {
+	font-size: 13px;
+	color: #a16207;
+	line-height: 1.5;
+	margin: 0 0 14px;
+}
+
+.gfm-pro-locked-card .gfm-pro-badge-lg {
+	display: inline-block;
+	margin-bottom: 14px;
+}
+
+/* ── Pro Upgrade Button ── */
+.gfm-btn-pro-upgrade {
+	display: inline-flex !important;
+	align-items: center;
+	gap: 6px;
+	padding: 10px 20px;
+	font-size: 13px;
+	font-weight: 700;
+	color: #fff !important;
+	background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	text-decoration: none;
+	transition: all 0.3s ease;
+	box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+
+	.dashicons {
+		font-size: 16px;
+		width: 16px;
+		height: 16px;
+	}
+
+	&:hover {
+		background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
+		transform: translateY(-1px);
+		box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+		color: #fff !important;
+	}
+}
+
+/* ── Pro Fields Section in Sidebar ── */
+.gfm-pro-fields-divider {
+	margin: 16px 0 12px;
+	padding-top: 16px;
+	border-top: 1px dashed #e5e7eb;
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.5px;
+	text-transform: uppercase;
+	color: #f59e0b;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+
+	.dashicons {
+		font-size: 14px;
+		width: 14px;
+		height: 14px;
+	}
+}
+
+/* ── Pro Modal ── */
+.gfm-pro-modal-content {
+	text-align: center;
+	max-width: 440px;
+}
+
+.gfm-pro-modal-body {
+	padding: 32px 28px !important;
+}
+
+.gfm-pro-modal-icon {
+	width: 64px;
+	height: 64px;
+	margin: 0 auto 16px;
+	background: linear-gradient(135deg, #dbeafe, #ede9fe);
+	border-radius: 20px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	.dashicons {
+		font-size: 30px;
+		width: 30px;
+		height: 30px;
+		color: #6366f1;
+	}
+}
+
+.gfm-pro-modal-body h2 {
+	font-size: 20px;
+	font-weight: 800;
+	color: #1e293b;
+	margin: 0 0 8px;
+}
+
+.gfm-pro-modal-body>p {
+	color: #64748b;
+	font-size: 14px;
+	margin: 0 0 20px;
+	line-height: 1.6;
+}
+
+.gfm-pro-feature-list {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 8px;
+	margin-bottom: 24px;
+	text-align: left;
+}
+
+.gfm-pro-feature-item {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 13px;
+	color: #374151;
+	font-weight: 500;
+
+	.dashicons {
+		font-size: 16px;
+		width: 16px;
+		height: 16px;
+		color: #10b981;
+	}
+}
+
+.gfm-pro-modal-body .gfm-btn-large {
+	padding: 12px 28px;
+	font-size: 15px;
+	width: 100%;
+	justify-content: center;
+}
+
+.gfm-pro-modal-note {
+	margin-top: 10px;
+	font-size: 12px;
+	color: #9ca3af;
+}
+
+/* ── Pro Settings Card ── */
+.gfm-pro-settings-card {
+	margin-top: 24px;
+}
+
+.gfm-pro-integrations-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+	gap: 12px;
+	margin-bottom: 20px;
+}
+
+.gfm-pro-integration-item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	padding: 16px 10px;
+	background: rgba(255, 255, 255, 0.8);
+	border: 1px solid #e5e7eb;
+	border-radius: 10px;
+	font-size: 12px;
+	font-weight: 600;
+	color: #374151;
+	transition: all 0.2s;
+
+	.dashicons {
+		font-size: 24px;
+		width: 24px;
+		height: 24px;
+		color: #6366f1;
+	}
+
+	&:hover {
+		border-color: #c7d2fe;
+		background: #fff;
+		transform: translateY(-1px);
+	}
+}

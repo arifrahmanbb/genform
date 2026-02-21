@@ -32,9 +32,32 @@ define('GENFORM_PATH', plugin_dir_path(__FILE__));
 define('GENFORM_URL', plugin_dir_url(__FILE__));
 
 /**
+ * Initialize Freemius SDK.
+ * Must be loaded before 'plugins_loaded' hook per Freemius docs.
+ */
+if ( file_exists( GENFORM_PATH . 'includes/freemius-init.php' ) ) {
+	require_once GENFORM_PATH . 'includes/freemius-init.php';
+}
+
+/**
  * Handle plugin activation logic.
  */
-register_activation_hook(__FILE__, array('GenForm\Core', 'activate'));
+register_activation_hook(__FILE__, array('GenForm\\Core', 'activate'));
+
+/**
+ * Freemius uninstall cleanup hook.
+ */
+if ( function_exists( 'genform_fs' ) ) {
+	genform_fs()->add_action( 'after_uninstall', function () {
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}genform_entries" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}genform_forms" );
+		delete_option( 'genform_version' );
+		delete_option( 'genform_settings' );
+	});
+}
 
 /**
  * Load the core plugin engine.

@@ -12,6 +12,8 @@ if (! defined('ABSPATH')) {
 	exit;
 }
 
+use GenForm\Pro\FeatureGate;
+
 global $wpdb;
 // Nonce is verified in handlers for all write operations. This view is for display only.
 // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -28,6 +30,24 @@ $genform_settings = $genform_form ? json_decode($genform_form->form_settings, tr
 			<button type="button" class="gfm-tab-link active" data-tab="fields"><?php esc_html_e('Fields', 'genform'); ?></button>
 			<button type="button" class="gfm-tab-link" data-tab="settings"><?php esc_html_e('Settings', 'genform'); ?></button>
 			<button type="button" class="gfm-tab-link" data-tab="notifications"><?php esc_html_e('Notifications', 'genform'); ?></button>
+			<?php
+			/**
+			 * Fires in the builder tab bar to allow Pro tabs.
+			 */
+			do_action( 'genform_builder_tabs' );
+			?>
+			<?php if ( ! FeatureGate::has( 'conditional_logic' ) ) : ?>
+				<button type="button" class="gfm-tab-link gfm-pro-tab-locked" data-pro="conditional_logic">
+					<?php esc_html_e('Logic', 'genform'); ?>
+					<?php echo FeatureGate::proBadge( 'conditional_logic' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				</button>
+			<?php endif; ?>
+			<?php if ( ! FeatureGate::has( 'payment_stripe' ) ) : ?>
+				<button type="button" class="gfm-tab-link gfm-pro-tab-locked" data-pro="payment_stripe">
+					<?php esc_html_e('Payments', 'genform'); ?>
+					<?php echo FeatureGate::proBadge( 'payment_stripe' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				</button>
+			<?php endif; ?>
 		</div>
 	</div>
 
@@ -85,6 +105,33 @@ $genform_settings = $genform_form ? json_decode($genform_form->form_settings, tr
 								</button>
 							<?php endforeach; ?>
 						</div>
+
+						<?php if ( ! FeatureGate::isProActive() ) : ?>
+						<div class="gfm-pro-fields-section">
+							<h4 class="gfm-pro-fields-title">
+								<span class="dashicons dashicons-star-filled"></span>
+								<?php esc_html_e('Pro Fields', 'genform'); ?>
+							</h4>
+							<div class="gfm-field-buttons gfm-pro-fields">
+								<?php
+								$genform_pro_fields = array(
+									'file_upload' => array( 'icon' => 'media-default', 'label' => __( 'File Upload', 'genform' ) ),
+									'page_break'  => array( 'icon' => 'editor-insertmore', 'label' => __( 'Page Break', 'genform' ) ),
+									'signature'   => array( 'icon' => 'art', 'label' => __( 'Signature', 'genform' ) ),
+									'star_rating' => array( 'icon' => 'star-filled', 'label' => __( 'Star Rating', 'genform' ) ),
+									'payment'     => array( 'icon' => 'money-alt', 'label' => __( 'Payment', 'genform' ) ),
+								);
+								foreach ( $genform_pro_fields as $genform_pro_slug => $genform_pro_info ) :
+								?>
+									<button type="button" class="gfm-add-field gfm-pro-field-locked" data-pro="<?php echo esc_attr( $genform_pro_slug ); ?>">
+										<span class="dashicons dashicons-<?php echo esc_attr( $genform_pro_info['icon'] ); ?>"></span>
+										<?php echo esc_html( $genform_pro_info['label'] ); ?>
+										<?php echo FeatureGate::proBadge( $genform_pro_slug ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+									</button>
+								<?php endforeach; ?>
+							</div>
+						</div>
+						<?php endif; ?>
 					</div>
 				</div>
 

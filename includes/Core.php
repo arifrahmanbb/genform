@@ -24,6 +24,7 @@ use GenForm\Integrations\Block;
 use GenForm\Integrations\Shortcode;
 use GenForm\Templates\Manager as TemplateManager;
 use GenForm\Templates\Renderer as TemplateRenderer;
+use GenForm\Pro\FeatureGate;
 
 final class Core {
 
@@ -261,6 +262,53 @@ final class Core {
 		// Template Library Modals.
 		TemplateRenderer::render();
 		?>
+
+		<?php if ( ! FeatureGate::isProActive() ) : ?>
+		<!-- Pro Upgrade Modal -->
+		<div id="gfm-pro-modal" class="gfm-modal gfm-hidden">
+			<div class="gfm-modal-content gfm-modal-mini gfm-pro-modal-content">
+				<div class="gfm-modal-body gfm-pro-modal-body text-center">
+					<span class="gfm-close-modal dashicons dashicons-no"></span>
+					<div class="gfm-pro-modal-icon">
+						<span class="dashicons dashicons-star-filled"></span>
+					</div>
+					<h3><?php esc_html_e( 'Unlock This Feature', 'genform' ); ?></h3>
+					<p id="gfm-pro-modal-desc"><?php esc_html_e( 'This feature is available in GenForm Pro. Upgrade to unlock conditional logic, multi-step forms, file uploads, payments, and more.', 'genform' ); ?></p>
+					<div class="gfm-pro-modal-features">
+						<div class="gfm-pro-feature-item">
+							<span class="dashicons dashicons-yes-alt"></span>
+							<?php esc_html_e( 'Conditional Logic', 'genform' ); ?>
+						</div>
+						<div class="gfm-pro-feature-item">
+							<span class="dashicons dashicons-yes-alt"></span>
+							<?php esc_html_e( 'Multi-Step Forms', 'genform' ); ?>
+						</div>
+						<div class="gfm-pro-feature-item">
+							<span class="dashicons dashicons-yes-alt"></span>
+							<?php esc_html_e( 'File Upload Field', 'genform' ); ?>
+						</div>
+						<div class="gfm-pro-feature-item">
+							<span class="dashicons dashicons-yes-alt"></span>
+							<?php esc_html_e( 'Stripe Payments', 'genform' ); ?>
+						</div>
+						<div class="gfm-pro-feature-item">
+							<span class="dashicons dashicons-yes-alt"></span>
+							<?php esc_html_e( 'Visual Reports', 'genform' ); ?>
+						</div>
+						<div class="gfm-pro-feature-item">
+							<span class="dashicons dashicons-yes-alt"></span>
+							<?php esc_html_e( 'Webhooks & Integrations', 'genform' ); ?>
+						</div>
+					</div>
+					<a href="<?php echo esc_url( FeatureGate::upgradeUrl() ); ?>" target="_blank" class="gfm-btn gfm-btn-pro-upgrade gfm-btn-large">
+						<span class="dashicons dashicons-superhero-alt"></span>
+						<?php esc_html_e( 'Upgrade to GenForm Pro', 'genform' ); ?>
+					</a>
+					<p class="gfm-pro-modal-note"><?php esc_html_e( 'Starting at $49/year — 14-day money-back guarantee', 'genform' ); ?></p>
+				</div>
+			</div>
+		</div>
+		<?php endif; ?>
 		<?php
 	}
 
@@ -310,6 +358,14 @@ final class Core {
 
 		wp_enqueue_style( 'genform-admin', GENFORM_URL . 'assets/css/admin.css', array(), GENFORM_VERSION );
 		wp_add_inline_style( 'genform-admin', $this->getDynamicStylesCss() );
+
+		/**
+		 * Fires after GenForm admin scripts are enqueued.
+		 * Pro plugin uses this to enqueue its own assets.
+		 *
+		 * @param string $hook The current admin page hook suffix.
+		 */
+		do_action( 'genform_admin_scripts', $hook );
 		wp_enqueue_script(
 			'genform-admin',
 			GENFORM_URL . 'assets/js/admin.js',
