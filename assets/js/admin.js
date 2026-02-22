@@ -114,13 +114,23 @@
 
 	/**
 	 * Pro Upgrade Modal handler.
-	 * Opens the Pro modal when locked items are clicked.
+	 * Opens the pricing modal when locked items are clicked.
+	 * Sets the context banner with the feature name that triggered it.
 	 */
-	const openProModal = () => {
-		const modal = document.getElementById('gfm-pro-modal');
-		if (modal) {
-			openModal('#gfm-pro-modal');
+	const openProModal = (featureSlug) => {
+		const modal = document.getElementById('gfm-pro-upgrade-modal');
+		if (!modal) return;
+
+		// Update the context banner with the feature name.
+		const contextText = document.getElementById('gfm-pro-context-text');
+		if (contextText && featureSlug) {
+			// Look for the feature title in the card or tab that was clicked.
+			const card = document.querySelector(`[data-feature="${featureSlug}"] .gfm-pro-preview-header h4`);
+			const featureTitle = card ? card.textContent.trim() : featureSlug.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+			contextText.textContent = `"${featureTitle}" requires GenForm Pro to unlock.`;
 		}
+
+		openModal('#gfm-pro-upgrade-modal');
 	};
 
 
@@ -287,12 +297,13 @@
 	 */
 	const init = () => {
 
-		// Pro locked fields & tabs — open upgrade modal.
+		// Pro locked fields & tabs — open upgrade pricing modal.
 		document.querySelectorAll('.gfm-pro-field-locked, .gfm-pro-tab-locked').forEach((el) => {
 			el.addEventListener('click', (e) => {
 				e.preventDefault();
 				e.stopPropagation();
-				openProModal();
+				const slug = el.getAttribute('data-pro') || el.getAttribute('data-feature') || '';
+				openProModal(slug);
 			});
 		});
 

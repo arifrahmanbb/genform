@@ -115,12 +115,30 @@ final class Core {
 	public function renderDashboardWidget(): void {
 		global $wpdb;
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$forms_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}genform_forms" );
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$entries_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}genform_entries" );
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$recent_entries = $wpdb->get_results( "SELECT e.*, f.form_name FROM {$wpdb->prefix}genform_entries e LEFT JOIN {$wpdb->prefix}genform_forms f ON e.form_id = f.id ORDER BY e.created_at DESC LIMIT 5" );
+		// Use object cache for dashboard stats.
+		$cache_key = 'genform_dashboard_stats';
+		$stats = wp_cache_get( $cache_key, 'genform' );
+
+		if ( false === $stats ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$forms_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}genform_forms" );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$entries_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}genform_entries" );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$recent_entries = $wpdb->get_results( "SELECT e.*, f.form_name FROM {$wpdb->prefix}genform_entries e LEFT JOIN {$wpdb->prefix}genform_forms f ON e.form_id = f.id ORDER BY e.created_at DESC LIMIT 5" );
+
+			$stats = array(
+				'forms'   => absint( $forms_count ),
+				'entries' => absint( $entries_count ),
+				'recent'  => $recent_entries,
+			);
+
+			wp_cache_set( $cache_key, $stats, 'genform', 300 );
+		}
+
+		$forms_count    = $stats['forms'];
+		$entries_count  = $stats['entries'];
+		$recent_entries = $stats['recent'];
 		?>
 		<div class="gfm-dashboard-widget">
 			<div class="gfm-db-stats">
@@ -264,52 +282,9 @@ final class Core {
 		?>
 
 		<?php if ( ! FeatureGate::isProActive() ) : ?>
-		<!-- Pro Upgrade Modal -->
-		<div id="gfm-pro-modal" class="gfm-modal gfm-hidden">
-			<div class="gfm-modal-content gfm-modal-mini gfm-pro-modal-content">
-				<div class="gfm-modal-body gfm-pro-modal-body text-center">
-					<span class="gfm-close-modal dashicons dashicons-no"></span>
-					<div class="gfm-pro-modal-icon">
-						<span class="dashicons dashicons-star-filled"></span>
-					</div>
-					<h3><?php esc_html_e( 'Unlock This Feature', 'genform' ); ?></h3>
-					<p id="gfm-pro-modal-desc"><?php esc_html_e( 'This feature is available in GenForm Pro. Upgrade to unlock conditional logic, multi-step forms, file uploads, payments, and more.', 'genform' ); ?></p>
-					<div class="gfm-pro-modal-features">
-						<div class="gfm-pro-feature-item">
-							<span class="dashicons dashicons-yes-alt"></span>
-							<?php esc_html_e( 'Conditional Logic', 'genform' ); ?>
-						</div>
-						<div class="gfm-pro-feature-item">
-							<span class="dashicons dashicons-yes-alt"></span>
-							<?php esc_html_e( 'Multi-Step Forms', 'genform' ); ?>
-						</div>
-						<div class="gfm-pro-feature-item">
-							<span class="dashicons dashicons-yes-alt"></span>
-							<?php esc_html_e( 'File Upload Field', 'genform' ); ?>
-						</div>
-						<div class="gfm-pro-feature-item">
-							<span class="dashicons dashicons-yes-alt"></span>
-							<?php esc_html_e( 'Stripe Payments', 'genform' ); ?>
-						</div>
-						<div class="gfm-pro-feature-item">
-							<span class="dashicons dashicons-yes-alt"></span>
-							<?php esc_html_e( 'Visual Reports', 'genform' ); ?>
-						</div>
-						<div class="gfm-pro-feature-item">
-							<span class="dashicons dashicons-yes-alt"></span>
-							<?php esc_html_e( 'Webhooks & Integrations', 'genform' ); ?>
-						</div>
-					</div>
-					<a href="<?php echo esc_url( FeatureGate::upgradeUrl() ); ?>" target="_blank" class="gfm-btn gfm-btn-pro-upgrade gfm-btn-large">
-						<span class="dashicons dashicons-superhero-alt"></span>
-						<?php esc_html_e( 'Upgrade to GenForm Pro', 'genform' ); ?>
-					</a>
-					<p class="gfm-pro-modal-note"><?php esc_html_e( 'Starting at $49/year — 14-day money-back guarantee', 'genform' ); ?></p>
-				</div>
-			</div>
-		</div>
-		<?php endif; ?>
-		<?php
+	<?php FeatureGate::renderUpgradeModal(); ?>
+	<?php endif; ?>
+	<?php
 	}
 
 	/**
@@ -327,7 +302,7 @@ final class Core {
 
 		global $wpdb;
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$forms         = $wpdb->get_results( "SELECT id, form_name FROM {$wpdb->prefix}genform_forms WHERE status = 'active'" );
+		$forms         = $wpdb->get_results( "SELECT id, form_name FROM {$wpdb->prefix}genform_forms WHERE status = 'active' LIMIT 500" );
 		$block_options = array();
 		foreach ( $forms as $form_item ) {
 			$block_options[] = array(

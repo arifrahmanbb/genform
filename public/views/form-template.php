@@ -44,7 +44,7 @@ $gfm_submit_align     = esc_attr($settings['gfm_submit_align'] ?? 'left');
 								<?php echo esc_html($genform_field['label']); ?>
 								<?php
 								if ($genform_field_required) {
-									echo '<span class="gfm-required-mark">*</span>';
+									echo '<span class="gfm-required-mark">*</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Static markup.
 								}
 								?>
 							</label>
@@ -77,7 +77,7 @@ $gfm_submit_align     = esc_attr($settings['gfm_submit_align'] ?? 'left');
 												printf('<option value="%1$s" %2$s>%3$s</option>', esc_attr($genform_option['value']), selected($genform_field['default_value'] ?? '', $genform_option['value'], false), esc_html($genform_option['label']));
 											}
 										}
-										echo '</select>';
+										echo '</select>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Static closing tag.
 										break;
 
 									case 'radio':
@@ -95,7 +95,7 @@ $gfm_submit_align     = esc_attr($settings['gfm_submit_align'] ?? 'left');
 													esc_html($genform_option['label'])
 												);
 											}
-											echo '</div>';
+											echo '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Static closing tag.
 										}
 										break;
 

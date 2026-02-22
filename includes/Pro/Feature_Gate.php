@@ -27,118 +27,91 @@ final class FeatureGate {
 	 */
 	public static function getFeatures(): array {
 		return array(
+			// ── Form Logic ──
 			'conditional_logic' => array(
 				'title'       => __( 'Conditional Logic', 'genform' ),
-				'description' => __( 'Show or hide fields based on user input. Create smart, dynamic forms that adapt to your visitors.', 'genform' ),
+				'description' => __( 'Show or hide fields based on user input. Create smart, dynamic forms.', 'genform' ),
 				'icon'        => 'randomize',
 				'preview'     => 'conditional-logic.png',
 			),
 			'multi_step'        => array(
 				'title'       => __( 'Multi-Step Forms', 'genform' ),
-				'description' => __( 'Split long forms into beautiful step-by-step pages with animated progress bars.', 'genform' ),
+				'description' => __( 'Split long forms into step-by-step pages with animated progress bars.', 'genform' ),
 				'icon'        => 'editor-insertmore',
 				'preview'     => 'multi-step.png',
 			),
+			'calculations'      => array(
+				'title'       => __( 'Calculations', 'genform' ),
+				'description' => __( 'Quote calculators, order forms, and pricing estimators with real-time math.', 'genform' ),
+				'icon'        => 'calculator',
+				'preview'     => '',
+			),
+			'save_resume'       => array(
+				'title'       => __( 'Save & Resume', 'genform' ),
+				'description' => __( 'Let users save progress and return later with a unique link.', 'genform' ),
+				'icon'        => 'backup',
+				'preview'     => '',
+			),
+			'form_abandonment'  => array(
+				'title'       => __( 'Form Abandonment', 'genform' ),
+				'description' => __( 'Capture partial entries from visitors who leave. Recover lost leads.', 'genform' ),
+				'icon'        => 'warning',
+				'preview'     => '',
+			),
+			// ── Pro Fields ──
 			'file_upload'       => array(
 				'title'       => __( 'File Uploads', 'genform' ),
-				'description' => __( 'Let users upload documents, images, and files with drag & drop, file type validation, and size limits.', 'genform' ),
+				'description' => __( 'Drag & drop file uploads with type validation and size limits.', 'genform' ),
 				'icon'        => 'upload',
 				'preview'     => 'file-upload.png',
 			),
-			'payments'          => array(
-				'title'       => __( 'Payment Collection', 'genform' ),
-				'description' => __( 'Accept payments via Stripe and PayPal directly in your forms. One-time or recurring.', 'genform' ),
-				'icon'        => 'money-alt',
-				'preview'     => 'payments.png',
-			),
-			'visual_reports'    => array(
-				'title'       => __( 'Visual Reports & Analytics', 'genform' ),
-				'description' => __( 'Beautiful charts, graphs, and stats dashboard. Track submissions, conversion rates, and revenue.', 'genform' ),
-				'icon'        => 'chart-bar',
-				'preview'     => 'visual-reports.png',
-			),
 			'signature'         => array(
 				'title'       => __( 'Digital Signature', 'genform' ),
-				'description' => __( 'Capture legally binding signatures with a touch-friendly canvas. Perfect for contracts and agreements.', 'genform' ),
+				'description' => __( 'Touch-friendly signature canvas for contracts and agreements.', 'genform' ),
 				'icon'        => 'art',
 				'preview'     => 'signature.png',
 			),
 			'star_rating'       => array(
 				'title'       => __( 'Star Rating', 'genform' ),
-				'description' => __( 'Interactive star rating field for reviews, feedback forms, and NPS surveys.', 'genform' ),
+				'description' => __( 'Interactive star rating for reviews and feedback forms.', 'genform' ),
 				'icon'        => 'star-filled',
-				'preview'     => '',
-			),
-			'integrations'      => array(
-				'title'       => __( 'Integrations Hub', 'genform' ),
-				'description' => __( 'Connect to Zapier, Mailchimp, Slack, Google Sheets, and 50+ services.', 'genform' ),
-				'icon'        => 'admin-plugins',
-				'preview'     => 'integrations.png',
-			),
-			'save_resume'       => array(
-				'title'       => __( 'Save & Resume', 'genform' ),
-				'description' => __( 'Let users save their progress and comeback later. Perfect for long application forms.', 'genform' ),
-				'icon'        => 'backup',
-				'preview'     => '',
-			),
-			'calculations'      => array(
-				'title'       => __( 'Calculations', 'genform' ),
-				'description' => __( 'Build quote calculators, order forms, and pricing estimators with real-time math.', 'genform' ),
-				'icon'        => 'calculator',
-				'preview'     => '',
-			),
-			'form_abandonment'  => array(
-				'title'       => __( 'Form Abandonment', 'genform' ),
-				'description' => __( 'Capture partial entries from visitors who leave. Recover lost leads automatically.', 'genform' ),
-				'icon'        => 'warning',
 				'preview'     => '',
 			),
 			'repeater'          => array(
 				'title'       => __( 'Repeater Field', 'genform' ),
-				'description' => __( 'Dynamic "add more" rows for work experience, order items, and any repeating data.', 'genform' ),
+				'description' => __( 'Dynamic "add more" rows for work experience, order items, etc.', 'genform' ),
 				'icon'        => 'plus-alt',
 				'preview'     => '',
 			),
 			'address'           => array(
 				'title'       => __( 'Address Field', 'genform' ),
-				'description' => __( 'Structured address input with street, city, state, zip, and country fields.', 'genform' ),
+				'description' => __( 'Structured address with street, city, state, zip, and country.', 'genform' ),
 				'icon'        => 'location',
 				'preview'     => '',
 			),
 			'rich_text'         => array(
 				'title'       => __( 'Rich Text Editor', 'genform' ),
-				'description' => __( 'WYSIWYG editor field for formatted content input in forms.', 'genform' ),
+				'description' => __( 'WYSIWYG editor for formatted content input in forms.', 'genform' ),
 				'icon'        => 'editor-paragraph',
 				'preview'     => '',
 			),
 			'survey'            => array(
 				'title'       => __( 'Surveys & Polls', 'genform' ),
-				'description' => __( 'Likert scales, NPS scores, opinion scales for professional survey forms.', 'genform' ),
+				'description' => __( 'Likert scales, NPS scores, and opinion scales for surveys.', 'genform' ),
 				'icon'        => 'editor-alignleft',
 				'preview'     => '',
 			),
-			'user_registration' => array(
-				'title'       => __( 'User Registration', 'genform' ),
-				'description' => __( 'Create WordPress user accounts directly from form submissions.', 'genform' ),
-				'icon'        => 'admin-users',
-				'preview'     => '',
+			// ── Payment Gateways (each separate) ──
+			'stripe'            => array(
+				'title'       => __( 'Stripe Payments', 'genform' ),
+				'description' => __( 'Accept credit card payments securely via Stripe. One-time or recurring.', 'genform' ),
+				'icon'        => 'money-alt',
+				'preview'     => 'payments.png',
 			),
-			'post_submission'   => array(
-				'title'       => __( 'Post Submission', 'genform' ),
-				'description' => __( 'Let users create blog posts and articles from the frontend via forms.', 'genform' ),
-				'icon'        => 'edit-page',
-				'preview'     => '',
-			),
-			'pdf_generator'     => array(
-				'title'       => __( 'PDF Generation', 'genform' ),
-				'description' => __( 'Generate PDF documents from entries. Perfect for invoices, receipts, and certificates.', 'genform' ),
-				'icon'        => 'media-document',
-				'preview'     => '',
-			),
-			'geolocation'       => array(
-				'title'       => __( 'Geolocation', 'genform' ),
-				'description' => __( 'Auto-detect user country, city, and coordinates with every submission.', 'genform' ),
-				'icon'        => 'location-alt',
+			'paypal'            => array(
+				'title'       => __( 'PayPal Payments', 'genform' ),
+				'description' => __( 'Accept PayPal payments directly in your forms with one-click checkout.', 'genform' ),
+				'icon'        => 'cart',
 				'preview'     => '',
 			),
 			'coupons'           => array(
@@ -147,16 +120,73 @@ final class FeatureGate {
 				'icon'        => 'tag',
 				'preview'     => '',
 			),
-			'landing_page'      => array(
-				'title'       => __( 'Form Landing Pages', 'genform' ),
-				'description' => __( 'Create distraction-free, conversion-optimized pages for individual forms.', 'genform' ),
-				'icon'        => 'welcome-widgets-menus',
+			// ── Integrations (each separate) ──
+			'zapier'            => array(
+				'title'       => __( 'Zapier', 'genform' ),
+				'description' => __( 'Connect your forms to 5,000+ apps via Zapier webhooks. Automate everything.', 'genform' ),
+				'icon'        => 'admin-plugins',
 				'preview'     => '',
 			),
-			'paypal'            => array(
-				'title'       => __( 'PayPal Payments', 'genform' ),
-				'description' => __( 'Accept PayPal payments directly in your forms with one-click checkout.', 'genform' ),
-				'icon'        => 'cart',
+			'mailchimp'         => array(
+				'title'       => __( 'Mailchimp', 'genform' ),
+				'description' => __( 'Auto-subscribe form submitters to your Mailchimp audience and lists.', 'genform' ),
+				'icon'        => 'email-alt',
+				'preview'     => '',
+			),
+			'slack'             => array(
+				'title'       => __( 'Slack Notifications', 'genform' ),
+				'description' => __( 'Get instant Slack messages in your channel when a form is submitted.', 'genform' ),
+				'icon'        => 'format-chat',
+				'preview'     => '',
+			),
+			'google_sheets'     => array(
+				'title'       => __( 'Google Sheets', 'genform' ),
+				'description' => __( 'Send form submissions as rows directly to your Google Spreadsheet.', 'genform' ),
+				'icon'        => 'media-spreadsheet',
+				'preview'     => '',
+			),
+			// ── Reporting ──
+			'visual_reports'    => array(
+				'title'       => __( 'Visual Reports', 'genform' ),
+				'description' => __( 'Charts, graphs, and stats dashboard. Track submissions and conversion.', 'genform' ),
+				'icon'        => 'chart-bar',
+				'preview'     => 'visual-reports.png',
+			),
+			// ── Features ──
+			'user_registration' => array(
+				'title'       => __( 'User Registration', 'genform' ),
+				'description' => __( 'Create WordPress accounts directly from form submissions.', 'genform' ),
+				'icon'        => 'admin-users',
+				'preview'     => '',
+			),
+			'post_submission'   => array(
+				'title'       => __( 'Post Submission', 'genform' ),
+				'description' => __( 'Let users create blog posts from the frontend via forms.', 'genform' ),
+				'icon'        => 'edit-page',
+				'preview'     => '',
+			),
+			'entry_editor'      => array(
+				'title'       => __( 'Entry Editor', 'genform' ),
+				'description' => __( 'Edit submitted entry data directly from the admin dashboard.', 'genform' ),
+				'icon'        => 'edit',
+				'preview'     => '',
+			),
+			'pdf_generator'     => array(
+				'title'       => __( 'PDF Generation', 'genform' ),
+				'description' => __( 'Generate PDF documents from entries — invoices, receipts, certificates.', 'genform' ),
+				'icon'        => 'media-document',
+				'preview'     => '',
+			),
+			'geolocation'       => array(
+				'title'       => __( 'Geolocation', 'genform' ),
+				'description' => __( 'Auto-detect user country, city, and coordinates for each submission.', 'genform' ),
+				'icon'        => 'location-alt',
+				'preview'     => '',
+			),
+			'landing_page'      => array(
+				'title'       => __( 'Form Landing Pages', 'genform' ),
+				'description' => __( 'Distraction-free, conversion-optimized standalone pages for forms.', 'genform' ),
+				'icon'        => 'welcome-widgets-menus',
 				'preview'     => '',
 			),
 		);
@@ -251,11 +281,11 @@ final class FeatureGate {
 	}
 
 	/**
-	 * Render a visual preview card with blurred screenshot for Pro upsell.
+	 * Render a visual preview card for a single Pro feature.
 	 *
-	 * Shows a real screenshot of the feature with a CSS blur overlay,
-	 * feature title, description, and upgrade CTA. On hover, the blur
-	 * slightly reduces to tease the user.
+	 * Shows a clear screenshot with subtle opacity overlay (no blur).
+	 * Cards without images show a gradient icon area instead.
+	 * Each card highlights ONE single feature for maximum impact.
 	 *
 	 * @param string $feature Feature slug from the registry.
 	 */
@@ -275,8 +305,10 @@ final class FeatureGate {
 		if ( ! empty( $info['preview'] ) ) {
 			$preview_url = GENFORM_URL . 'assets/images/pro-previews/' . $info['preview'];
 		}
+
+		$card_class = $preview_url ? 'gfm-pro-preview-card' : 'gfm-pro-preview-card gfm-pro-preview-card--no-image';
 		?>
-		<div class="gfm-pro-preview-card" data-feature="<?php echo esc_attr( $feature ); ?>">
+		<div class="<?php echo esc_attr( $card_class ); ?>" data-feature="<?php echo esc_attr( $feature ); ?>">
 			<?php if ( $preview_url ) : ?>
 				<div class="gfm-pro-preview-image">
 					<img
@@ -284,10 +316,14 @@ final class FeatureGate {
 						alt="<?php echo esc_attr( $info['title'] ); ?>"
 						loading="lazy"
 					>
-					<div class="gfm-pro-preview-blur-overlay"></div>
+					<div class="gfm-pro-preview-overlay"></div>
 					<div class="gfm-pro-preview-lock">
 						<span class="dashicons dashicons-lock"></span>
 					</div>
+				</div>
+			<?php else : ?>
+				<div class="gfm-pro-preview-icon-area">
+					<span class="dashicons dashicons-<?php echo esc_attr( $info['icon'] ); ?>"></span>
 				</div>
 			<?php endif; ?>
 			<div class="gfm-pro-preview-content">
@@ -320,6 +356,21 @@ final class FeatureGate {
 		$features = self::getFeatures();
 		$show = ! empty( $feature_slugs ) ? $feature_slugs : array_keys( $features );
 		?>
+		<div class="gfm-pro-settings-header">
+			<h2>
+				<span class="dashicons dashicons-superhero-alt"></span>
+				<?php esc_html_e( 'Unlock All Pro Features', 'genform' ); ?>
+			</h2>
+			<p>
+				<?php
+				printf(
+					/* translators: %d: number of Pro features */
+					esc_html__( '%d powerful features to supercharge your forms. Upgrade to unlock everything.', 'genform' ),
+					count( $show )
+				);
+				?>
+			</p>
+		</div>
 		<div class="gfm-pro-preview-grid">
 			<?php foreach ( $show as $slug ) : ?>
 				<?php self::previewCard( $slug ); ?>
@@ -402,4 +453,149 @@ final class FeatureGate {
 
 		return admin_url( 'admin.php?page=genform-account' );
 	}
+
+	/**
+	 * Render the Pro upgrade modal with pricing tiers.
+	 *
+	 * Inspired by WPForms/Fluent Forms/Gravity Forms patterns:
+	 * - 3 pricing plans with "Most Popular" badge
+	 * - Feature bullet list with green checkmarks
+	 * - Money-back guarantee + trust indicators
+	 * - Context-aware: shows which feature triggered the modal
+	 *
+	 * Called via admin_footer hook to put the modal markup in the page.
+	 */
+	public static function renderUpgradeModal(): void {
+		if ( self::isProActive() ) {
+			return;
+		}
+
+		$upgrade_url = self::upgradeUrl();
+		$pricing_url = self::pricingUrl();
+		$features    = self::getFeatures();
+		$total       = count( $features );
+		?>
+		<!-- GenForm Pro Upgrade Modal -->
+		<div id="gfm-pro-upgrade-modal" class="gfm-modal gfm-hidden">
+			<div class="gfm-modal-content gfm-pro-upgrade-modal-content">
+
+				<!-- Header -->
+				<div class="gfm-pro-upgrade-header">
+					<div class="gfm-pro-upgrade-header-left">
+						<span class="dashicons dashicons-superhero-alt"></span>
+						<h3><?php esc_html_e( 'Upgrade to GenForm Pro', 'genform' ); ?></h3>
+					</div>
+					<span class="gfm-close-modal dashicons dashicons-no" title="<?php esc_attr_e( 'Close', 'genform' ); ?>"></span>
+				</div>
+
+				<div class="gfm-pro-upgrade-body">
+					<!-- Feature context banner (dynamically updated by JS) -->
+					<div class="gfm-pro-upgrade-context" id="gfm-pro-context-banner">
+						<span class="dashicons dashicons-lock"></span>
+						<span id="gfm-pro-context-text">
+							<?php esc_html_e( 'This feature requires GenForm Pro.', 'genform' ); ?>
+						</span>
+					</div>
+
+					<!-- Pricing Cards -->
+					<div class="gfm-pro-pricing-grid">
+						<!-- Personal Plan -->
+						<div class="gfm-pro-plan-card">
+							<div class="gfm-pro-plan-header">
+								<h4><?php esc_html_e( 'Personal', 'genform' ); ?></h4>
+								<div class="gfm-pro-plan-price">
+									<span class="gfm-pro-price-amount">$49</span>
+									<span class="gfm-pro-price-period">/<?php esc_html_e( 'year', 'genform' ); ?></span>
+								</div>
+								<span class="gfm-pro-plan-sites"><?php esc_html_e( '1 Site License', 'genform' ); ?></span>
+							</div>
+							<ul class="gfm-pro-plan-features">
+								<li><span class="dashicons dashicons-yes-alt"></span><?php esc_html_e( 'All Pro Features', 'genform' ); ?></li>
+								<li><span class="dashicons dashicons-yes-alt"></span><?php esc_html_e( '1 Year Updates', 'genform' ); ?></li>
+								<li><span class="dashicons dashicons-yes-alt"></span><?php esc_html_e( 'Priority Support', 'genform' ); ?></li>
+								<li class="gfm-plan-feature-muted"><span class="dashicons dashicons-minus"></span><?php esc_html_e( 'Multisite Support', 'genform' ); ?></li>
+							</ul>
+							<a href="<?php echo esc_url( $upgrade_url ); ?>" class="gfm-btn gfm-pro-plan-btn">
+								<?php esc_html_e( 'Get Personal', 'genform' ); ?>
+							</a>
+						</div>
+
+						<!-- Agency Plan (Popular) -->
+						<div class="gfm-pro-plan-card gfm-pro-plan-popular">
+							<div class="gfm-pro-plan-badge"><?php esc_html_e( 'Most Popular', 'genform' ); ?></div>
+							<div class="gfm-pro-plan-header">
+								<h4><?php esc_html_e( 'Agency', 'genform' ); ?></h4>
+								<div class="gfm-pro-plan-price">
+									<span class="gfm-pro-price-amount">$99</span>
+									<span class="gfm-pro-price-period">/<?php esc_html_e( 'year', 'genform' ); ?></span>
+								</div>
+								<span class="gfm-pro-plan-sites"><?php esc_html_e( '5 Site License', 'genform' ); ?></span>
+							</div>
+							<ul class="gfm-pro-plan-features">
+								<li><span class="dashicons dashicons-yes-alt"></span><?php esc_html_e( 'All Pro Features', 'genform' ); ?></li>
+								<li><span class="dashicons dashicons-yes-alt"></span><?php esc_html_e( '1 Year Updates', 'genform' ); ?></li>
+								<li><span class="dashicons dashicons-yes-alt"></span><?php esc_html_e( 'Priority Support', 'genform' ); ?></li>
+								<li><span class="dashicons dashicons-yes-alt"></span><?php esc_html_e( 'Multisite Support', 'genform' ); ?></li>
+							</ul>
+							<a href="<?php echo esc_url( $upgrade_url ); ?>" class="gfm-btn gfm-btn-pro-upgrade gfm-pro-plan-btn">
+								<?php esc_html_e( 'Get Agency', 'genform' ); ?>
+							</a>
+						</div>
+
+						<!-- Unlimited Plan -->
+						<div class="gfm-pro-plan-card">
+							<div class="gfm-pro-plan-header">
+								<h4><?php esc_html_e( 'Unlimited', 'genform' ); ?></h4>
+								<div class="gfm-pro-plan-price">
+									<span class="gfm-pro-price-amount">$199</span>
+									<span class="gfm-pro-price-period">/<?php esc_html_e( 'year', 'genform' ); ?></span>
+								</div>
+								<span class="gfm-pro-plan-sites"><?php esc_html_e( 'Unlimited Sites', 'genform' ); ?></span>
+							</div>
+							<ul class="gfm-pro-plan-features">
+								<li><span class="dashicons dashicons-yes-alt"></span><?php esc_html_e( 'All Pro Features', 'genform' ); ?></li>
+								<li><span class="dashicons dashicons-yes-alt"></span><?php esc_html_e( 'Lifetime Updates', 'genform' ); ?></li>
+								<li><span class="dashicons dashicons-yes-alt"></span><?php esc_html_e( 'Priority Support', 'genform' ); ?></li>
+								<li><span class="dashicons dashicons-yes-alt"></span><?php esc_html_e( 'Multisite Support', 'genform' ); ?></li>
+							</ul>
+							<a href="<?php echo esc_url( $upgrade_url ); ?>" class="gfm-btn gfm-pro-plan-btn">
+								<?php esc_html_e( 'Get Unlimited', 'genform' ); ?>
+							</a>
+						</div>
+					</div>
+
+					<!-- Trust indicators -->
+					<div class="gfm-pro-upgrade-trust">
+						<div class="gfm-pro-trust-item">
+							<span class="dashicons dashicons-shield-alt"></span>
+							<?php esc_html_e( '14-Day Money-Back Guarantee', 'genform' ); ?>
+						</div>
+						<div class="gfm-pro-trust-item">
+							<span class="dashicons dashicons-lock"></span>
+							<?php esc_html_e( 'Secure Checkout', 'genform' ); ?>
+						</div>
+						<div class="gfm-pro-trust-item">
+							<span class="dashicons dashicons-update"></span>
+							<?php
+							printf(
+								/* translators: %d: total number of Pro features */
+								esc_html__( '%d+ Pro Features', 'genform' ),
+								$total
+							);
+							?>
+						</div>
+					</div>
+
+					<!-- View All Features link -->
+					<div class="gfm-pro-upgrade-footer">
+						<a href="<?php echo esc_url( $pricing_url ); ?>" class="gfm-pro-view-all-link">
+							<?php esc_html_e( 'View full feature comparison →', 'genform' ); ?>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<?php
+	}
 }
+

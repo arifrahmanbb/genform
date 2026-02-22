@@ -59,8 +59,8 @@ final class ExportHandler {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			$samples = $wpdb->get_col( $wpdb->prepare( "SELECT entry_data FROM {$wpdb->prefix}genform_entries WHERE form_id = %d AND status != 'trash' LIMIT 100", $form_id ) );
 		} else {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-			$samples = $wpdb->get_col( "SELECT entry_data FROM {$wpdb->prefix}genform_entries WHERE status != 'trash' LIMIT 100" );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$samples = $wpdb->get_col( $wpdb->prepare( "SELECT entry_data FROM {$wpdb->prefix}genform_entries WHERE status != %s LIMIT 100", 'trash' ) );
 		}
 
 		foreach ( $samples as $json_entry ) {

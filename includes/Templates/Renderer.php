@@ -63,7 +63,7 @@ final class Renderer {
 					<div class="gfm-templates-filters" id="gfm-template-filters">
 						<?php foreach ( $categories as $cat_slug => $cat_name ) : ?>
 							<button type="button"
-								class="gfm-filter-btn<?php echo 'all' === $cat_slug ? ' active' : ''; ?>"
+								class="gfm-filter-btn<?php echo 'all' === $cat_slug ? ' active' : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Static string. ?>"
 								data-category="<?php echo esc_attr( $cat_slug ); ?>">
 								<?php echo esc_html( $cat_name ); ?>
 							</button>

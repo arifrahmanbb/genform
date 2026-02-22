@@ -284,7 +284,7 @@ class EntriesTable extends \WP_List_Table {
 		}
 		global $wpdb;
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$available_forms = $wpdb->get_results( "SELECT id, form_name FROM {$wpdb->prefix}genform_forms ORDER BY form_name ASC" );
+		$available_forms = $wpdb->get_results( "SELECT id, form_name FROM {$wpdb->prefix}genform_forms ORDER BY form_name ASC LIMIT 500" );
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$current_form_id = isset( $_GET['form_id'] ) ? absint( wp_unslash( $_GET['form_id'] ) ) : 0;
 		?>
