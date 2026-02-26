@@ -13,11 +13,12 @@
 
 namespace GenForm\Templates;
 
-if ( ! defined( 'ABSPATH' ) ) {
+if (! defined('ABSPATH')) {
 	exit;
 }
 
-final class Renderer {
+final class Renderer
+{
 
 
 	/**
@@ -26,12 +27,13 @@ final class Renderer {
 	 * Called from Core::outputGlobalModals via an include or direct
 	 * method call.
 	 */
-	public static function render(): void {
+	public static function render(): void
+	{
 		$categories = Manager::getCategories();
 		$templates  = Manager::getAll();
 
 		self::renderCreateFormModal();
-		self::renderLibraryModal( $categories, $templates );
+		self::renderLibraryModal($categories, $templates);
 		self::renderPreviewModal();
 	}
 
@@ -41,31 +43,33 @@ final class Renderer {
 	 * @param array<string, string>            $categories slug => label.
 	 * @param array<int, array<string, mixed>> $templates  Template data.
 	 */
-	private static function renderLibraryModal( array $categories, array $templates ): void {
-		?>
+	private static function renderLibraryModal(array $categories, array $templates): void
+	{
+?>
 		<!-- Template Library Modal -->
 		<div id="gfm-templates-modal" class="gfm-modal gfm-hidden">
 			<div class="gfm-modal-content gfm-modal-templates">
 				<div class="gfm-modal-header">
 					<div class="gfm-templates-header-left">
 						<span class="dashicons dashicons-layout"></span>
-						<h3><?php esc_html_e( 'Template Library', 'genform' ); ?></h3>
-						<span class="gfm-templates-count"><?php echo (int) count( $templates ); ?> <?php esc_html_e( 'Templates', 'genform' ); ?></span>
+						<h3><?php esc_html_e('Template Library', 'genform'); ?></h3>
+						<span class="gfm-templates-count"><?php echo (int) count($templates); ?> <?php esc_html_e('Templates', 'genform'); ?></span>
 					</div>
-					<span class="gfm-close-modal dashicons dashicons-no" title="<?php esc_attr_e( 'Close', 'genform' ); ?>"></span>
+					<span class="gfm-close-modal dashicons dashicons-no" title="<?php esc_attr_e('Close', 'genform'); ?>"></span>
 				</div>
 
 				<div class="gfm-templates-toolbar">
 					<div class="gfm-templates-search">
 						<span class="dashicons dashicons-search"></span>
-						<input type="text" id="gfm-template-search" placeholder="<?php esc_attr_e( 'Search templates...', 'genform' ); ?>" autocomplete="off">
+						<input type="text" id="gfm-template-search" placeholder="<?php esc_attr_e('Search templates...', 'genform'); ?>" autocomplete="off">
 					</div>
 					<div class="gfm-templates-filters" id="gfm-template-filters">
-						<?php foreach ( $categories as $cat_slug => $cat_name ) : ?>
+						<?php foreach ($categories as $cat_slug => $cat_name) : ?>
 							<button type="button"
-								class="gfm-filter-btn<?php echo 'all' === $cat_slug ? ' active' : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Static string. ?>"
-								data-category="<?php echo esc_attr( $cat_slug ); ?>">
-								<?php echo esc_html( $cat_name ); ?>
+								class="gfm-filter-btn<?php echo 'all' === $cat_slug ? ' active' : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Static string. 
+														?>"
+								data-category="<?php echo esc_attr($cat_slug); ?>">
+								<?php echo esc_html($cat_name); ?>
 							</button>
 						<?php endforeach; ?>
 					</div>
@@ -73,55 +77,88 @@ final class Renderer {
 
 				<div class="gfm-modal-body gfm-templates-body">
 					<div class="gfm-templates-grid" id="gfm-templates-grid">
-						<?php foreach ( $templates as $index => $tpl ) : ?>
+						<?php foreach ($templates as $index => $tpl) : ?>
 							<div class="gfm-template-card"
-								data-category="<?php echo esc_attr( $tpl['category'] ); ?>"
-								data-slug="<?php echo esc_attr( $tpl['slug'] ); ?>"
+								data-category="<?php echo esc_attr($tpl['category']); ?>"
+								data-slug="<?php echo esc_attr($tpl['slug']); ?>"
 								data-index="<?php echo (int) $index; ?>">
 
 								<div class="gfm-template-preview-area">
-									<div class="gfm-template-icon-wrap">
-										<span class="dashicons <?php echo esc_attr( $tpl['icon'] ); ?>"></span>
-									</div>
-									<div class="gfm-template-field-preview">
-										<?php
-										$preview_count = min( count( $tpl['fields'] ), 4 );
-										for ( $i = 0; $i < $preview_count; $i++ ) :
-											$field = $tpl['fields'][ $i ];
+									<?php
+									$image_path = GENFORM_PATH . 'assets/images/templates/' . $tpl['slug'] . '.png';
+									$image_url  = GENFORM_URL . 'assets/images/templates/' . $tpl['slug'] . '.png';
+									if (file_exists($image_path)) :
+									?>
+										<div class="gfm-template-screenshot" style="background-image: url('<?php echo esc_url($image_url); ?>');"></div>
+									<?php else : ?>
+										<div class="gfm-template-icon-wrap">
+											<span class="dashicons <?php echo esc_attr($tpl['icon']); ?>"></span>
+										</div>
+										<div class="gfm-template-field-preview">
+											<?php
+											$preview_count = min(count($tpl['fields']), 3); // Max 3 to fit well visually
+											for ($i = 0; $i < $preview_count; $i++) :
+												$field = $tpl['fields'][$i];
+												$type  = $field['type'] ?? 'text';
 											?>
-											<div class="gfm-tpl-field-row">
-												<span class="gfm-tpl-field-label"><?php echo esc_html( $field['label'] ); ?></span>
-												<span class="gfm-tpl-field-bar"></span>
+												<div class="gfm-tpl-mock-row">
+													<span class="gfm-tpl-mock-label"><?php echo esc_html($field['label']); ?></span>
+													<?php if ('textarea' === $type) : ?>
+														<div class="gfm-tpl-mock-input gfm-tpl-mock-textarea"></div>
+													<?php elseif ('select' === $type) : ?>
+														<div class="gfm-tpl-mock-input gfm-tpl-mock-select">
+															<span class="dashicons dashicons-arrow-down-alt2"></span>
+														</div>
+													<?php elseif ('radio' === $type || 'checkbox' === $type) : ?>
+														<div class="gfm-tpl-mock-options">
+															<div class="gfm-tpl-mock-option">
+																<span class="gfm-tpl-mock-<?php echo esc_attr($type); ?>"></span>
+																<span class="gfm-tpl-mock-line"></span>
+															</div>
+															<div class="gfm-tpl-mock-option">
+																<span class="gfm-tpl-mock-<?php echo esc_attr($type); ?>"></span>
+																<span class="gfm-tpl-mock-line" style="width: 60%;"></span>
+															</div>
+														</div>
+													<?php else : ?>
+														<div class="gfm-tpl-mock-input"></div>
+													<?php endif; ?>
+												</div>
+											<?php endfor; ?>
+
+											<div class="gfm-tpl-mock-submit">
+												<div class="gfm-tpl-mock-btn"></div>
 											</div>
-										<?php endfor; ?>
-										<?php if ( count( $tpl['fields'] ) > 4 ) : ?>
-											<div class="gfm-tpl-field-more">
-												+<?php echo (int) ( count( $tpl['fields'] ) - 4 ); ?> <?php esc_html_e( 'more fields', 'genform' ); ?>
-											</div>
-										<?php endif; ?>
-									</div>
+
+											<?php if (count($tpl['fields']) > 3) : ?>
+												<div class="gfm-tpl-field-more">
+													+<?php echo (int) (count($tpl['fields']) - 3); ?> <?php esc_html_e('more fields', 'genform'); ?>
+												</div>
+											<?php endif; ?>
+										</div>
+									<?php endif; ?>
 								</div>
 
 								<div class="gfm-template-card-body">
-									<h4 class="gfm-template-card-title"><?php echo esc_html( $tpl['name'] ); ?></h4>
-									<p class="gfm-template-card-desc"><?php echo esc_html( $tpl['description'] ); ?></p>
+									<h4 class="gfm-template-card-title"><?php echo esc_html($tpl['name']); ?></h4>
+									<p class="gfm-template-card-desc"><?php echo esc_html($tpl['description']); ?></p>
 									<div class="gfm-template-card-meta">
 										<span class="gfm-tpl-meta-badge">
 											<span class="dashicons dashicons-editor-ul"></span>
-											<?php echo (int) count( $tpl['fields'] ); ?> <?php esc_html_e( 'fields', 'genform' ); ?>
+											<?php echo (int) count($tpl['fields']); ?> <?php esc_html_e('fields', 'genform'); ?>
 										</span>
 										<span class="gfm-tpl-meta-badge gfm-tpl-cat-badge">
-											<?php echo esc_html( $categories[ $tpl['category'] ] ?? $tpl['category'] ); ?>
+											<?php echo esc_html($categories[$tpl['category']] ?? $tpl['category']); ?>
 										</span>
 									</div>
 									<div class="gfm-template-card-actions">
 										<button type="button" class="gfm-btn gfm-btn-outline gfm-btn-sm gfm-template-preview-btn" data-index="<?php echo (int) $index; ?>">
 											<span class="dashicons dashicons-visibility"></span>
-											<?php esc_html_e( 'Preview', 'genform' ); ?>
+											<?php esc_html_e('Preview', 'genform'); ?>
 										</button>
 										<button type="button" class="gfm-btn gfm-btn-primary gfm-btn-sm gfm-template-use-btn" data-index="<?php echo (int) $index; ?>">
 											<span class="dashicons dashicons-plus-alt2"></span>
-											<?php esc_html_e( 'Use Template', 'genform' ); ?>
+											<?php esc_html_e('Use Template', 'genform'); ?>
 										</button>
 									</div>
 								</div>
@@ -131,46 +168,47 @@ final class Renderer {
 
 					<div class="gfm-templates-empty gfm-hidden" id="gfm-templates-empty">
 						<span class="dashicons dashicons-search"></span>
-						<p><?php esc_html_e( 'No templates match your search.', 'genform' ); ?></p>
+						<p><?php esc_html_e('No templates match your search.', 'genform'); ?></p>
 					</div>
 				</div>
 			</div>
 		</div>
-		<?php
+	<?php
 	}
 
 	/**
 	 * Render the detailed template preview modal (populated by JS).
 	 */
-	private static function renderPreviewModal(): void {
-		?>
+	private static function renderPreviewModal(): void
+	{
+	?>
 		<!-- Template Preview Modal (Detailed View) -->
 		<div id="gfm-template-preview-modal" class="gfm-modal gfm-hidden">
 			<div class="gfm-modal-content gfm-modal-large">
 				<div class="gfm-modal-header">
 					<div class="gfm-templates-header-left">
-						<button type="button" class="gfm-preview-back-btn" id="gfm-preview-back" title="<?php esc_attr_e( 'Back to Library', 'genform' ); ?>">
+						<button type="button" class="gfm-preview-back-btn" id="gfm-preview-back" title="<?php esc_attr_e('Back to Library', 'genform'); ?>">
 							<span class="dashicons dashicons-arrow-left-alt2"></span>
 						</button>
 						<h3 id="gfm-preview-title"></h3>
 					</div>
-					<span class="gfm-close-modal dashicons dashicons-no" title="<?php esc_attr_e( 'Close', 'genform' ); ?>"></span>
+					<span class="gfm-close-modal dashicons dashicons-no" title="<?php esc_attr_e('Close', 'genform'); ?>"></span>
 				</div>
 				<div class="gfm-modal-body" id="gfm-preview-body">
 					<!-- Dynamically rendered by JS -->
 				</div>
 				<div class="gfm-preview-footer">
 					<button type="button" class="gfm-btn gfm-btn-outline" id="gfm-preview-cancel">
-						<?php esc_html_e( 'Cancel', 'genform' ); ?>
+						<?php esc_html_e('Cancel', 'genform'); ?>
 					</button>
 					<button type="button" class="gfm-btn gfm-btn-primary" id="gfm-preview-use">
 						<span class="dashicons dashicons-plus-alt2"></span>
-						<?php esc_html_e( 'Use This Template', 'genform' ); ?>
+						<?php esc_html_e('Use This Template', 'genform'); ?>
 					</button>
 				</div>
 			</div>
 		</div>
-		<?php
+	<?php
 	}
 
 	/**
@@ -179,25 +217,26 @@ final class Renderer {
 	 * Presents two paths: start from a blank form or browse the
 	 * template library. Displayed when clicking "Add New Form".
 	 */
-	private static function renderCreateFormModal(): void {
-		$blank_url = admin_url( 'admin.php?page=genform-builder' );
-		?>
+	private static function renderCreateFormModal(): void
+	{
+		$blank_url = admin_url('admin.php?page=genform-builder');
+	?>
 		<!-- Create New Form Chooser Modal -->
 		<div id="gfm-create-form-modal" class="gfm-modal gfm-hidden">
 			<div class="gfm-modal-content gfm-modal-create-form">
 				<div class="gfm-modal-header">
 					<div class="gfm-templates-header-left">
 						<span class="dashicons dashicons-plus-alt"></span>
-						<h3><?php esc_html_e( 'Create a New Form', 'genform' ); ?></h3>
+						<h3><?php esc_html_e('Create a New Form', 'genform'); ?></h3>
 					</div>
-					<span class="gfm-close-modal dashicons dashicons-no" title="<?php esc_attr_e( 'Close', 'genform' ); ?>"></span>
+					<span class="gfm-close-modal dashicons dashicons-no" title="<?php esc_attr_e('Close', 'genform'); ?>"></span>
 				</div>
 
 				<div class="gfm-modal-body gfm-create-form-body">
 					<div class="gfm-create-form-grid">
 
 						<!-- Option 1: New Blank Form -->
-						<a href="<?php echo esc_url( $blank_url ); ?>" class="gfm-create-option-card" id="gfm-create-blank">
+						<a href="<?php echo esc_url($blank_url); ?>" class="gfm-create-option-card" id="gfm-create-blank">
 							<div class="gfm-create-option-illustration gfm-illustration-blank">
 								<svg viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg" class="gfm-create-svg">
 									<rect x="20" y="10" width="80" height="80" rx="8" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="2" stroke-dasharray="6 4" />
@@ -207,8 +246,8 @@ final class Renderer {
 								</svg>
 							</div>
 							<div class="gfm-create-option-info">
-								<h4><?php esc_html_e( 'New Blank Form', 'genform' ); ?></h4>
-								<p><?php esc_html_e( 'Start from scratch and build your form field by field.', 'genform' ); ?></p>
+								<h4><?php esc_html_e('New Blank Form', 'genform'); ?></h4>
+								<p><?php esc_html_e('Start from scratch and build your form field by field.', 'genform'); ?></p>
 							</div>
 						</a>
 
@@ -231,11 +270,11 @@ final class Renderer {
 								</svg>
 							</div>
 							<div class="gfm-create-option-info">
-								<h4><?php esc_html_e( 'Choose a Template', 'genform' ); ?></h4>
-								<p><?php esc_html_e( 'Pick a pre-made template and customize it to your needs.', 'genform' ); ?></p>
+								<h4><?php esc_html_e('Choose a Template', 'genform'); ?></h4>
+								<p><?php esc_html_e('Pick a pre-made template and customize it to your needs.', 'genform'); ?></p>
 							</div>
 							<span class="gfm-create-option-badge">
-								<?php echo (int) Manager::count(); ?> <?php esc_html_e( 'templates', 'genform' ); ?>
+								<?php echo (int) Manager::count(); ?> <?php esc_html_e('templates', 'genform'); ?>
 							</span>
 						</button>
 
@@ -243,6 +282,6 @@ final class Renderer {
 				</div>
 			</div>
 		</div>
-		<?php
+<?php
 	}
 }

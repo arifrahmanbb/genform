@@ -185,6 +185,23 @@
     gap: $space-sm;
     min-height: 120px;
     transition: $transition-base;
+    overflow: hidden;
+}
+
+.gfm-template-screenshot {
+    width: 100%;
+    height: 140px;
+    background-size: cover;
+    background-position: top center;
+    border-radius: $radius-md;
+    background-repeat: no-repeat;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba($primary, 0.1);
+    transition: transform 0.5s ease;
+}
+
+.gfm-template-card:hover .gfm-template-screenshot {
+    transform: scale(1.03);
 }
 
 .gfm-template-icon-wrap {
@@ -212,28 +229,95 @@
     gap: 6px;
 }
 
-.gfm-tpl-field-row {
+.gfm-tpl-mock-row {
     display: flex;
-    align-items: center;
-    gap: 8px;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 8px;
 }
 
-.gfm-tpl-field-label {
-    font-size: 10px;
+.gfm-tpl-mock-label {
+    font-size: 9px;
     font-weight: 700;
     color: $text-muted;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     white-space: nowrap;
-    min-width: 60px;
 }
 
-.gfm-tpl-field-bar {
-    flex: 1;
-    height: 8px;
+.gfm-tpl-mock-input {
+    width: 100%;
+    height: 24px;
+    background: #ffffff;
+    border: 1px solid rgba($primary, 0.15);
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.gfm-tpl-mock-textarea {
+    height: 40px;
+}
+
+.gfm-tpl-mock-select {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 4px;
+
+    .dashicons {
+        font-size: 12px;
+        width: 12px;
+        height: 12px;
+        color: rgba($primary, 0.4);
+    }
+}
+
+.gfm-tpl-mock-options {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.gfm-tpl-mock-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.gfm-tpl-mock-radio {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid rgba($primary, 0.3);
+    background: #ffffff;
+}
+
+.gfm-tpl-mock-checkbox {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    border: 1px solid rgba($primary, 0.3);
+    background: #ffffff;
+}
+
+.gfm-tpl-mock-line {
+    height: 4px;
+    width: 80%;
     background: rgba($primary, 0.08);
-    border-radius: $radius-full;
-    border: 1px solid rgba($primary, 0.12);
+    border-radius: 2px;
+}
+
+.gfm-tpl-mock-submit {
+    margin-top: 10px;
+    display: flex;
+}
+
+.gfm-tpl-mock-btn {
+    height: 24px;
+    width: 60px;
+    background: $primary;
+    border-radius: 4px;
+    opacity: 0.9;
 }
 
 .gfm-tpl-field-more {
