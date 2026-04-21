@@ -4,13 +4,14 @@
  * Global Settings Page Styles
  */
 
+// Settings & Notifications tabs in the builder share the same card centering.
 #gfm-tab-settings,
 #gfm-tab-notifications {
     .gfm-card {
         max-width: 850px;
         margin-left: auto;
         margin-right: auto;
-        padding: $space-lg;
+        padding: $space-lg $space-xl;
     }
 }
 
@@ -20,28 +21,41 @@
     }
 
     .form-table th {
-        padding: 24px 20px 24px 0;
-        width: 260px;
+        padding: 24px 24px 24px 0;
+        width: 240px;
         font-size: 14px;
         font-weight: $weight-bold;
         color: $text-main;
         vertical-align: top;
+        line-height: 1.5;
     }
 
     .form-table td {
         padding: 24px 0;
-        
+
+        input[type="text"],
+        input[type="email"],
+        input[type="url"],
+        input[type="password"],
+        textarea {
+            width: 100%;
+            max-width: 520px;
+        }
+
         p.description {
-            margin-top: 8px;
+            margin-top: 10px;
             font-size: 12.5px;
-            color: $text-muted;
+            color: $text-light;
+            line-height: 1.5;
         }
     }
 
     .form-table h2 {
         font-size: 20px;
         font-weight: 800;
-        margin: $space-lg 0 $space-xs 0;
+        margin: $space-xl 0 $space-xs 0;
+        padding-top: $space-lg;
+        border-top: 1px solid $border;
         color: $text-main;
         letter-spacing: -0.01em;
     }
@@ -49,7 +63,7 @@
     .gfm-section-desc {
         font-size: 14px;
         color: $text-muted;
-        margin: 0 0 $space-lg 0;
+        margin: 0 0 $space-md 0;
         line-height: 1.6;
         max-width: 700px;
     }
@@ -70,13 +84,17 @@
         }
     }
 
+    // First section heading should not have a top border.
     .form-table tr:first-child h2 {
         margin-top: 0;
+        padding-top: 0;
+        border-top: none;
     }
 
     .submit {
-        margin-top: $space-lg;
-        padding: 0;
+        margin-top: $space-xl;
+        padding-top: $space-lg;
+        border-top: 1px solid $border;
 
         .button-primary {
             background: linear-gradient(135deg, $primary 0%, $primary-dark 100%) !important;

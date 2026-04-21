@@ -331,6 +331,30 @@
 			});
 		});
 
+		// JSON Import handler
+		const importFile = document.getElementById('gfm-import-file');
+		if (importFile) {
+			importFile.addEventListener('change', async (e) => {
+				const file = e.target.files[0];
+				if (!file) return;
+				const reader = new FileReader();
+				reader.onload = async (evt) => {
+					showSpinner();
+					const res = await gfmFetch('genform_import_form_json', { json_data: evt.target.result });
+					hideSpinner();
+					if (res.success) {
+						showNotice('Form imported successfully. Redirecting...');
+						setTimeout(() => { window.location.href = res.data.redirect; }, 800);
+					} else {
+						showNotice(res.data?.message || 'Import failed. Please check the file.', 'error');
+					}
+				};
+				reader.readAsText(file);
+				// Reset so the same file can be re-selected if needed
+				importFile.value = '';
+			});
+		}
+
 		document.addEventListener('click', async function (e) {
 			const target = e.target;
 
@@ -514,6 +538,43 @@
 						delPermBtn.closest('tr').classList.add('gfm-removing');
 						setTimeout(() => { showNotice('Entry deleted.'); setTimeout(() => window.location.reload(), 1000); }, 500);
 					}
+				}
+				return;
+			}
+
+			// 5a. Star Entry toggle
+			const starBtn = target.closest('.gfm-star-btn');
+			if (starBtn) {
+				e.preventDefault();
+				const entryId = starBtn.dataset.entryId;
+				const res = await gfmFetch('genform_star_entry', { entry_id: entryId });
+				if (res.success) {
+					const isStarred = res.data.starred;
+					const icon = starBtn.querySelector('.dashicons');
+					if (icon) {
+						icon.classList.toggle('dashicons-star-filled', isStarred);
+						icon.classList.toggle('dashicons-star-empty', !isStarred);
+					}
+					starBtn.classList.toggle('gfm-starred', isStarred);
+					starBtn.title = isStarred ? 'Unstar' : 'Star';
+				}
+				return;
+			}
+
+			// 5b. Form status toggle
+			const statusToggle = target.closest('.gfm-toggle-status');
+			if (statusToggle) {
+				const formId = statusToggle.dataset.formId;
+				const res = await gfmFetch('genform_toggle_form_status', { form_id: formId });
+				if (res.success) {
+					const isActive = res.data.status === 'active';
+					statusToggle.checked = isActive;
+					const label = statusToggle.closest('.gfm-status-toggle');
+					if (label) label.title = isActive ? 'Click to deactivate' : 'Click to activate';
+					showNotice(isActive ? 'Form activated.' : 'Form deactivated.');
+				} else {
+					// Revert the checkbox if request failed
+					statusToggle.checked = !statusToggle.checked;
 				}
 				return;
 			}

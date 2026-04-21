@@ -2,7 +2,8 @@
 
 .gfm-card {
     @include card;
-    margin-bottom: 24px;
+    margin-bottom: $space-md;
+    transition: box-shadow 0.25s ease;
 
     &:hover {
         box-shadow: $shadow-lg;

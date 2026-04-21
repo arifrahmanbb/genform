@@ -214,6 +214,24 @@ $genform_settings = $genform_form ? json_decode($genform_form->form_settings, tr
 				</div>
 			</div>
 
+			<?php
+			$genform_options = get_option( 'genform_general', array() );
+			if ( ! empty( $genform_options['recaptcha_site_key'] ) ) :
+			?>
+			<div class="gfm-card">
+				<h3><?php esc_html_e( 'reCAPTCHA', 'genform' ); ?></h3>
+				<div class="gfm-grid">
+					<div class="gfm-col">
+						<label class="gfm-choice-label">
+							<input type="checkbox" id="gfm-recaptcha-enabled" value="1" <?php checked( ! empty( $genform_settings['gfm_recaptcha_enabled'] ) ); ?>>
+							<span class="gfm-choice-text"><?php esc_html_e( 'Enable reCAPTCHA on this form', 'genform' ); ?></span>
+						</label>
+						<p class="description" style="margin-top:6px;"><?php esc_html_e( 'reCAPTCHA keys are configured in Settings.', 'genform' ); ?></p>
+					</div>
+				</div>
+			</div>
+			<?php endif; ?>
+
 			<div class="gfm-card">
 				<h3><?php esc_html_e('GDPR / Consent', 'genform'); ?></h3>
 				<div class="gfm-grid">
@@ -266,6 +284,36 @@ $genform_settings = $genform_form ? json_decode($genform_form->form_settings, tr
 					<label><?php esc_html_e('Email Body', 'genform'); ?></label>
 					<textarea id="gfm-email-body" rows="8" class="widefat" placeholder="<?php esc_attr_e("{all_fields}\n\nSent from {site_title}", 'genform'); ?>"><?php echo esc_textarea($genform_settings['gfm_email_body'] ?? ''); ?></textarea>
 					<span class="gfm-setting-desc"><?php esc_html_e('Tags: {all_fields}, {form_name}, {site_title}, {field_ID}', 'genform'); ?></span>
+				</div>
+			</div>
+
+			<div class="gfm-card">
+				<h3><?php esc_html_e( 'Confirmation Email to Submitter', 'genform' ); ?></h3>
+				<div class="gfm-grid">
+					<div class="gfm-col">
+						<label class="gfm-choice-label">
+							<input type="checkbox" id="gfm-conf-enabled" value="1" <?php checked( ! empty( $genform_settings['gfm_conf_enabled'] ) ); ?>>
+							<span class="gfm-choice-text"><?php esc_html_e( 'Send a confirmation email to the person who submitted', 'genform' ); ?></span>
+						</label>
+					</div>
+				</div>
+				<div class="gfm-conf-options" style="margin-top:16px;">
+					<div class="gfm-grid">
+						<div class="gfm-col">
+							<label><?php esc_html_e( 'Email Field (field name key)', 'genform' ); ?></label>
+							<input type="text" id="gfm-conf-to-field" value="<?php echo esc_attr( $genform_settings['gfm_conf_to_field'] ?? 'email' ); ?>" placeholder="email">
+							<span class="gfm-setting-desc"><?php esc_html_e( 'The field name that holds the submitter\'s email address.', 'genform' ); ?></span>
+						</div>
+						<div class="gfm-col">
+							<label><?php esc_html_e( 'Subject', 'genform' ); ?></label>
+							<input type="text" id="gfm-conf-subject" value="<?php echo esc_attr( $genform_settings['gfm_conf_subject'] ?? '' ); ?>" class="widefat" placeholder="<?php esc_attr_e( 'Thank you for contacting us — {form_name}', 'genform' ); ?>">
+						</div>
+					</div>
+					<div class="gfm-setting-row gfm-mt-md">
+						<label><?php esc_html_e( 'Message Body', 'genform' ); ?></label>
+						<textarea id="gfm-conf-body" rows="6" class="widefat" placeholder="<?php esc_attr_e( "Hi,\n\nThank you for your submission. We'll get back to you shortly.\n\n{all_fields}", 'genform' ); ?>"><?php echo esc_textarea( $genform_settings['gfm_conf_body'] ?? '' ); ?></textarea>
+						<span class="gfm-setting-desc"><?php esc_html_e( 'Tags: {all_fields}, {form_name}, {site_title}, {field_ID}', 'genform' ); ?></span>
+					</div>
 				</div>
 			</div>
 		</div>

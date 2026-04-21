@@ -148,6 +148,7 @@ class EntriesTable extends \WP_List_Table {
 	public function get_columns() {
 		return array(
 			'cb'            => '<input type="checkbox" />',
+			'starred'       => '<span class="dashicons dashicons-star-empty" title="' . esc_attr__( 'Starred', 'genform' ) . '"></span>',
 			'id'            => esc_html__( 'ID', 'genform' ),
 			'form_name'     => esc_html__( 'Form Name', 'genform' ),
 			'entry_preview' => esc_html__( 'Entry Preview', 'genform' ),
@@ -183,6 +184,20 @@ class EntriesTable extends \WP_List_Table {
 
 	public function column_cb( $item ) {
 		return sprintf( '<input type="checkbox" name="entry[]" value="%s" />', esc_attr( $item->id ) );
+	}
+
+	/**
+	 * Renders the star toggle for an entry.
+	 */
+	public function column_starred( $item ) {
+		$is_starred = ! empty( $item->starred );
+		return sprintf(
+			'<button type="button" class="gfm-star-btn gfm-action-icon %s" data-entry-id="%d" title="%s"><span class="dashicons dashicons-%s"></span></button>',
+			$is_starred ? 'gfm-starred' : '',
+			(int) $item->id,
+			$is_starred ? esc_attr__( 'Unstar', 'genform' ) : esc_attr__( 'Star', 'genform' ),
+			$is_starred ? 'star-filled' : 'star-empty'
+		);
 	}
 
 	/**

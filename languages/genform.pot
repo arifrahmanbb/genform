@@ -2,14 +2,14 @@
 # This file is distributed under the GPL v3 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: GenForm - Drag & Drop Form Builder 1.2.0\n"
+"Project-Id-Version: GenForm - Drag & Drop Form Builder 1.3.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/genform\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-02-20T10:23:53+00:00\n"
+"POT-Creation-Date: 2026-04-21T00:00:00+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: genform\n"
@@ -130,8 +130,8 @@ msgid "Form:"
 msgstr ""
 
 #: admin/views/entry-detail.php:126
-#: includes/Admin/EntriesTable.php:200
-#: includes/Admin/EntriesTable.php:271
+#: includes/Admin/EntriesTable.php:215
+#: includes/Admin/EntriesTable.php:286
 #: includes/Core.php:145
 msgid "Deleted Form"
 msgstr ""
@@ -164,216 +164,299 @@ msgstr ""
 msgid "Source Page:"
 msgstr ""
 
-#: admin/views/form-builder.php:26
+#: admin/views/form-builder.php:28
 #: admin/views/form-preview.php:48
 msgid "Edit Form"
 msgstr ""
 
-#: admin/views/form-builder.php:26
+#: admin/views/form-builder.php:28
 msgid "Create Form"
 msgstr ""
 
-#: admin/views/form-builder.php:28
+#: admin/views/form-builder.php:30
 msgid "Fields"
 msgstr ""
 
-#: admin/views/form-builder.php:29
+#: admin/views/form-builder.php:31
 #: includes/Core.php:194
 #: includes/Core.php:374
 msgid "Settings"
 msgstr ""
 
-#: admin/views/form-builder.php:30
+#: admin/views/form-builder.php:32
 msgid "Notifications"
 msgstr ""
 
-#: admin/views/form-builder.php:39
+#: admin/views/form-builder.php:41
+msgid "Logic"
+msgstr ""
+
+#: admin/views/form-builder.php:47
+msgid "Payments"
+msgstr ""
+
+#: admin/views/form-builder.php:59
 msgid "Form Title"
 msgstr ""
 
-#: admin/views/form-builder.php:40
+#: admin/views/form-builder.php:60
 msgid "e.g. Contact Us"
 msgstr ""
 
-#: admin/views/form-builder.php:44
+#: admin/views/form-builder.php:64
 msgid "Save Form"
 msgstr ""
 
-#: admin/views/form-builder.php:49
+#: admin/views/form-builder.php:69
 #: includes/Templates/Renderer.php:120
 msgid "Preview"
 msgstr ""
 
-#: admin/views/form-builder.php:53
+#: admin/views/form-builder.php:73
 #: includes/Core.php:253
 #: includes/Templates/Renderer.php:164
 msgid "Cancel"
 msgstr ""
 
-#: admin/views/form-builder.php:63
+#: admin/views/form-builder.php:83
 msgid "Available Fields"
 msgstr ""
 
-#: admin/views/form-builder.php:95
-msgid "Add fields here."
+#: admin/views/form-builder.php:113
+msgid "Pro Fields"
 msgstr ""
 
-#: admin/views/form-builder.php:105
-msgid "Confirmation"
+#: admin/views/form-builder.php:118
+msgid "File Upload"
 msgstr ""
 
-#: admin/views/form-builder.php:108
-msgid "Type"
+#: admin/views/form-builder.php:119
+msgid "Page Break"
 msgstr ""
 
-#: admin/views/form-builder.php:110
-msgid "Message"
-msgstr ""
-
-#: admin/views/form-builder.php:111
-msgid "Redirect"
-msgstr ""
-
-#: admin/views/form-builder.php:115
-msgid "URL"
+#: admin/views/form-builder.php:120
+msgid "Signature"
 msgstr ""
 
 #: admin/views/form-builder.php:121
+msgid "Star Rating"
+msgstr ""
+
+#: admin/views/form-builder.php:122
+msgid "Payment"
+msgstr ""
+
+#: admin/views/form-builder.php:142
+msgid "Add fields here."
+msgstr ""
+
+#: admin/views/form-builder.php:152
+msgid "Confirmation"
+msgstr ""
+
+#: admin/views/form-builder.php:155
+msgid "Type"
+msgstr ""
+
+#: admin/views/form-builder.php:157
+msgid "Message"
+msgstr ""
+
+#: admin/views/form-builder.php:158
+msgid "Redirect"
+msgstr ""
+
+#: admin/views/form-builder.php:162
+msgid "URL"
+msgstr ""
+
+#: admin/views/form-builder.php:169
 msgid "Success Message"
 msgstr ""
 
-#: admin/views/form-builder.php:125
+#: admin/views/form-builder.php:173
 msgid "Error Message"
 msgstr ""
 
-#: admin/views/form-builder.php:132
+#: admin/views/form-builder.php:179
 msgid "Submit Button"
 msgstr ""
 
-#: admin/views/form-builder.php:135
+#: admin/views/form-builder.php:182
 msgid "Button Text"
 msgstr ""
 
-#: admin/views/form-builder.php:136
+#: admin/views/form-builder.php:183
 #: public/views/form-template.php:176
 msgid "Submit"
 msgstr ""
 
-#: admin/views/form-builder.php:139
+#: admin/views/form-builder.php:186
 msgid "Button Alignment"
 msgstr ""
 
-#: admin/views/form-builder.php:141
+#: admin/views/form-builder.php:188
 msgid "Left"
 msgstr ""
 
-#: admin/views/form-builder.php:142
+#: admin/views/form-builder.php:189
 msgid "Center"
 msgstr ""
 
-#: admin/views/form-builder.php:143
+#: admin/views/form-builder.php:190
 msgid "Right"
 msgstr ""
 
-#: admin/views/form-builder.php:144
+#: admin/views/form-builder.php:191
 msgid "Full Width"
 msgstr ""
 
-#: admin/views/form-builder.php:151
+#: admin/views/form-builder.php:198
 msgid "Typography & Spacing"
 msgstr ""
 
-#: admin/views/form-builder.php:154
+#: admin/views/form-builder.php:201
 msgid "Base Font Size (px)"
 msgstr ""
 
-#: admin/views/form-builder.php:158
+#: admin/views/form-builder.php:205
 msgid "Font Weight"
 msgstr ""
 
-#: admin/views/form-builder.php:160
+#: admin/views/form-builder.php:207
 msgid "Light (300)"
 msgstr ""
 
-#: admin/views/form-builder.php:161
+#: admin/views/form-builder.php:208
 msgid "Regular (400)"
 msgstr ""
 
-#: admin/views/form-builder.php:162
+#: admin/views/form-builder.php:209
 msgid "Medium (500)"
 msgstr ""
 
-#: admin/views/form-builder.php:163
+#: admin/views/form-builder.php:210
 msgid "Semi-Bold (600)"
 msgstr ""
 
-#: admin/views/form-builder.php:164
+#: admin/views/form-builder.php:211
 msgid "Bold (700)"
 msgstr ""
 
-#: admin/views/form-builder.php:171
+#: admin/views/form-builder.php:222
+msgid "reCAPTCHA"
+msgstr ""
+
+#: admin/views/form-builder.php:227
+msgid "Enable reCAPTCHA on this form"
+msgstr ""
+
+#: admin/views/form-builder.php:229
+msgid "reCAPTCHA keys are configured in Settings."
+msgstr ""
+
+#: admin/views/form-builder.php:236
 msgid "GDPR / Consent"
 msgstr ""
 
-#: admin/views/form-builder.php:176
+#: admin/views/form-builder.php:241
 msgid "Enable GDPR Consent Checkbox"
 msgstr ""
 
-#: admin/views/form-builder.php:182
+#: admin/views/form-builder.php:247
 msgid "Consent Text"
 msgstr ""
 
-#: admin/views/form-builder.php:183
+#: admin/views/form-builder.php:248
 #: public/views/form-template.php:167
 msgid "I consent to having this website store my submitted information."
 msgstr ""
 
-#: admin/views/form-builder.php:192
+#: admin/views/form-builder.php:257
 msgid "Email Notifications"
 msgstr ""
 
-#: admin/views/form-builder.php:195
+#: admin/views/form-builder.php:260
 msgid "Send To Email"
 msgstr ""
 
-#: admin/views/form-builder.php:197
+#: admin/views/form-builder.php:262
 msgid "Use {admin_email} for site admin email."
 msgstr ""
 
-#: admin/views/form-builder.php:200
+#: admin/views/form-builder.php:265
 msgid "From Name"
 msgstr ""
 
-#: admin/views/form-builder.php:206
+#: admin/views/form-builder.php:271
 msgid "From Email"
 msgstr ""
 
-#: admin/views/form-builder.php:210
+#: admin/views/form-builder.php:275
 msgid "Reply-To Email"
 msgstr ""
 
-#: admin/views/form-builder.php:215
+#: admin/views/form-builder.php:280
 msgid "Email Subject"
 msgstr ""
 
-#: admin/views/form-builder.php:216
+#: admin/views/form-builder.php:281
 #: includes/Integrations/Email.php:48
 msgid "New Submission: {form_name}"
 msgstr ""
 
-#: admin/views/form-builder.php:219
+#: admin/views/form-builder.php:284
 msgid "Email Body"
 msgstr ""
 
-#: admin/views/form-builder.php:220
+#: admin/views/form-builder.php:285
 msgid ""
 "{all_fields}\n"
 "\n"
 "Sent from {site_title}"
 msgstr ""
 
-#: admin/views/form-builder.php:221
+#: admin/views/form-builder.php:286
 msgid "Tags: {all_fields}, {form_name}, {site_title}, {field_ID}"
+msgstr ""
+
+#: admin/views/form-builder.php:291
+msgid "Confirmation Email to Submitter"
+msgstr ""
+
+#: admin/views/form-builder.php:296
+msgid "Send a confirmation email to the person who submitted"
+msgstr ""
+
+#: admin/views/form-builder.php:303
+msgid "Email Field (field name key)"
+msgstr ""
+
+#: admin/views/form-builder.php:305
+msgid "The field name that holds the submitter's email address."
+msgstr ""
+
+#: admin/views/form-builder.php:308
+msgid "Subject"
+msgstr ""
+
+#: admin/views/form-builder.php:309
+#: includes/Integrations/Email.php:115
+msgid "Thank you for contacting us — {form_name}"
+msgstr ""
+
+#: admin/views/form-builder.php:313
+msgid "Message Body"
+msgstr ""
+
+#: admin/views/form-builder.php:314
+#: includes/Integrations/Email.php:122
+msgid ""
+"Hi,\n"
+"\n"
+"Thank you for your submission. We'll get back to you shortly.\n"
+"\n"
+"{all_fields}"
 msgstr ""
 
 #: admin/views/form-preview.php:23
@@ -402,70 +485,96 @@ msgid "Preview Mode – Submissions are disabled"
 msgstr ""
 
 #: admin/views/forms-list.php:27
-#: includes/Admin/EntriesTable.php:293
+#: includes/Admin/EntriesTable.php:308
 #: includes/Core.php:191
 msgid "All Forms"
 msgstr ""
 
+#: admin/views/forms-list.php:29
+msgid "Import form from JSON file"
+msgstr ""
+
 #: admin/views/forms-list.php:31
+#: includes/Admin/Builder.php:242
+msgid "Import"
+msgstr ""
+
+#: admin/views/forms-list.php:36
 #: includes/Admin/EntriesTable.php:313
 #: includes/Core.php:85
 msgid "Add New Form"
 msgstr ""
 
-#: admin/views/forms-list.php:41
+#: admin/views/forms-list.php:44
 msgid "Form duplicated successfully."
 msgstr ""
 
-#: admin/views/forms-list.php:49
+#: admin/views/forms-list.php:54
+#: includes/Admin/Builder.php:251
+msgid "Form imported successfully."
+msgstr ""
+
+#: admin/views/forms-list.php:62
 msgid "No forms yet. Start from scratch or pick a ready-made template."
 msgstr ""
 
-#: admin/views/forms-list.php:53
+#: admin/views/forms-list.php:66
 msgid "Browse Templates"
 msgstr ""
 
-#: admin/views/forms-list.php:56
+#: admin/views/forms-list.php:69
 msgid "Create Your First Form"
 msgstr ""
 
-#: admin/views/forms-list.php:64
+#: admin/views/forms-list.php:77
 msgid "Name"
 msgstr ""
 
-#: admin/views/forms-list.php:65
+#: admin/views/forms-list.php:78
 msgid "Shortcode"
 msgstr ""
 
-#: admin/views/forms-list.php:66
+#: admin/views/forms-list.php:79
 #: includes/Core.php:193
 msgid "Entries"
 msgstr ""
 
-#: admin/views/forms-list.php:67
+#: admin/views/forms-list.php:80
 msgid "Status"
 msgstr ""
 
-#: admin/views/forms-list.php:68
+#: admin/views/forms-list.php:81
 msgid "Created"
 msgstr ""
 
-#: admin/views/forms-list.php:69
-#: includes/Admin/EntriesTable.php:155
+#: admin/views/forms-list.php:82
+#: includes/Admin/EntriesTable.php:156
 msgid "Actions"
 msgstr ""
 
-#: admin/views/forms-list.php:101
+#: admin/views/forms-list.php:107
+msgid "Click to deactivate"
+msgstr ""
+
+#: admin/views/forms-list.php:107
+msgid "Click to activate"
+msgstr ""
+
+#: admin/views/forms-list.php:115
 #: includes/Core.php:391
 msgid "Edit"
 msgstr ""
 
-#: admin/views/forms-list.php:104
+#: admin/views/forms-list.php:118
 #: includes/Core.php:390
 msgid "Duplicate"
 msgstr ""
 
-#: admin/views/forms-list.php:107
+#: admin/views/forms-list.php:121
+msgid "Export JSON"
+msgstr ""
+
+#: admin/views/forms-list.php:124
 #: includes/Core.php:392
 msgid "Delete"
 msgstr ""
@@ -478,16 +587,32 @@ msgstr ""
 msgid "Copy"
 msgstr ""
 
-#: includes/Admin/Builder.php:137
+#: includes/Admin/Builder.php:139
 msgid "Invalid JSON in form field data."
 msgstr ""
 
-#: includes/Admin/Builder.php:142
+#: includes/Admin/Builder.php:144
 msgid "Invalid JSON in form settings."
 msgstr ""
 
-#: includes/Admin/Builder.php:159
+#: includes/Admin/Builder.php:161
 msgid "Form updated successfully."
+msgstr ""
+
+#: includes/Admin/Builder.php:183
+msgid "Form not found."
+msgstr ""
+
+#: includes/Admin/Builder.php:225
+msgid "No data received."
+msgstr ""
+
+#: includes/Admin/Builder.php:230
+msgid "Invalid GenForm JSON file."
+msgstr ""
+
+#: includes/Admin/Builder.php:233
+msgid "Imported Form"
 msgstr ""
 
 #: includes/Admin/EntriesTable.php:139
@@ -503,46 +628,58 @@ msgid "Trash"
 msgstr ""
 
 #: includes/Admin/EntriesTable.php:151
-msgid "ID"
+msgid "Starred"
 msgstr ""
 
 #: includes/Admin/EntriesTable.php:152
-msgid "Form Name"
+msgid "ID"
 msgstr ""
 
 #: includes/Admin/EntriesTable.php:153
-msgid "Entry Preview"
+msgid "Form Name"
 msgstr ""
 
 #: includes/Admin/EntriesTable.php:154
+msgid "Entry Preview"
+msgstr ""
+
+#: includes/Admin/EntriesTable.php:155
 #: includes/Core.php:357
 #: includes/Handlers/ExportHandler.php:95
 msgid "Date"
 msgstr ""
 
-#: includes/Admin/EntriesTable.php:177
-#: includes/Admin/EntriesTable.php:254
+#: includes/Admin/EntriesTable.php:178
+#: includes/Admin/EntriesTable.php:269
 msgid "Restore"
 msgstr ""
 
-#: includes/Admin/EntriesTable.php:178
+#: includes/Admin/EntriesTable.php:179
 msgid "Delete permanently"
 msgstr ""
 
-#: includes/Admin/EntriesTable.php:181
-#: includes/Admin/EntriesTable.php:274
+#: includes/Admin/EntriesTable.php:182
+#: includes/Admin/EntriesTable.php:289
 msgid "Move to Trash"
+msgstr ""
+
+#: includes/Admin/EntriesTable.php:198
+msgid "Unstar"
+msgstr ""
+
+#: includes/Admin/EntriesTable.php:198
+msgid "Star"
 msgstr ""
 
 #: includes/Admin/EntriesTable.php:256
 msgid "Delete Permanently"
 msgstr ""
 
-#: includes/Admin/EntriesTable.php:268
+#: includes/Admin/EntriesTable.php:283
 msgid "View full detail"
 msgstr ""
 
-#: includes/Admin/EntriesTable.php:272
+#: includes/Admin/EntriesTable.php:287
 msgid "Quick view"
 msgstr ""
 
@@ -817,6 +954,14 @@ msgstr ""
 msgid "Step"
 msgstr ""
 
+#: includes/Core.php:410
+msgid "Min Length"
+msgstr ""
+
+#: includes/Core.php:411
+msgid "Max Length"
+msgstr ""
+
 #: includes/Core.php:380
 msgid "This value is sent with the form but not visible to users."
 msgstr ""
@@ -869,7 +1014,7 @@ msgstr ""
 msgid "e.g."
 msgstr ""
 
-#: includes/Core.php:417
+#: includes/Core.php:416
 msgid "Entry Details"
 msgstr ""
 
@@ -883,6 +1028,10 @@ msgstr ""
 
 #: includes/Core.php:484
 msgid "Please accept the consent checkbox to proceed."
+msgstr ""
+
+#: includes/Core.php:530
+msgid "Please complete the reCAPTCHA verification."
 msgstr ""
 
 #: includes/Core.php:485
@@ -907,6 +1056,14 @@ msgstr ""
 
 #: includes/Handlers/FormHandler.php:63
 msgid "Too many submissions. Please try again later."
+msgstr ""
+
+#: includes/Handlers/FormHandler.php:67
+msgid "Please complete the reCAPTCHA verification."
+msgstr ""
+
+#: includes/Handlers/FormHandler.php:82
+msgid "reCAPTCHA verification failed. Please try again."
 msgstr ""
 
 #: includes/Handlers/FormHandler.php:76

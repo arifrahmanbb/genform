@@ -75,6 +75,65 @@ final class Email
 	}
 
 	/**
+	 * Send an auto-response confirmation email to the form submitter.
+	 * Only fires when the form has confirmation email enabled and a valid recipient field.
+	 */
+	public static function sendConfirmation(int $form_id, array $data): void
+	{
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$form = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}genform_forms WHERE id = %d", $form_id));
+		if (! $form) {
+			return;
+		}
+
+		$settings = json_decode($form->form_settings, true);
+
+		if (empty($settings['gfm_conf_enabled'])) {
+			return;
+		}
+
+		// Resolve the recipient: use the configured email field key.
+		$email_field = $settings['gfm_conf_to_field'] ?? 'email';
+		$to          = $data[$email_field] ?? '';
+		if (! is_email($to)) {
+			return;
+		}
+
+		$tags = array(
+			'{form_name}'   => $form->form_name,
+			'{site_title}'  => get_bloginfo('name'),
+			'{all_fields}'  => self::buildFieldsHtml($data),
+		);
+		foreach ($data as $key => $val) {
+			$tags["{field_{$key}}"] = is_array($val) ? implode(', ', $val) : (string) $val;
+		}
+
+		$subject = str_replace(
+			array_keys($tags),
+			array_values($tags),
+			$settings['gfm_conf_subject'] ?: esc_html__('Thank you for contacting us — {form_name}', 'genform')
+		);
+
+		$style = '<style>.gfm-mail-table{width:100%;border-collapse:collapse;font-family:sans-serif}.gfm-mail-label{padding:10px;border:1px solid #eee;background:#f9f9f9;width:30%}.gfm-mail-value{padding:10px;border:1px solid #eee}</style>';
+		$body  = wpautop(str_replace(
+			array_keys($tags),
+			array_values($tags),
+			$style . ($settings['gfm_conf_body'] ?: esc_html__("Hi,\n\nThank you for your submission. We'll get back to you shortly.\n\n{all_fields}", 'genform'))
+		));
+
+		$global_options = get_option('genform_general', array());
+		$from_name      = ! empty($settings['gfm_from_name']) ? $settings['gfm_from_name'] : ($global_options['from_name'] ?? get_bloginfo('name'));
+		$from_email     = ! empty($settings['gfm_from_email']) ? $settings['gfm_from_email'] : ($global_options['from_email'] ?? get_bloginfo('admin_email'));
+		$headers        = array(
+			'Content-Type: text/html; charset=UTF-8',
+			"From: {$from_name} <{$from_email}>",
+		);
+
+		wp_mail($to, $subject, $body, $headers);
+	}
+
+	/**
 	 * Helper to generate the tabular representation of all form fields.
 	 */
 	private static function buildFieldsHtml(array $data): string

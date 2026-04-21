@@ -24,6 +24,8 @@ final class Builder {
 		add_action( 'admin_init', array( $this, 'handleSave' ) );
 		add_action( 'admin_init', array( $this, 'handleDeleteForm' ) );
 		add_action( 'admin_init', array( $this, 'handleDuplicate' ) );
+		add_action( 'admin_init', array( $this, 'handleJsonExport' ) );
+		add_action( 'wp_ajax_genform_import_form_json', array( $this, 'handleJsonImport' ) );
 	}
 
 	/**
@@ -164,6 +166,92 @@ final class Builder {
 			wp_safe_redirect( admin_url( "admin.php?page=genform-builder&action=edit&form_id=$new_id&_wpnonce=" . wp_create_nonce( 'genform_edit_form' ) ) );
 			exit;
 		}
+	}
+
+	/**
+	 * Streams a single form's structure as a downloadable JSON file.
+	 */
+	public function handleJsonExport(): void {
+		$action  = isset( $_GET['action'] ) ? sanitize_text_field( wp_unslash( $_GET['action'] ) ) : '';
+		$form_id = isset( $_GET['form_id'] ) ? absint( wp_unslash( $_GET['form_id'] ) ) : 0;
+
+		if ( 'genform_json_export' !== $action || ! $form_id ) {
+			return;
+		}
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Unauthorized.', 'genform' ) );
+		}
+
+		$nonce = isset( $_GET['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ) : '';
+		if ( ! wp_verify_nonce( $nonce, 'genform_json_export_' . $form_id ) ) {
+			wp_die( esc_html__( 'Security check failed.', 'genform' ) );
+		}
+
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$form = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}genform_forms WHERE id = %d", $form_id ) );
+		if ( ! $form ) {
+			wp_die( esc_html__( 'Form not found.', 'genform' ) );
+		}
+
+		$export = array(
+			'genform_export' => true,
+			'version'        => GENFORM_VERSION,
+			'form_name'      => $form->form_name,
+			'form_data'      => json_decode( $form->form_data, true ),
+			'form_settings'  => json_decode( $form->form_settings, true ),
+		);
+
+		$filename = sanitize_file_name( $form->form_name ) . '-genform.json';
+		header( 'Content-Type: application/json' );
+		header( 'Content-Disposition: attachment; filename=' . $filename );
+		header( 'Cache-Control: no-cache' );
+		echo wp_json_encode( $export, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		exit;
+	}
+
+	/**
+	 * AJAX handler to import a form from uploaded JSON.
+	 */
+	public function handleJsonImport(): void {
+		check_ajax_referer( 'genform_admin_nonce', 'nonce' );
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => esc_html__( 'Unauthorized.', 'genform' ) ) );
+		}
+
+		$json_raw = isset( $_POST['json_data'] ) ? wp_unslash( $_POST['json_data'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		if ( empty( $json_raw ) ) {
+			wp_send_json_error( array( 'message' => esc_html__( 'No data received.', 'genform' ) ) );
+		}
+
+		$import = json_decode( (string) $json_raw, true );
+		if ( json_last_error() !== JSON_ERROR_NONE || empty( $import['genform_export'] ) ) {
+			wp_send_json_error( array( 'message' => esc_html__( 'Invalid GenForm JSON file.', 'genform' ) ) );
+		}
+
+		$form_name     = sanitize_text_field( $import['form_name'] ?? esc_html__( 'Imported Form', 'genform' ) );
+		$form_data     = wp_json_encode( $this->sanitizeRecursive( $import['form_data'] ?? array() ) );
+		$form_settings = wp_json_encode( $this->sanitizeRecursive( $import['form_settings'] ?? array() ) );
+
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		$wpdb->insert(
+			"{$wpdb->prefix}genform_forms",
+			array(
+				'form_name'     => $form_name . ' (' . esc_html__( 'Import', 'genform' ) . ')',
+				'form_data'     => $form_data,
+				'form_settings' => $form_settings,
+				'status'        => 'active',
+			)
+		);
+
+		wp_send_json_success(
+			array(
+				'message'  => esc_html__( 'Form imported successfully.', 'genform' ),
+				'redirect' => admin_url( 'admin.php?page=genform&imported=1' ),
+			)
+		);
 	}
 
 	/**

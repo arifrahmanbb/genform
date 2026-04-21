@@ -93,7 +93,10 @@ class GenFormBuilder {
                     'gfm-reply-to': initialSettings.gfm_reply_to || '{field_email}',
                     'gfm-email-subject': initialSettings.gfm_email_subject || '',
                     'gfm-email-body': initialSettings.gfm_email_body || '',
-                    'gfm-gdpr-text': initialSettings.gfm_gdpr_text || 'I consent to having this website store my submitted information.'
+                    'gfm-gdpr-text': initialSettings.gfm_gdpr_text || 'I consent to having this website store my submitted information.',
+                    'gfm-conf-to-field': initialSettings.gfm_conf_to_field || 'email',
+                    'gfm-conf-subject': initialSettings.gfm_conf_subject || '',
+                    'gfm-conf-body': initialSettings.gfm_conf_body || '',
                 };
 
                 for (const id in mapping) {
@@ -104,6 +107,12 @@ class GenFormBuilder {
                 // Handle GDPR checkbox separately (checked state, not value).
                 const gdprCheckbox = document.getElementById('gfm-gdpr-enabled');
                 if (gdprCheckbox) gdprCheckbox.checked = !!initialSettings.gfm_gdpr_enabled;
+
+                // Handle reCAPTCHA and confirmation email checkboxes.
+                const recaptchaCheckbox = document.getElementById('gfm-recaptcha-enabled');
+                if (recaptchaCheckbox) recaptchaCheckbox.checked = !!initialSettings.gfm_recaptcha_enabled;
+                const confCheckbox = document.getElementById('gfm-conf-enabled');
+                if (confCheckbox) confCheckbox.checked = !!initialSettings.gfm_conf_enabled;
             }
         }
 
@@ -191,6 +200,7 @@ class GenFormBuilder {
             // Type-specific defaults.
             ...(type === 'textarea' ? { rows: 4 } : {}),
             ...(type === 'number' ? { min: '', max: '', step: '' } : {}),
+            ...(['text', 'email', 'url', 'tel', 'textarea'].includes(type) ? { minlength: '', maxlength: '' } : {}),
         };
 
         this.fields.push(field);
@@ -326,6 +336,20 @@ class GenFormBuilder {
                         <input type="number" class="gfm-setter" data-prop="rows" value="${f.rows || 4}" min="2" max="20">
                     </div>
                     <div class="gfm-col"></div>
+                </div>`;
+        }
+
+        if (['text', 'email', 'url', 'tel', 'textarea'].includes(f.type)) {
+            html += `
+                <div class="gfm-grid">
+                    <div class="gfm-col">
+                        <label>${this.t('min_length', 'Min Length')}</label>
+                        <input type="number" class="gfm-setter" data-prop="minlength" value="${this.escape(f.minlength || '')}" min="0" placeholder="${this.t('example_prefix', 'e.g.')} 5">
+                    </div>
+                    <div class="gfm-col">
+                        <label>${this.t('max_length', 'Max Length')}</label>
+                        <input type="number" class="gfm-setter" data-prop="maxlength" value="${this.escape(f.maxlength || '')}" min="1" placeholder="${this.t('example_prefix', 'e.g.')} 200">
+                    </div>
                 </div>`;
         }
 
@@ -651,6 +675,11 @@ class GenFormBuilder {
             gfm_email_body: document.getElementById('gfm-email-body')?.value,
             gfm_gdpr_enabled: document.getElementById('gfm-gdpr-enabled')?.checked ? '1' : '',
             gfm_gdpr_text: document.getElementById('gfm-gdpr-text')?.value,
+            gfm_recaptcha_enabled: document.getElementById('gfm-recaptcha-enabled')?.checked ? '1' : '',
+            gfm_conf_enabled: document.getElementById('gfm-conf-enabled')?.checked ? '1' : '',
+            gfm_conf_to_field: document.getElementById('gfm-conf-to-field')?.value,
+            gfm_conf_subject: document.getElementById('gfm-conf-subject')?.value,
+            gfm_conf_body: document.getElementById('gfm-conf-body')?.value,
         };
 
         if (this.dataInput) this.dataInput.value = JSON.stringify({ fields: this.fields });

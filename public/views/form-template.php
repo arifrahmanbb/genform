@@ -57,12 +57,20 @@ $gfm_submit_align     = esc_attr($settings['gfm_submit_align'] ?? 'left');
 										if ($genform_rows < 2) {
 											$genform_rows = 4;
 										}
+										$genform_len_attrs = '';
+										if (! empty($genform_field['minlength'])) {
+											$genform_len_attrs .= ' minlength="' . absint($genform_field['minlength']) . '"';
+										}
+										if (! empty($genform_field['maxlength'])) {
+											$genform_len_attrs .= ' maxlength="' . absint($genform_field['maxlength']) . '"';
+										}
 										printf(
-											'<textarea name="%1$s" class="gfm-textarea" rows="%2$d" placeholder="%3$s" %4$s>%5$s</textarea>',
+											'<textarea name="%1$s" class="gfm-textarea" rows="%2$d" placeholder="%3$s" %4$s%5$s>%6$s</textarea>',
 											esc_attr($genform_field_name),
 											(int) $genform_rows, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 											esc_attr($genform_field_placeholder),
 											esc_attr($genform_field_required),
+											$genform_len_attrs, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 											esc_textarea($genform_field['default_value'] ?? '')
 										);
 										break;
@@ -130,13 +138,21 @@ $gfm_submit_align     = esc_attr($settings['gfm_submit_align'] ?? 'left');
 										break;
 
 									default:
+										$genform_input_len = '';
+										if (! empty($genform_field['minlength'])) {
+											$genform_input_len .= ' minlength="' . absint($genform_field['minlength']) . '"';
+										}
+										if (! empty($genform_field['maxlength'])) {
+											$genform_input_len .= ' maxlength="' . absint($genform_field['maxlength']) . '"';
+										}
 										printf(
-											'<input type="%1$s" name="%2$s" class="gfm-input" placeholder="%3$s" value="%4$s" %5$s>',
+											'<input type="%1$s" name="%2$s" class="gfm-input" placeholder="%3$s" value="%4$s" %5$s%6$s>',
 											esc_attr($genform_field['type']),
 											esc_attr($genform_field_name),
 											esc_attr($genform_field_placeholder),
 											esc_attr($genform_field['default_value'] ?? ''),
-											esc_attr($genform_field_required)
+											esc_attr($genform_field_required),
+											$genform_input_len // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 										);
 										break;
 								}
@@ -169,6 +185,16 @@ $gfm_submit_align     = esc_attr($settings['gfm_submit_align'] ?? 'left');
 					</span>
 				</label>
 			</div>
+		<?php endif; ?>
+
+		<?php
+		$genform_global_opts = get_option( 'genform_general', array() );
+		$genform_recaptcha_key = $genform_global_opts['recaptcha_site_key'] ?? '';
+		if ( $genform_recaptcha_key && ! empty( $settings['gfm_recaptcha_enabled'] ) ) :
+		?>
+		<div class="gfm-form-field gfm-w-100 gfm-recaptcha-wrap">
+			<div class="g-recaptcha" data-sitekey="<?php echo esc_attr( $genform_recaptcha_key ); ?>"></div>
+		</div>
 		<?php endif; ?>
 
 		<div class="gfm-submit-wrap gfm-align-<?php echo esc_attr($gfm_submit_align); ?>">

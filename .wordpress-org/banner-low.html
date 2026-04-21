@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 772px;
+    height: 250px;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f8f7ff;
+  }
+
+  .banner {
+    width: 772px;
+    height: 250px;
+    display: flex;
+    align-items: stretch;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Left indigo accent strip */
+  .accent {
+    width: 6px;
+    background: linear-gradient(180deg, #6366f1 0%, #4338ca 100%);
+    flex-shrink: 0;
+  }
+
+  /* Left content area */
+  .left {
+    flex: 0 0 390px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 36px 40px 36px 36px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .logo-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .logo-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 14px rgba(99,102,241,0.4);
+    flex-shrink: 0;
+  }
+
+  .logo-icon svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .logo-text {
+    font-size: 28px;
+    font-weight: 800;
+    color: #1e1b4b;
+    letter-spacing: -0.5px;
+    line-height: 1;
+  }
+
+  .logo-text span {
+    color: #6366f1;
+  }
+
+  .tagline {
+    font-size: 15px;
+    color: #4b5563;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    max-width: 300px;
+    font-weight: 500;
+  }
+
+  .features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  .feature-pill {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: white;
+    border: 1.5px solid #e0e7ff;
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 11.5px;
+    color: #4338ca;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .feature-pill::before {
+    content: '✓';
+    color: #6366f1;
+    font-weight: 800;
+    font-size: 11px;
+  }
+
+  /* Right area — form UI mockup */
+  .right {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* Background circles */
+  .bg-circle-1 {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%);
+    top: -80px;
+    right: -60px;
+  }
+
+  .bg-circle-2 {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(67,56,202,0.08) 0%, transparent 70%);
+    bottom: -60px;
+    right: 60px;
+  }
+
+  /* Form card mockup */
+  .form-card {
+    width: 220px;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(99,102,241,0.18), 0 2px 8px rgba(0,0,0,0.06);
+    padding: 16px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .form-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .header-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #6366f1;
+  }
+
+  .header-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #1e1b4b;
+  }
+
+  .field-group {
+    margin-bottom: 9px;
+  }
+
+  .field-label {
+    height: 6px;
+    width: 50px;
+    background: #e0e7ff;
+    border-radius: 4px;
+    margin-bottom: 5px;
+  }
+
+  .field-input {
+    height: 20px;
+    background: #f8f7ff;
+    border: 1.5px solid #e0e7ff;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .field-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 9px;
+  }
+
+  .field-row .field-group {
+    flex: 1;
+    margin-bottom: 0;
+  }
+
+  .submit-btn {
+    height: 28px;
+    background: linear-gradient(135deg, #6366f1, #4338ca);
+    border-radius: 7px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+    box-shadow: 0 3px 10px rgba(99,102,241,0.35);
+  }
+
+  .submit-text {
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 0.3px;
+  }
+
+  /* Floating badge */
+  .badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: #10b981;
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 9px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(16,185,129,0.4);
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+
+  /* Separator line */
+  .divider {
+    position: absolute;
+    left: 396px;
+    top: 20px;
+    bottom: 20px;
+    width: 1px;
+    background: linear-gradient(180deg, transparent, #e0e7ff 30%, #e0e7ff 70%, transparent);
+  }
+</style>
+</head>
+<body>
+<div class="banner">
+  <div class="accent"></div>
+
+  <div class="left">
+    <div class="logo-row">
+      <div class="logo-icon">
+        <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="4" width="20" height="22" rx="3" fill="white" opacity="0.25"/>
+          <rect x="4" y="4" width="20" height="22" rx="3" stroke="white" stroke-width="1.5" fill="none"/>
+          <rect x="8" y="10" width="12" height="2" rx="1" fill="white" opacity="0.8"/>
+          <rect x="8" y="14" width="12" height="2" rx="1" fill="white" opacity="0.8"/>
+          <rect x="8" y="18" width="7" height="2" rx="1" fill="white" opacity="0.8"/>
+          <rect x="17" y="17" width="7" height="5" rx="2" fill="white"/>
+          <polyline points="18.5,19.5 20,21 23,18" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="logo-text">Gen<span>Form</span></div>
+    </div>
+
+    <p class="tagline">The smart, lightweight drag-and-drop form builder for WordPress.</p>
+
+    <div class="features">
+      <span class="feature-pill">12 Field Types</span>
+      <span class="feature-pill">Email Notifications</span>
+      <span class="feature-pill">Entry Management</span>
+      <span class="feature-pill">CSV Export</span>
+      <span class="feature-pill">JSON Import/Export</span>
+      <span class="feature-pill">reCAPTCHA</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="right">
+    <div class="bg-circle-1"></div>
+    <div class="bg-circle-2"></div>
+
+    <div class="form-card">
+      <div class="badge">Free</div>
+      <div class="form-card-header">
+        <div class="header-dot"></div>
+        <div class="header-title">Contact Form</div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label"></div>
+        <div class="field-input"></div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label" style="width:45px;"></div>
+        <div class="field-input"></div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <div class="field-label" style="width:38px;"></div>
+          <div class="field-input"></div>
+        </div>
+        <div class="field-group">
+          <div class="field-label" style="width:42px;"></div>
+          <div class="field-input"></div>
+        </div>
+      </div>
+
+      <div class="submit-btn">
+        <span class="submit-text">Submit Message</span>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

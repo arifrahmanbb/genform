@@ -32,6 +32,8 @@ final class FormHandler
 		add_action('wp_ajax_genform_trash_entry', array($this, 'handleTrashEntry'));
 		add_action('wp_ajax_genform_delete_form', array($this, 'handleDeleteFormAjax'));
 		add_action('wp_ajax_genform_mark_as_read', array($this, 'handleMarkAsRead'));
+		add_action('wp_ajax_genform_star_entry', array($this, 'handleStarEntry'));
+		add_action('wp_ajax_genform_toggle_form_status', array($this, 'handleToggleFormStatus'));
 		add_action('admin_init', array($this, 'processBulkActions'));
 	}
 
@@ -53,6 +55,33 @@ final class FormHandler
 		if (! empty($honeypot)) {
 			// Silently reject — do NOT reveal bot detection to attackers.
 			wp_send_json_success(array('message' => esc_html__('Thank you! Your submission has been received.', 'genform')));
+		}
+
+		// reCAPTCHA v2 verification.
+		$options         = get_option( 'genform_general', array() );
+		$recaptcha_secret = $options['recaptcha_secret_key'] ?? '';
+		if ( $recaptcha_secret ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$recaptcha_token = isset( $_POST['g-recaptcha-response'] ) ? sanitize_text_field( wp_unslash( $_POST['g-recaptcha-response'] ) ) : '';
+			if ( empty( $recaptcha_token ) ) {
+				$this->sendError( esc_html__( 'Please complete the reCAPTCHA verification.', 'genform' ), $form_id );
+			}
+			$verify = wp_remote_post(
+				'https://www.google.com/recaptcha/api/siteverify',
+				array(
+					'body' => array(
+						'secret'   => $recaptcha_secret,
+						'response' => $recaptcha_token,
+						'remoteip' => sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ?? '' ) ),
+					),
+				)
+			);
+			if ( ! is_wp_error( $verify ) ) {
+				$verify_body = json_decode( wp_remote_retrieve_body( $verify ), true );
+				if ( empty( $verify_body['success'] ) ) {
+					$this->sendError( esc_html__( 'reCAPTCHA verification failed. Please try again.', 'genform' ), $form_id );
+				}
+			}
 		}
 
 		// Rate limiting (5 submissions per minute per IP).
@@ -123,8 +152,9 @@ final class FormHandler
 			)
 		);
 
-		// Send email notification.
+		// Send admin notification and optional confirmation to submitter.
 		Email::send($wpdb->insert_id, $form_id, $entry_data);
+		Email::sendConfirmation($form_id, $entry_data);
 
 		/**
 		 * Fires after a submission is saved.
@@ -318,5 +348,49 @@ final class FormHandler
 			wp_send_json_success();
 		}
 		wp_send_json_error();
+	}
+
+	/**
+	 * Admin AJAX handler for toggling an entry's starred state.
+	 */
+	public function handleStarEntry(): void
+	{
+		check_ajax_referer('genform_admin_nonce', 'nonce');
+		if (! current_user_can('manage_options')) {
+			wp_send_json_error();
+		}
+		$entry_id = isset($_POST['entry_id']) ? absint(wp_unslash($_POST['entry_id'])) : 0;
+		if (! $entry_id) {
+			wp_send_json_error();
+		}
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$current = $wpdb->get_var($wpdb->prepare("SELECT starred FROM {$wpdb->prefix}genform_entries WHERE id = %d", $entry_id));
+		$new_val = $current ? 0 : 1;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->update("{$wpdb->prefix}genform_entries", array('starred' => $new_val), array('id' => $entry_id));
+		wp_send_json_success(array('starred' => (bool) $new_val));
+	}
+
+	/**
+	 * Admin AJAX handler for toggling a form's active/inactive status.
+	 */
+	public function handleToggleFormStatus(): void
+	{
+		check_ajax_referer('genform_admin_nonce', 'nonce');
+		if (! current_user_can('manage_options')) {
+			wp_send_json_error();
+		}
+		$form_id = isset($_POST['form_id']) ? absint(wp_unslash($_POST['form_id'])) : 0;
+		if (! $form_id) {
+			wp_send_json_error();
+		}
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$current = $wpdb->get_var($wpdb->prepare("SELECT status FROM {$wpdb->prefix}genform_forms WHERE id = %d", $form_id));
+		$new_status = ('active' === $current) ? 'inactive' : 'active';
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->update("{$wpdb->prefix}genform_forms", array('status' => $new_status), array('id' => $form_id));
+		wp_send_json_success(array('status' => $new_status));
 	}
 }

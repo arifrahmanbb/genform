@@ -408,6 +408,8 @@ final class Core {
 						'min_value'             => esc_html__( 'Min Value', 'genform' ),
 						'max_value'             => esc_html__( 'Max Value', 'genform' ),
 						'step'                  => esc_html__( 'Step', 'genform' ),
+						'min_length'            => esc_html__( 'Min Length', 'genform' ),
+						'max_length'            => esc_html__( 'Max Length', 'genform' ),
 						'hidden_desc'           => esc_html__( 'This value is sent with the form but not visible to users.', 'genform' ),
 						// Options.
 						'options_title'         => esc_html__( 'Options', 'genform' ),
@@ -504,17 +506,32 @@ final class Core {
 				'in_footer' => true,
 			)
 		);
+
+		$genform_options  = get_option( 'genform_general', array() );
+		$recaptcha_key    = $genform_options['recaptcha_site_key'] ?? '';
+		if ( $recaptcha_key ) {
+			wp_enqueue_script(
+				'google-recaptcha',
+				'https://www.google.com/recaptcha/api.js',
+				array(),
+				null, // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
+				array( 'in_footer' => false )
+			);
+		}
+
 		wp_localize_script(
 			'genform-frontend',
 			'genform',
 			array(
-				'ajax_url' => admin_url( 'admin-ajax.php' ),
-				'i18n'     => array(
-					'submitting'     => esc_html__( 'Submitting...', 'genform' ),
-					'checkbox_error' => esc_html__( 'Please select at least one option for required checkbox fields.', 'genform' ),
-					'gdpr_error'     => esc_html__( 'Please accept the consent checkbox to proceed.', 'genform' ),
-					'generic_error'  => esc_html__( 'An error occurred.', 'genform' ),
-					'unknown_error'  => esc_html__( 'An unknown error occurred.', 'genform' ),
+				'ajax_url'       => admin_url( 'admin-ajax.php' ),
+				'recaptcha_key'  => $recaptcha_key,
+				'i18n'           => array(
+					'submitting'       => esc_html__( 'Submitting...', 'genform' ),
+					'checkbox_error'   => esc_html__( 'Please select at least one option for required checkbox fields.', 'genform' ),
+					'gdpr_error'       => esc_html__( 'Please accept the consent checkbox to proceed.', 'genform' ),
+					'recaptcha_error'  => esc_html__( 'Please complete the reCAPTCHA verification.', 'genform' ),
+					'generic_error'    => esc_html__( 'An error occurred.', 'genform' ),
+					'unknown_error'    => esc_html__( 'An unknown error occurred.', 'genform' ),
 				),
 			)
 		);
@@ -561,8 +578,11 @@ final class Core {
 			user_ip varchar(100) DEFAULT '' NOT NULL,
 			user_agent varchar(255) DEFAULT '' NOT NULL,
 			status varchar(20) DEFAULT 'unread' NOT NULL,
+			starred tinyint(1) DEFAULT 0 NOT NULL,
 			created_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-			PRIMARY KEY  (id)
+			PRIMARY KEY  (id),
+			KEY form_id (form_id),
+			KEY status (status)
 		) $charset_collate;";
 
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';

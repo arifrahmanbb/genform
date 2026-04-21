@@ -68,10 +68,12 @@
     textarea::-webkit-scrollbar {
         width: 8px;
     }
+
     textarea::-webkit-scrollbar-track {
         background: $bg;
         border-radius: $radius-sm;
     }
+
     textarea::-webkit-scrollbar-thumb {
         background: $border;
         border-radius: $radius-sm;
@@ -110,7 +112,7 @@
             width: 0;
             height: 0;
 
-            &:checked + .slider {
+            &:checked+.slider {
                 background: $primary;
                 border-color: $primary;
 
@@ -172,7 +174,7 @@
                 transform: rotate(45deg) scale(1);
             }
         }
-        
+
         &:hover {
             border-color: $primary;
         }
@@ -222,12 +224,14 @@
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: $space-md;
         margin-bottom: $space-md;
-        
+
         .gfm-col {
             display: flex;
             flex-direction: column;
 
-            input, select, textarea {
+            input,
+            select,
+            textarea {
                 width: 100%;
             }
         }
@@ -238,6 +242,27 @@
     }
 
     // Spacing Helpers
-    .mt-0 { margin-top: 0 !important; }
-    .mb-0 { margin-bottom: 0 !important; }
+    .mt-0 {
+        margin-top: 0 !important;
+    }
+
+    .mb-0 {
+        margin-bottom: 0 !important;
+    }
+
+    .gfm-mt-sm {
+        margin-top: $space-sm !important;
+    }
+
+    .gfm-mt-md {
+        margin-top: $space-md !important;
+    }
+
+    .gfm-mt-lg {
+        margin-top: $space-lg !important;
+    }
+
+    .gfm-mb-md {
+        margin-bottom: $space-md !important;
+    }
 }

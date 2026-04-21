@@ -32,7 +32,7 @@
 
     tbody tr {
         transition: $transition-base;
-        
+
         &:last-child td {
             border-bottom: none;
         }
@@ -62,13 +62,13 @@
 
 .gfm-table-actions {
     display: flex;
-    gap: $space-xs;
+    gap: 10px;
 }
 
 .gfm-action-icon {
     @include flex-center;
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
     border-radius: $radius-sm;
     background: $white;
     border: 1px solid $border;
@@ -84,10 +84,15 @@
         box-shadow: $shadow-md;
     }
 
+    &.gfm-action-delete:hover {
+        border-color: $danger;
+        background: $danger !important;
+    }
+
     .dashicons {
-        font-size: 18px;
-        width: 18px;
-        height: 18px;
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
     }
 }
 
@@ -109,5 +114,73 @@
     &:hover {
         background: $primary;
         color: $white;
+    }
+}
+
+// Form status toggle switch
+.gfm-status-toggle {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+
+    input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+        position: absolute;
+    }
+
+    .gfm-toggle-slider {
+        width: 36px;
+        height: 20px;
+        background: $border;
+        border-radius: 20px;
+        transition: $transition-base;
+        position: relative;
+        flex-shrink: 0;
+
+        &::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 14px;
+            height: 14px;
+            background: $white;
+            border-radius: 50%;
+            transition: $transition-base;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+    }
+
+    input:checked + .gfm-toggle-slider {
+        background: $primary;
+
+        &::after {
+            transform: translateX(16px);
+        }
+    }
+}
+
+// Starred entry button
+.gfm-star-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: $text-light;
+    transition: $transition-base;
+    line-height: 1;
+
+    &:hover,
+    &.gfm-starred {
+        color: #f59e0b;
+    }
+
+    .dashicons {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
     }
 }

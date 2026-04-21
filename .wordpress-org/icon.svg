@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#4338ca"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#312e81" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect width="256" height="256" rx="44" fill="url(#bg)"/>
+
+  <!-- Subtle top-right highlight -->
+  <ellipse cx="210" cy="46" rx="80" ry="60" fill="#818cf8" opacity="0.25"/>
+
+  <!-- Document / form card -->
+  <rect x="52" y="48" width="152" height="168" rx="12" fill="white" filter="url(#shadow)"/>
+
+  <!-- Form header bar -->
+  <rect x="52" y="48" width="152" height="36" rx="12" fill="#eef2ff"/>
+  <rect x="52" y="72" width="152" height="12" fill="#eef2ff"/>
+
+  <!-- Header label dot -->
+  <circle cx="78" cy="66" r="7" fill="#6366f1"/>
+  <rect x="91" y="61" width="55" height="10" rx="5" fill="#c7d2fe"/>
+
+  <!-- Field row 1 -->
+  <rect x="68" y="104" width="70" height="8" rx="4" fill="#e0e7ff"/>
+  <rect x="68" y="118" width="120" height="14" rx="6" fill="#f5f3ff" stroke="#e0e7ff" stroke-width="1.5"/>
+
+  <!-- Field row 2 -->
+  <rect x="68" y="142" width="55" height="8" rx="4" fill="#e0e7ff"/>
+  <rect x="68" y="156" width="120" height="14" rx="6" fill="#f5f3ff" stroke="#e0e7ff" stroke-width="1.5"/>
+
+  <!-- Field row 3 - half width fields -->
+  <rect x="68" y="180" width="50" height="8" rx="4" fill="#e0e7ff"/>
+  <rect x="68" y="194" width="52" height="10" rx="5" fill="#f5f3ff" stroke="#e0e7ff" stroke-width="1.5"/>
+  <rect x="134" y="180" width="40" height="8" rx="4" fill="#e0e7ff"/>
+  <rect x="134" y="194" width="54" height="10" rx="5" fill="#f5f3ff" stroke="#e0e7ff" stroke-width="1.5"/>
+
+  <!-- Bottom: Submit button pill -->
+  <rect x="145" y="192" width="45" height="16" rx="8" fill="#6366f1"/>
+
+  <!-- Checkmark on button -->
+  <polyline points="151,200 155,204 163,196" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

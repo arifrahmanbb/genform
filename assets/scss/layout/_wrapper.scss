@@ -2,19 +2,167 @@
 
 .genform-admin-wrap {
     background: $bg;
-    padding: $space-lg;
+    padding: $space-lg $space-lg $space-xl;
     font-family: $font-main;
     color: $text-main;
+    min-height: calc(100vh - 32px);
+
+    // Override WP defaults inside our wrapper.
+    .wp-list-table {
+        margin-top: 0;
+    }
+
+    // Search box alignment fix.
+    .search-box {
+        display: flex;
+        align-items: center;
+        gap: $space-xs;
+        margin-bottom: 0;
+        float: right;
+
+        input[type="search"] {
+            height: 38px;
+            padding: 0 14px;
+            border: 1px solid $border;
+            border-radius: $radius-sm;
+            font-size: 13px;
+            min-width: 220px;
+            background: $white;
+            transition: $transition-base;
+
+            &:focus {
+                border-color: $primary;
+                box-shadow: 0 0 0 2px rgba($primary, 0.1);
+                outline: none;
+            }
+        }
+
+        .button {
+            height: 38px;
+            padding: 0 18px;
+            border-radius: $radius-sm;
+            font-size: 13px;
+            font-weight: $weight-bold;
+            border: 1px solid $border;
+            background: $white;
+            transition: $transition-base;
+
+            &:hover {
+                border-color: $primary;
+                color: $primary;
+                background: $primary-light;
+            }
+        }
+    }
+
+    // Filter bar alignment.
+    .tablenav {
+        margin: $space-sm 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: $space-sm;
+
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: $space-xs;
+            padding: 0;
+
+            select {
+                height: 38px;
+                padding: 0 12px;
+                border: 1px solid $border;
+                border-radius: $radius-sm;
+                font-size: 13px;
+                background: $white;
+                min-width: 160px;
+            }
+
+            .button {
+                height: 38px;
+                padding: 0 16px;
+                border-radius: $radius-sm;
+                font-size: 13px;
+                font-weight: $weight-bold;
+                border: 1px solid $border;
+                background: $white;
+
+                &:hover {
+                    border-color: $primary;
+                    color: $primary;
+                }
+            }
+        }
+
+        .tablenav-pages {
+            margin-left: auto;
+            font-size: 13px;
+
+            .button {
+                height: 34px;
+                min-width: 34px;
+                border-radius: $radius-sm;
+            }
+        }
+    }
+
+    // Sub-sub-sub views (All | Unread | Trash).
+    .subsubsub {
+        margin: 0 0 $space-sm;
+        font-size: 13px;
+        float: none;
+        display: flex;
+        gap: 4px;
+
+        li {
+            margin: 0;
+        }
+
+        a {
+            color: $text-muted;
+            text-decoration: none;
+            padding: 4px 8px;
+            border-radius: $radius-sm;
+            transition: $transition-base;
+
+            &:hover {
+                color: $primary;
+                background: $primary-light;
+            }
+
+            &.current {
+                color: $text-main;
+                font-weight: 700;
+            }
+        }
+    }
+
+    // Tablenav items count.
+    .displaying-num {
+        font-size: 13px;
+        color: $text-muted;
+    }
 }
 
 .gfm-header-flex {
     @include flex-between;
-    margin-bottom: $space-md;
+    margin-bottom: $space-lg;
+    padding: $space-xs 0;
 
     h1 {
-        font-size: 24px;
-        font-weight: 700;
+        font-size: 28px;
+        font-weight: 800;
         margin: 0;
+        letter-spacing: -0.02em;
+    }
+
+    .gfm-actions,
+    .gfm-header-actions {
+        display: flex;
+        gap: $space-sm;
+        align-items: center;
     }
 }
 
@@ -29,4 +177,3 @@
     transition: all 0.3s ease !important;
     pointer-events: none;
 }
-
