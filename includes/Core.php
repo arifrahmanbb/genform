@@ -64,6 +64,11 @@ final class Core {
 		add_action( 'genform_send_email_async',        array( 'GenForm\Integrations\Email', 'sendAsync' ),             10, 2 );
 		add_action( 'genform_send_confirmation_async', array( 'GenForm\Integrations\Email', 'sendConfirmationAsync' ), 10, 2 );
 
+		// Onboarding wizard AJAX handlers.
+		add_action( 'wp_ajax_genform_dismiss_onboarding', array( $this, 'ajaxDismissOnboarding' ) );
+		add_action( 'wp_ajax_genform_wizard_create_form', array( $this, 'ajaxWizardCreateForm' ) );
+		add_action( 'wp_ajax_genform_relaunch_wizard',    array( $this, 'ajaxRelaunchWizard' ) );
+
 		$this->loadComponents();
 	}
 
@@ -288,7 +293,223 @@ final class Core {
 		<?php if ( ! FeatureGate::isProActive() ) : ?>
 	<?php FeatureGate::renderUpgradeModal(); ?>
 	<?php endif; ?>
+
+		<?php if ( ! get_option( 'genform_onboarding_complete' ) ) : ?>
+		<!-- Onboarding Wizard -->
+		<div id="gfm-onboarding-wizard" class="gfm-wizard-overlay gfm-hidden" role="dialog" aria-modal="true" aria-label="<?php esc_attr_e( 'GenForm Setup Wizard', 'genform' ); ?>">
+			<div class="gfm-wizard-box">
+
+				<!-- Progress indicator -->
+				<div class="gfm-wizard-progress" aria-hidden="true">
+					<div class="gfm-wiz-step active" data-step="1"><span>1</span></div>
+					<div class="gfm-wiz-line"></div>
+					<div class="gfm-wiz-step" data-step="2"><span>2</span></div>
+					<div class="gfm-wiz-line"></div>
+					<div class="gfm-wiz-step" data-step="3"><span>3</span></div>
+				</div>
+
+				<!-- Step 1: Welcome -->
+				<div class="gfm-wiz-panel" data-panel="1">
+					<div class="gfm-wiz-icon-wrap">
+						<span class="dashicons dashicons-feedback"></span>
+					</div>
+					<h2><?php esc_html_e( 'Welcome to GenForm!', 'genform' ); ?></h2>
+					<p class="gfm-wiz-subtitle"><?php esc_html_e( "You're 3 minutes away from publishing your first form. Let's get you set up.", 'genform' ); ?></p>
+					<ul class="gfm-wiz-features">
+						<li><span class="dashicons dashicons-yes-alt"></span> <?php esc_html_e( 'Drag-and-drop form builder', 'genform' ); ?></li>
+						<li><span class="dashicons dashicons-yes-alt"></span> <?php esc_html_e( 'Email notifications on every submission', 'genform' ); ?></li>
+						<li><span class="dashicons dashicons-yes-alt"></span> <?php esc_html_e( 'All entries stored in your own site', 'genform' ); ?></li>
+					</ul>
+					<div class="gfm-wiz-actions">
+						<button type="button" class="gfm-btn gfm-btn-primary gfm-wiz-next-btn">
+							<?php esc_html_e( "Let's Start", 'genform' ); ?> <span class="dashicons dashicons-arrow-right-alt"></span>
+						</button>
+					</div>
+					<button type="button" class="gfm-wiz-skip"><?php esc_html_e( 'Skip for now', 'genform' ); ?></button>
+				</div>
+
+				<!-- Step 2: Choose start method -->
+				<div class="gfm-wiz-panel gfm-hidden" data-panel="2">
+					<h2><?php esc_html_e( 'How would you like to start?', 'genform' ); ?></h2>
+					<p class="gfm-wiz-subtitle"><?php esc_html_e( 'Pick a category and we\'ll pre-build a form for you — or start from scratch.', 'genform' ); ?></p>
+					<div class="gfm-wiz-categories">
+						<?php
+						$wizard_categories = array(
+							'general'    => array( 'icon' => 'dashicons-email-alt',        'label' => __( 'Contact Form', 'genform' ) ),
+							'business'   => array( 'icon' => 'dashicons-businessman',       'label' => __( 'Business', 'genform' ) ),
+							'booking'    => array( 'icon' => 'dashicons-calendar-alt',      'label' => __( 'Booking', 'genform' ) ),
+							'feedback'   => array( 'icon' => 'dashicons-format-chat',       'label' => __( 'Feedback', 'genform' ) ),
+							'marketing'  => array( 'icon' => 'dashicons-chart-area',        'label' => __( 'Marketing', 'genform' ) ),
+							'education'  => array( 'icon' => 'dashicons-welcome-learn-more','label' => __( 'Education', 'genform' ) ),
+							'healthcare' => array( 'icon' => 'dashicons-heart',             'label' => __( 'Healthcare', 'genform' ) ),
+							'blank'      => array( 'icon' => 'dashicons-plus-alt',          'label' => __( 'Start Blank', 'genform' ) ),
+						);
+						foreach ( $wizard_categories as $cat_slug => $cat ) :
+						?>
+							<button type="button" class="gfm-wiz-cat-card" data-category="<?php echo esc_attr( $cat_slug ); ?>">
+								<span class="dashicons <?php echo esc_attr( $cat['icon'] ); ?>"></span>
+								<span><?php echo esc_html( $cat['label'] ); ?></span>
+							</button>
+						<?php endforeach; ?>
+					</div>
+					<button type="button" class="gfm-wiz-skip"><?php esc_html_e( 'Skip for now', 'genform' ); ?></button>
+				</div>
+
+				<!-- Step 3: Notification email + create -->
+				<div class="gfm-wiz-panel gfm-hidden" data-panel="3">
+					<div class="gfm-wiz-icon-wrap gfm-wiz-icon-green">
+						<span class="dashicons dashicons-email-alt"></span>
+					</div>
+					<h2><?php esc_html_e( 'Where should we send submissions?', 'genform' ); ?></h2>
+					<p class="gfm-wiz-subtitle"><?php esc_html_e( "We'll send you an email every time someone fills in your form.", 'genform' ); ?></p>
+					<div class="gfm-wiz-email-wrap">
+						<label for="gfm-wiz-email"><?php esc_html_e( 'Notification Email', 'genform' ); ?></label>
+						<input
+							type="email"
+							id="gfm-wiz-email"
+							class="gfm-wiz-email-input"
+							value="<?php echo esc_attr( get_option( 'admin_email', '' ) ); ?>"
+							placeholder="<?php esc_attr_e( 'your@email.com', 'genform' ); ?>"
+						>
+					</div>
+					<div class="gfm-wiz-actions">
+						<button type="button" class="gfm-btn gfm-btn-primary gfm-wiz-create-btn">
+							<span class="gfm-wiz-create-label"><?php esc_html_e( 'Create My Form', 'genform' ); ?> <span class="dashicons dashicons-arrow-right-alt"></span></span>
+							<span class="gfm-wiz-create-loading gfm-hidden"><span class="gfm-wiz-spinner"></span> <?php esc_html_e( 'Creating...', 'genform' ); ?></span>
+						</button>
+					</div>
+					<button type="button" class="gfm-wiz-back">&larr; <?php esc_html_e( 'Back', 'genform' ); ?></button>
+				</div>
+
+			</div>
+		</div>
+		<?php endif; ?>
 	<?php
+	}
+
+	/**
+	 * AJAX: mark onboarding wizard as dismissed / complete.
+	 */
+	public function ajaxDismissOnboarding(): void {
+		check_ajax_referer( 'genform_admin_nonce', 'nonce' );
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error();
+		}
+		update_option( 'genform_onboarding_complete', 1 );
+		wp_send_json_success();
+	}
+
+	/**
+	 * AJAX: relaunch wizard by clearing the completed flag.
+	 */
+	public function ajaxRelaunchWizard(): void {
+		check_ajax_referer( 'genform_admin_nonce', 'nonce' );
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error();
+		}
+		delete_option( 'genform_onboarding_complete' );
+		wp_send_json_success();
+	}
+
+	/**
+	 * AJAX: create a form from the wizard (blank or from first template in a category)
+	 * then mark onboarding complete and return the builder redirect URL.
+	 */
+	public function ajaxWizardCreateForm(): void {
+		check_ajax_referer( 'genform_admin_nonce', 'nonce' );
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => esc_html__( 'Unauthorized', 'genform' ) ) );
+		}
+
+		$category           = sanitize_text_field( wp_unslash( $_POST['category'] ?? 'blank' ) );
+		$notification_email = sanitize_email( wp_unslash( $_POST['notification_email'] ?? get_option( 'admin_email' ) ) );
+
+		if ( ! is_email( $notification_email ) ) {
+			$notification_email = get_option( 'admin_email' );
+		}
+
+		$form_name = esc_html__( 'My First Form', 'genform' );
+		$fields    = array();
+		$settings  = array(
+			'gfm_notification_email' => $notification_email,
+			'gfm_submit_text'        => esc_html__( 'Submit', 'genform' ),
+			'gfm_success_message'    => esc_html__( 'Thank you! Your message has been sent.', 'genform' ),
+			'gfm_submit_align'       => 'left',
+		);
+
+		if ( 'blank' !== $category ) {
+			$all_templates = TemplateManager::getAll();
+			foreach ( $all_templates as $tpl ) {
+				if ( isset( $tpl['category'] ) && $tpl['category'] === $category ) {
+					$form_name = $tpl['name'];
+					$fields    = $tpl['fields'];
+					if ( isset( $tpl['settings'] ) && is_array( $tpl['settings'] ) ) {
+						$settings = array_merge( $settings, $tpl['settings'] );
+					}
+					// Always use wizard email.
+					$settings['gfm_notification_email'] = $notification_email;
+					break;
+				}
+			}
+		}
+
+		// Normalize fields same way Manager does.
+		$normalized = array();
+		$counter    = 0;
+		foreach ( $fields as $field ) {
+			++$counter;
+			$label    = $field['label'] ?? esc_html__( 'New Field', 'genform' );
+			$type     = $field['type'] ?? 'text';
+			$name     = sanitize_title( $label ) . '_' . $counter;
+			$options  = array();
+			if ( ! empty( $field['options'] ) && is_array( $field['options'] ) ) {
+				foreach ( $field['options'] as $opt ) {
+					if ( is_array( $opt ) && isset( $opt['label'] ) ) {
+						$options[] = $opt;
+					} else {
+						$options[] = array(
+							'label' => (string) $opt,
+							'value' => sanitize_title( (string) $opt ),
+						);
+					}
+				}
+			}
+			$normalized[] = array(
+				'id'            => 'field_' . $counter,
+				'type'          => $type,
+				'label'         => $label,
+				'name'          => $name,
+				'placeholder'   => $field['placeholder'] ?? '',
+				'required'      => ! empty( $field['required'] ),
+				'css_class'     => '',
+				'default_value' => '',
+				'width'         => '100',
+				'options'       => $options,
+			);
+		}
+
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		$inserted = $wpdb->insert(
+			"{$wpdb->prefix}genform_forms",
+			array(
+				'form_name'     => $form_name,
+				'form_data'     => wp_json_encode( array( 'fields' => $normalized ) ),
+				'form_settings' => wp_json_encode( $settings ),
+				'status'        => 'active',
+			)
+		);
+
+		if ( ! $inserted ) {
+			wp_send_json_error( array( 'message' => esc_html__( 'Failed to create form.', 'genform' ) ) );
+		}
+
+		$new_form_id = absint( $wpdb->insert_id );
+		update_option( 'genform_onboarding_complete', 1 );
+
+		wp_send_json_success( array(
+			'redirect' => admin_url( "admin.php?page=genform-builder&form_id={$new_form_id}&wizard=1" ),
+		) );
 	}
 
 	/**
@@ -449,6 +670,8 @@ final class Core {
 				'builder_url' => admin_url( 'admin.php?page=genform-builder' ),
 				'edit_nonce'  => wp_create_nonce( 'genform_edit_form' ),
 				'templates'   => TemplateManager::getAll(),
+				'showWizard'  => ! get_option( 'genform_onboarding_complete' ) && str_contains( $hook, 'genform' ),
+				'adminEmail'  => get_option( 'admin_email', '' ),
 				'i18n'        => array(
 					'confirm_delete' => esc_html__( 'Are you sure?', 'genform' ),
 					'entry_details'  => esc_html__( 'Entry Details', 'genform' ),

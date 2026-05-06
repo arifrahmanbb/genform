@@ -40,6 +40,15 @@ use GenForm\Pro\FeatureGate;
 		</form>
 	</div>
 
+	<div class="gfm-card" style="padding: 20px 24px;">
+		<h2 style="margin: 0 0 8px; font-size: 15px; font-weight: 700; color: #1e293b;"><?php esc_html_e( 'Setup Wizard', 'genform' ); ?></h2>
+		<p style="color: #64748b; font-size: 13px; margin: 0 0 14px;"><?php esc_html_e( 'Relaunch the onboarding wizard to create a new form with a guided walkthrough.', 'genform' ); ?></p>
+		<button type="button" id="gfm-relaunch-wizard-btn" class="button button-secondary">
+			<span class="dashicons dashicons-redo" style="vertical-align: middle; margin-top: -2px; margin-right: 4px;"></span>
+			<?php esc_html_e( 'Relaunch Setup Wizard', 'genform' ); ?>
+		</button>
+	</div>
+
 	<?php if ( ! FeatureGate::isProActive() ) : ?>
 	<div class="gfm-card gfm-pro-settings-card">
 		<div style="padding: 20px 24px 0;">

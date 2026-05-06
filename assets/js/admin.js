@@ -632,3 +632,120 @@
 	}
 })();
 
+/* ─── Onboarding Wizard ─────────────────────────────────────────────────────── */
+(function () {
+	'use strict';
+
+	if (typeof genform === 'undefined') return;
+
+	const wizard = document.getElementById('gfm-onboarding-wizard');
+	if (!wizard) return;
+
+	let selectedCategory = 'blank';
+
+	const panels     = wizard.querySelectorAll('.gfm-wiz-panel');
+	const steps      = wizard.querySelectorAll('.gfm-wiz-step');
+	const emailInput = wizard.querySelector('.gfm-wiz-email-input');
+
+	const showPanel = (n) => {
+		panels.forEach((p) => {
+			p.classList.toggle('gfm-hidden', +p.dataset.panel !== n);
+		});
+		steps.forEach((s) => {
+			const sn = +s.dataset.step;
+			s.classList.toggle('active', sn === n);
+			s.classList.toggle('done',   sn < n);
+		});
+	};
+
+	const openWizard = () => {
+		showPanel(1);
+		selectedCategory = 'blank';
+		wizard.classList.remove('gfm-hidden');
+		wizard.offsetHeight; // force reflow for CSS transition
+		wizard.classList.add('show');
+	};
+
+	const closeWizard = () => {
+		wizard.classList.remove('show');
+		setTimeout(() => wizard.classList.add('gfm-hidden'), 300);
+	};
+
+	const dismiss = async () => {
+		closeWizard();
+		await fetch(genform.ajax_url, {
+			method: 'POST',
+			body:   new URLSearchParams({ action: 'genform_dismiss_onboarding', nonce: genform.nonce }),
+		});
+	};
+
+	const createForm = async () => {
+		const btn       = wizard.querySelector('.gfm-wiz-create-btn');
+		const labelEl   = wizard.querySelector('.gfm-wiz-create-label');
+		const loadingEl = wizard.querySelector('.gfm-wiz-create-loading');
+		const email     = (emailInput && emailInput.value.trim()) || genform.adminEmail;
+
+		btn.disabled = true;
+		labelEl.classList.add('gfm-hidden');
+		loadingEl.classList.remove('gfm-hidden');
+
+		const body = new URLSearchParams({
+			action:             'genform_wizard_create_form',
+			nonce:              genform.nonce,
+			category:           selectedCategory,
+			notification_email: email,
+		});
+
+		try {
+			const res  = await fetch(genform.ajax_url, { method: 'POST', body });
+			const json = await res.json();
+			if (json.success && json.data.redirect) {
+				window.location.href = json.data.redirect;
+			} else {
+				btn.disabled = false;
+				labelEl.classList.remove('gfm-hidden');
+				loadingEl.classList.add('gfm-hidden');
+			}
+		} catch {
+			btn.disabled = false;
+			labelEl.classList.remove('gfm-hidden');
+			loadingEl.classList.add('gfm-hidden');
+		}
+	};
+
+	// Wire events.
+	wizard.querySelector('.gfm-wiz-next-btn')?.addEventListener('click', () => showPanel(2));
+
+	wizard.querySelectorAll('.gfm-wiz-skip').forEach((el) =>
+		el.addEventListener('click', dismiss)
+	);
+
+	wizard.querySelectorAll('.gfm-wiz-cat-card').forEach((card) => {
+		card.addEventListener('click', () => {
+			selectedCategory = card.dataset.category;
+			showPanel(3);
+		});
+	});
+
+	wizard.querySelector('.gfm-wiz-back')?.addEventListener('click', () => showPanel(2));
+	wizard.querySelector('.gfm-wiz-create-btn')?.addEventListener('click', createForm);
+
+	emailInput?.addEventListener('keydown', (e) => {
+		if (e.key === 'Enter') createForm();
+	});
+
+	// Relaunch button on Settings page — works regardless of showWizard flag.
+	document.getElementById('gfm-relaunch-wizard-btn')?.addEventListener('click', async () => {
+		await fetch(genform.ajax_url, {
+			method: 'POST',
+			body: new URLSearchParams({ action: 'genform_relaunch_wizard', nonce: genform.nonce }),
+		});
+		openWizard();
+	});
+
+	// Auto-open on first visit.
+	if (genform.showWizard) {
+		openWizard();
+	}
+})();
+
