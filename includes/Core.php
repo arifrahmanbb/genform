@@ -60,6 +60,10 @@ final class Core {
 		add_action( 'admin_bar_menu', array( $this, 'addAdminBarMenu' ), 999 );
 		add_action( 'admin_footer', array( $this, 'outputGlobalModals' ) );
 
+		// Background email delivery via WP-Cron.
+		add_action( 'genform_send_email_async',        array( 'GenForm\Integrations\Email', 'sendAsync' ),             10, 2 );
+		add_action( 'genform_send_confirmation_async', array( 'GenForm\Integrations\Email', 'sendConfirmationAsync' ), 10, 2 );
+
 		$this->loadComponents();
 	}
 
@@ -526,12 +530,21 @@ final class Core {
 				'ajax_url'       => admin_url( 'admin-ajax.php' ),
 				'recaptcha_key'  => $recaptcha_key,
 				'i18n'           => array(
-					'submitting'       => esc_html__( 'Submitting...', 'genform' ),
-					'checkbox_error'   => esc_html__( 'Please select at least one option for required checkbox fields.', 'genform' ),
-					'gdpr_error'       => esc_html__( 'Please accept the consent checkbox to proceed.', 'genform' ),
-					'recaptcha_error'  => esc_html__( 'Please complete the reCAPTCHA verification.', 'genform' ),
-					'generic_error'    => esc_html__( 'An error occurred.', 'genform' ),
-					'unknown_error'    => esc_html__( 'An unknown error occurred.', 'genform' ),
+					'submitting'        => esc_html__( 'Submitting...', 'genform' ),
+					'required_error'    => esc_html__( 'This field is required.', 'genform' ),
+					'email_error'       => esc_html__( 'Please enter a valid email address.', 'genform' ),
+					'url_error'         => esc_html__( 'Please enter a valid URL (e.g. https://example.com).', 'genform' ),
+					'tel_error'         => esc_html__( 'Please enter a valid phone number.', 'genform' ),
+					'number_error'      => esc_html__( 'Please enter a valid number.', 'genform' ),
+					'minlength_error'   => esc_html__( 'Please enter at least {min} characters.', 'genform' ),
+					'maxlength_error'   => esc_html__( 'Please enter no more than {max} characters.', 'genform' ),
+					'min_error'         => esc_html__( 'Value must be at least {min}.', 'genform' ),
+					'max_error'         => esc_html__( 'Value must be no more than {max}.', 'genform' ),
+					'checkbox_error'    => esc_html__( 'Please select at least one option for required checkbox fields.', 'genform' ),
+					'gdpr_error'        => esc_html__( 'Please accept the consent checkbox to proceed.', 'genform' ),
+					'recaptcha_error'   => esc_html__( 'Please complete the reCAPTCHA verification.', 'genform' ),
+					'generic_error'     => esc_html__( 'An error occurred. Please try again.', 'genform' ),
+					'unknown_error'     => esc_html__( 'An unknown error occurred. Please try again.', 'genform' ),
 				),
 			)
 		);

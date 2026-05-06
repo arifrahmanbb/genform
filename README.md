@@ -16,7 +16,7 @@
 
 **GenForm** is a modern, lightweight WordPress form plugin. Create contact forms, feedback forms, booking requests, job applications, and more — using an intuitive drag-and-drop builder. No page reloads and absolutely no learning curve.
 
-Packed with features right out of the box — 12 field types, 16+ templates, entry management, email notifications, CSV export, JSON import/export, reCAPTCHA, and more. All free.
+Packed with features right out of the box — **13 field types** (including Section Break), 16+ templates, entry management, email notifications, CSV export, JSON import/export, reCAPTCHA, inline validation, dark mode, and more. All free.
 
 ---
 
@@ -37,13 +37,17 @@ Packed with features right out of the box — 12 field types, 16+ templates, ent
 
 ### Drag & Drop Form Builder
 
-- **12 field types:** Text, Email, Textarea, Number, Select, Radio, Checkbox, Date, URL, Phone, Hidden, Password
+- **13 field types:** Text, Email, Textarea, Number, Select, Radio, Checkbox, Date, URL, Phone, Hidden, Password, **Section Break**
+- **Section Break field** — add titled dividers with an optional description to group related fields into named sections
 - Per-field customization: labels, placeholders, help text, required toggle, CSS classes
 - **6 column-width options** (25% to 100%) for multi-column layouts
 - One-click field cloning with full configuration
 - Type-specific controls: textarea rows, number min/max/step, and **text/email/URL/tel min/max character limits**
 - Default values and multi-option management for Select, Radio, and Checkbox fields
 - Live form preview before publishing
+- **Inline field validation** — per-field error messages appear on blur for required, email, URL, phone, number, and character-length rules
+- **URL parameter prefill** — populate fields from query strings (e.g. `?gfm_name=John`) for landing pages and CRM flows
+- **Dark mode** — forms adapt automatically when the visitor's OS is set to dark mode
 
 ### 16+ Ready-Made Templates
 
@@ -152,6 +156,15 @@ GenForm works seamlessly with:
 ---
 
 ## Changelog
+
+### 1.4.0 — 2026-05-06
+
+- **New:** Section Break field — add titled dividers between form sections to group related fields visually. Supports a title, optional description, and CSS class
+- **New:** Inline field validation — real-time per-field error messages appear on blur for required fields, email, URL, phone, number, and character-length constraints
+- **New:** URL parameter prefill — populate form fields from URL query strings (e.g. `?gfm_name=John`) for landing-page and CRM workflows
+- **New:** Dark mode support — forms automatically switch to a dark colour palette when the visitor's OS is set to dark mode
+- **Fix:** Rate limiting is now scoped per form and per IP address. Previously a single transient key was shared across all forms
+- **Enhancement:** Email notifications are now sent asynchronously via WP-Cron, eliminating SMTP latency from the submission response time
 
 ### 1.3.0 — 2026-04-21
 

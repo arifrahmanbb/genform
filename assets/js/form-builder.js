@@ -201,6 +201,7 @@ class GenFormBuilder {
             ...(type === 'textarea' ? { rows: 4 } : {}),
             ...(type === 'number' ? { min: '', max: '', step: '' } : {}),
             ...(['text', 'email', 'url', 'tel', 'textarea'].includes(type) ? { minlength: '', maxlength: '' } : {}),
+            ...(type === 'section_break' ? { description: '' } : {}),
         };
 
         this.fields.push(field);
@@ -251,20 +252,22 @@ class GenFormBuilder {
     }
 
     getDefaultLabel(type) {
-        return this.t(`label_${type}`, {
-            text: 'Text Field',
-            email: 'Email Address',
-            textarea: 'Paragraph',
-            select: 'Dropdown',
-            radio: 'Single Choice',
-            checkbox: 'Checkboxes',
-            number: 'Number',
-            date: 'Date',
-            url: 'Website',
-            tel: 'Phone Number',
-            hidden: 'Hidden Field',
-            password: 'Password',
-        }[type] || 'New Field');
+        const labels = {
+            text:          'Text Field',
+            email:         'Email Address',
+            textarea:      'Paragraph',
+            select:        'Dropdown',
+            radio:         'Single Choice',
+            checkbox:      'Checkboxes',
+            number:        'Number',
+            date:          'Date',
+            url:           'Website',
+            tel:           'Phone Number',
+            hidden:        'Hidden Field',
+            password:      'Password',
+            section_break: 'Section Break',
+        };
+        return this.t(`label_${type}`, labels[type] || 'New Field');
     }
 
     isOptionField(type) {
@@ -272,10 +275,10 @@ class GenFormBuilder {
     }
 
     /**
-     * Returns true if the type should have no visible settings panel.
+     * Returns true for types that get a stripped-down settings panel.
      */
     isMinimalField(type) {
-        return type === 'hidden';
+        return type === 'hidden' || type === 'section_break';
     }
 
     updateOrder() {
@@ -403,8 +406,9 @@ class GenFormBuilder {
             `<button type="button" class="gfm-width-btn ${f.width === opt.value ? 'active' : ''}" data-width="${opt.value}">${opt.label}</button>`
         ).join('');
 
-        // Build settings panel — hidden fields get a minimal panel.
+        // Build settings panel — hidden and section_break get minimal panels.
         let settingsPanel = '';
+        const isSectionBreak = f.type === 'section_break';
 
         if (isHidden) {
             settingsPanel = `
@@ -424,6 +428,38 @@ class GenFormBuilder {
                             <label>${this.t('default_value', 'Default Value')}</label>
                             <input type="text" class="gfm-setter" data-prop="default_value" value="${this.escape(f.default_value)}">
                             <span class="gfm-setting-desc">${this.t('hidden_desc', 'This value is sent with the form but not visible to users.')}</span>
+                        </div>
+                    </div>
+                </div>`;
+        } else if (isSectionBreak) {
+            settingsPanel = `
+                <div class="gfm-field-settings-panel gfm-hidden">
+                    <div class="gfm-field-settings-header">
+                        <span class="dashicons dashicons-minus"></span>
+                        <span>Section Break Settings</span>
+                    </div>
+                    <div class="gfm-grid">
+                        <div class="gfm-col" style="grid-column: span 2;">
+                            <label>${this.t('section_title', 'Section Title')}</label>
+                            <input type="text" class="gfm-setter" data-prop="label" value="${this.escape(f.label)}" placeholder="e.g. Personal Information">
+                        </div>
+                    </div>
+                    <div class="gfm-grid">
+                        <div class="gfm-col" style="grid-column: span 2;">
+                            <label>${this.t('section_desc', 'Description')} <small style="font-weight:400;color:#64748b;">(optional)</small></label>
+                            <input type="text" class="gfm-setter" data-prop="description" value="${this.escape(f.description || '')}" placeholder="e.g. Fill in your contact details below.">
+                        </div>
+                    </div>
+                    <div class="gfm-grid">
+                        <div class="gfm-col">
+                            <label>${this.t('width', 'Width')}</label>
+                            <div class="gfm-width-selector">
+                                ${widthButtons}
+                            </div>
+                        </div>
+                        <div class="gfm-col">
+                            <label>${this.t('css_class', 'CSS Class')}</label>
+                            <input type="text" class="gfm-setter" data-prop="css_class" value="${this.escape(f.css_class)}">
                         </div>
                     </div>
                 </div>`;
@@ -600,18 +636,19 @@ class GenFormBuilder {
      */
     getFieldIcon(type) {
         const icons = {
-            text: 'edit',
-            email: 'email',
-            textarea: 'text',
-            number: 'calculator',
-            select: 'menu-alt',
-            radio: 'marker',
-            checkbox: 'yes',
-            date: 'calendar-alt',
-            url: 'admin-links',
-            tel: 'phone',
-            hidden: 'hidden',
-            password: 'lock',
+            text:          'edit',
+            email:         'email',
+            textarea:      'text',
+            number:        'calculator',
+            select:        'menu-alt',
+            radio:         'marker',
+            checkbox:      'yes',
+            date:          'calendar-alt',
+            url:           'admin-links',
+            tel:           'phone',
+            hidden:        'hidden',
+            password:      'lock',
+            section_break: 'minus',
         };
         return icons[type] || 'admin-generic';
     }

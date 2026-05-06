@@ -3,7 +3,7 @@ Contributors: arifrahman1
 Tags: contact form, form builder, drag and drop, forms, email notifications
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.3.0
+Stable tag: 1.4.0
 Requires PHP: 8.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -22,7 +22,7 @@ Whether you need a simple contact form, event RSVP, job application, booking req
 
 Most WordPress form plugins overwhelm you with heavy page loads or confusing dashboards. GenForm takes a different approach:
 
-**Feature-Packed** — 12 field types, 16+ templates, entry management, email notifications, CSV export, and more — all included.
+**Feature-Packed** — 13 field types (including Section Break), 16+ templates, entry management, email notifications, CSV export, inline validation, dark mode, and more — all included.
 **Lightweight & Fast** — CSS and JavaScript only load on pages that actually contain a form. Zero overhead on every other page.
 **Privacy First** — All submissions are stored in your own WordPress database. Nothing is sent to any external server.
 **Secure by Default** — Built-in honeypot spam protection, IP rate limiting, nonce verification, and full input sanitization from day one.
@@ -33,12 +33,16 @@ Most WordPress form plugins overwhelm you with heavy page loads or confusing das
 Build any form visually — no code, no complexity.
 
 * Drag fields from the sidebar onto the canvas and reorder them in real time.
-* **12 field types**: Text, Email, Textarea, Number, Select, Radio, Checkbox, Date, URL, Phone, Hidden, and Password.
+* **13 field types**: Text, Email, Textarea, Number, Select, Radio, Checkbox, Date, URL, Phone, Hidden, Password, and **Section Break**.
 * Customize every field: label, placeholder, help text, required toggle, CSS class, and column width.
 * **6 column-width options** (25%, 33%, 50%, 67%, 75%, 100%) to create multi-column layouts.
+* **Section Break field** — add titled dividers with an optional description to group related fields into named sections.
 * Clone any field with its full configuration in one click.
 * Type-specific controls: textarea rows, number min/max/step values, and text min/max character limits.
 * Default values and multi-option management for Select, Radio, and Checkbox fields.
+* **Inline field validation** — real-time per-field error messages appear on blur for required, email, URL, phone, number, and character-length rules.
+* **URL parameter prefill** — populate fields from URL query strings for landing-page and CRM flows.
+* **Dark mode** — forms adapt automatically to the visitor's OS dark mode preference.
 
 = 16+ Ready-Made Form Templates =
 
@@ -237,6 +241,15 @@ When you **delete** GenForm from the Plugins page, all custom database tables, s
 
 == Changelog ==
 
+= 1.4.0 - 2026-05-06 =
+
+* New: Section Break field — add titled dividers between form sections to group related fields visually. Supports a title, optional description, and CSS class.
+* New: Inline field validation — real-time per-field error messages appear on blur (before submission) for required fields, email, URL, phone, number, and character-length constraints.
+* New: URL parameter prefill — populate form fields automatically from URL query strings (e.g. `?gfm_name=John`) for landing-page and CRM workflows.
+* New: Dark mode support — forms automatically switch to a dark colour palette when the visitor's OS is set to dark mode (`prefers-color-scheme: dark`).
+* Fix: Rate limiting is now scoped per form and per IP address. Previously a single transient key was shared across all forms, which could block a user from submitting a second form after submitting the first.
+* Enhancement: Email notifications are now sent asynchronously via WP-Cron, eliminating SMTP latency from the submission response time.
+
 = 1.3.0 - 2026-04-21 =
 
 * Fix: reCAPTCHA keys saved in Settings are now fully enforced — the widget renders on the form and the token is verified server-side on every submission.
@@ -293,6 +306,9 @@ When you **delete** GenForm from the Plugins page, all custom database tables, s
 * New: Clean uninstall with full data removal.
 
 == Upgrade Notice ==
+
+= 1.4.0 =
+Adds Section Break field, inline client-side validation, URL prefill, dark mode, async email delivery, and a per-form rate-limit fix. Safe to upgrade — no database changes.
 
 = 1.3.0 =
 Adds reCAPTCHA enforcement, form status toggle, confirmation emails, character limits, JSON import/export, entry starring, and database indexes. Safe to upgrade — uses non-destructive dbDelta for all schema changes.

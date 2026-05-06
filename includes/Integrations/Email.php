@@ -134,6 +134,46 @@ final class Email
 	}
 
 	/**
+	 * Queue both notification and confirmation emails as background WP-Cron jobs.
+	 * Returns immediately so the submission AJAX response is not blocked by SMTP.
+	 */
+	public static function queue(int $entry_id, int $form_id): void
+	{
+		wp_schedule_single_event(time(), 'genform_send_email_async', array($entry_id, $form_id));
+		wp_schedule_single_event(time(), 'genform_send_confirmation_async', array($entry_id, $form_id));
+	}
+
+	/**
+	 * WP-Cron handler: fetch saved entry data and send the admin notification.
+	 */
+	public static function sendAsync(int $entry_id, int $form_id): void
+	{
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$entry = $wpdb->get_row($wpdb->prepare("SELECT entry_data FROM {$wpdb->prefix}genform_entries WHERE id = %d", $entry_id));
+		if (! $entry) {
+			return;
+		}
+		$data = json_decode($entry->entry_data, true);
+		self::send($entry_id, $form_id, is_array($data) ? $data : array());
+	}
+
+	/**
+	 * WP-Cron handler: fetch saved entry data and send the confirmation email.
+	 */
+	public static function sendConfirmationAsync(int $entry_id, int $form_id): void
+	{
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$entry = $wpdb->get_row($wpdb->prepare("SELECT entry_data FROM {$wpdb->prefix}genform_entries WHERE id = %d", $entry_id));
+		if (! $entry) {
+			return;
+		}
+		$data = json_decode($entry->entry_data, true);
+		self::sendConfirmation($form_id, is_array($data) ? $data : array());
+	}
+
+	/**
 	 * Helper to generate the tabular representation of all form fields.
 	 */
 	private static function buildFieldsHtml(array $data): string

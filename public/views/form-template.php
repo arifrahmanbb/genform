@@ -38,6 +38,15 @@ $gfm_submit_align     = esc_attr($settings['gfm_submit_align'] ?? 'left');
 							type="hidden"
 							name="<?php echo esc_attr($genform_field_name); ?>"
 							value="<?php echo esc_attr($genform_field['default_value'] ?? ''); ?>">
+					<?php elseif ('section_break' === $genform_field['type']) : ?>
+						<div class="gfm-form-field gfm-w-100 gfm-type-section_break <?php echo esc_attr($genform_field['css_class'] ?? ''); ?>">
+							<?php if (! empty($genform_field['label'])) : ?>
+								<h3 class="gfm-section-title"><?php echo esc_html($genform_field['label']); ?></h3>
+							<?php endif; ?>
+							<?php if (! empty($genform_field['description'])) : ?>
+								<p class="gfm-section-desc"><?php echo esc_html($genform_field['description']); ?></p>
+							<?php endif; ?>
+						</div>
 					<?php else : ?>
 						<div class="gfm-form-field gfm-w-<?php echo esc_attr($genform_field_width); ?> <?php echo esc_attr($genform_field['css_class'] ?? ''); ?> gfm-type-<?php echo esc_attr($genform_field['type']); ?>">
 							<label class="gfm-label">

@@ -84,9 +84,9 @@ final class FormHandler
 			}
 		}
 
-		// Rate limiting (5 submissions per minute per IP).
+		// Rate limiting (5 submissions per minute per IP per form).
 		$client_ip     = sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'] ?? ''));
-		$transient_key = 'genform_rate_' . md5($client_ip);
+		$transient_key = 'genform_rate_' . $form_id . '_' . md5($client_ip);
 		$attempts      = (int) get_transient($transient_key);
 		if ($attempts >= 5) {
 			$this->sendError(esc_html__('Too many submissions. Please try again later.', 'genform'), $form_id);
@@ -152,9 +152,10 @@ final class FormHandler
 			)
 		);
 
-		// Send admin notification and optional confirmation to submitter.
-		Email::send($wpdb->insert_id, $form_id, $entry_data);
-		Email::sendConfirmation($form_id, $entry_data);
+		// Queue notification and confirmation emails as background WP-Cron jobs.
+		// This returns the AJAX response to the visitor immediately without waiting on SMTP.
+		$new_entry_id = $wpdb->insert_id;
+		Email::queue($new_entry_id, $form_id);
 
 		/**
 		 * Fires after a submission is saved.
@@ -164,7 +165,7 @@ final class FormHandler
 		 * @param int   $form_id    The form ID.
 		 * @param array $entry_data Sanitized entry data.
 		 */
-		do_action( 'genform_post_submission', $wpdb->insert_id, $form_id, $entry_data );
+		do_action( 'genform_post_submission', $new_entry_id, $form_id, $entry_data );
 
 		$form_settings = json_decode($form->form_settings, true);
 		$response      = array(

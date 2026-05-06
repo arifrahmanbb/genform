@@ -84,24 +84,42 @@ $genform_settings = $genform_form ? json_decode($genform_form->form_settings, tr
 						<div class="gfm-field-buttons">
 							<?php
 							$genform_fields = array(
-								'text'     => 'edit',
-								'email'    => 'email',
-								'textarea' => 'text',
-								'number'   => 'calculator',
-								'select'   => 'menu-alt',
-								'radio'    => 'marker',
-								'checkbox' => 'yes',
-								'date'     => 'calendar-alt',
-								'url'      => 'admin-links',
-								'tel'      => 'phone',
-								'hidden'   => 'hidden',
-								'password' => 'lock',
+								'text'          => 'edit',
+								'email'         => 'email',
+								'textarea'      => 'text',
+								'number'        => 'calculator',
+								'select'        => 'menu-alt',
+								'radio'         => 'marker',
+								'checkbox'      => 'yes',
+								'date'          => 'calendar-alt',
+								'url'           => 'admin-links',
+								'tel'           => 'phone',
+								'hidden'        => 'hidden',
+								'password'      => 'lock',
+								'section_break' => 'minus',
 							);
 							foreach ($genform_fields as $genform_type => $genform_icon) :
 							?>
 								<button type="button" class="gfm-add-field" data-type="<?php echo esc_attr($genform_type); ?>">
 									<span class="dashicons dashicons-<?php echo esc_attr($genform_icon); ?>"></span>
-									<?php echo esc_html(ucfirst($genform_type)); ?>
+									<?php
+									$genform_labels = array(
+										'text'          => __( 'Text', 'genform' ),
+										'email'         => __( 'Email', 'genform' ),
+										'textarea'      => __( 'Paragraph', 'genform' ),
+										'number'        => __( 'Number', 'genform' ),
+										'select'        => __( 'Dropdown', 'genform' ),
+										'radio'         => __( 'Radio', 'genform' ),
+										'checkbox'      => __( 'Checkbox', 'genform' ),
+										'date'          => __( 'Date', 'genform' ),
+										'url'           => __( 'Website', 'genform' ),
+										'tel'           => __( 'Phone', 'genform' ),
+										'hidden'        => __( 'Hidden', 'genform' ),
+										'password'      => __( 'Password', 'genform' ),
+										'section_break' => __( 'Section', 'genform' ),
+									);
+									echo esc_html( $genform_labels[ $genform_type ] ?? ucfirst( $genform_type ) );
+									?>
 								</button>
 							<?php endforeach; ?>
 						</div>
