@@ -556,16 +556,37 @@ final class Core {
 			return;
 		}
 
+		// ====================================================================
+		// Per-screen asset loading
+		//
+		// Preview page is fully isolated — no admin chrome assets, only
+		// frontend.css + small preview.css. We do NOT fire
+		// `genform_admin_scripts` here because Pro's pro-admin.css declares
+		// `genform-admin` as a dependency that doesn't exist on this screen.
+		// Pro plugins can hook into `genform_preview_scripts` instead.
+		// ====================================================================
+		$genform_is_preview = str_contains( $hook, 'genform-preview' );
+
+		if ( $genform_is_preview ) {
+			wp_enqueue_style( 'genform-frontend', GENFORM_URL . 'assets/css/frontend.css', array(), GENFORM_VERSION );
+			wp_enqueue_style( 'genform-preview', GENFORM_URL . 'assets/css/preview.css', array( 'genform-frontend' ), GENFORM_VERSION );
+			wp_add_inline_style( 'genform-frontend', $this->getDynamicStylesCss() );
+
+			/**
+			 * Fires when assets are being loaded on the form preview page.
+			 * Pro plugins can use this to enqueue preview-specific assets
+			 * (e.g. styling for Pro field types rendered in the preview).
+			 *
+			 * @param string $hook The current admin page hook suffix.
+			 */
+			do_action( 'genform_preview_scripts', $hook );
+			return;
+		}
+
+		// Standard admin pages: list / builder / entries / settings.
 		wp_enqueue_style( 'genform-admin', GENFORM_URL . 'assets/css/admin.css', array(), GENFORM_VERSION );
 		wp_add_inline_style( 'genform-admin', $this->getDynamicStylesCss() );
 
-		/**
-		 * Fires after GenForm admin scripts are enqueued.
-		 * Pro plugin uses this to enqueue its own assets.
-		 *
-		 * @param string $hook The current admin page hook suffix.
-		 */
-		do_action( 'genform_admin_scripts', $hook );
 		wp_enqueue_script(
 			'genform-admin',
 			GENFORM_URL . 'assets/js/admin.js',
@@ -576,6 +597,15 @@ final class Core {
 				'in_footer' => true,
 			)
 		);
+
+		/**
+		 * Fires after GenForm admin assets are enqueued. Pro plugin uses
+		 * this to enqueue its own admin chrome assets (pro-admin.css etc.)
+		 * which depend on `genform-admin`.
+		 *
+		 * @param string $hook The current admin page hook suffix.
+		 */
+		do_action( 'genform_admin_scripts', $hook );
 
 		if ( str_contains( $hook, 'genform-builder' ) ) {
 			wp_enqueue_script( 'jquery-ui-sortable' );

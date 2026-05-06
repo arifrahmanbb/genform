@@ -13,6 +13,8 @@
         font-size: 32px;
         font-weight: 800;
         margin: 0;
+        line-height: 1.25;
+        padding: 4px 2px 6px;
         letter-spacing: -0.03em;
         background: linear-gradient(135deg, $primary 0%, #7C3AED 100%);
         -webkit-background-clip: text;
@@ -473,6 +475,69 @@
 .gfm-opt-drag {
     color: $text-light;
     cursor: move;
+}
+
+// ==========================================
+// Template Tag Picker (clickable chips that
+// insert {tags} into the related textarea).
+// ==========================================
+.gfm-tag-picker {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+
+    .gfm-tag-picker-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: $text-muted;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-right: 4px;
+    }
+}
+
+.gfm-tag-chip {
+    display: inline-flex;
+    align-items: center;
+    height: 26px;
+    padding: 0 10px;
+    background: $primary-light;
+    color: $primary;
+    border: 1px solid rgba($primary, 0.18);
+    border-radius: 999px;
+    font-family: ui-monospace, SFMono-Regular, 'Menlo', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition-base;
+    line-height: 1;
+    box-shadow: none;
+
+    &:hover {
+        background: $primary;
+        color: $white;
+        border-color: $primary;
+        transform: translateY(-1px);
+    }
+
+    &:active {
+        transform: scale(0.96);
+    }
+
+    &.is-inserted {
+        background: $success;
+        color: $white;
+        border-color: $success;
+        animation: gfm-chip-pulse 0.5s ease;
+    }
+}
+
+@keyframes gfm-chip-pulse {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.08); }
+    100% { transform: scale(1); }
 }
 
 .gfm-opt-btn {

@@ -21,8 +21,21 @@
 .gfm-form {
   background: $white;
   padding: 32px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  font-family: $font-main;
+}
+
+// Utility: hide elements with .gfm-hidden regardless of which stylesheet is loaded.
+// (Previously only defined in admin.css — broke on the preview page where admin.css
+// isn't enqueued, leaving the empty `.gfm-message` placeholder visible at the bottom.)
+.gfm-hidden {
+  display: none !important;
+}
+
+// Empty message placeholder — stays invisible until populated by JS.
+.gfm-form .gfm-message:empty {
+  display: none;
 }
 
 // ========================================
@@ -70,12 +83,18 @@
 // Form Labels
 // ========================================
 
+// Reset any admin label rules that might leak through when the form is
+// rendered inside the admin preview. Frontend labels stay normal-case.
+.gfm-form .gfm-label,
 .gfm-label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 600;
-  font-size: 14px;
-  color: $gfm-color-text;
+  display: block !important;
+  margin-bottom: 8px !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  color: $text-main !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  line-height: 1.4 !important;
 }
 
 .gfm-required-mark {
@@ -87,15 +106,50 @@
 // Text Inputs & Textareas
 // ========================================
 
+// Wrapper around each input — must be full-width block so the input fills the field.
+.gfm-form .gfm-input-control,
+.gfm-input-control {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+// Higher specificity wins over .genform-admin-wrap input[type="text"]
+// when the form is rendered inside the admin preview.
+.gfm-form .gfm-input,
+.gfm-form .gfm-textarea,
+.gfm-form .gfm-select,
 .gfm-input,
 .gfm-textarea,
 .gfm-select {
   @include gfm-form-input-base;
+  display: block;
+  max-width: 100%;
 }
 
+.gfm-form .gfm-textarea,
 .gfm-textarea {
   resize: vertical;
   min-height: 100px;
+  height: auto;
+  padding: 12px 16px;
+  line-height: 1.5;
+}
+
+.gfm-form .gfm-select,
+.gfm-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'><path d='M1 1.5L6 6.5L11 1.5' stroke='%236B7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 40px;
+  cursor: pointer;
+  // Selects need an explicit width — without this, some browsers size them
+  // to the longest option's text width even with width:100% on the mixin.
+  width: 100%;
+  min-width: 0;
 }
 
 // ========================================
@@ -214,12 +268,23 @@
 .gfm-submit-wrap {
   width: 100%;
   margin-top: 24px;
+
+  &.gfm-align-left   { text-align: left; }
+  &.gfm-align-center { text-align: center; }
+  &.gfm-align-right  { text-align: right; }
 }
 
+// Use selector specificity instead of !important to override admin styles
+// when the form is rendered inside .genform-admin-wrap (preview page).
+.gfm-form .gfm-submit,
 .gfm-submit {
   @include gfm-btn-primary;
   position: relative;
-  transition: all 0.3s ease;
+}
+
+.gfm-form .gfm-submit.gfm-btn-full,
+.gfm-submit.gfm-btn-full {
+  width: 100%;
 }
 
 // Spinner for loading state.

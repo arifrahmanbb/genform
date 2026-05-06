@@ -1,9 +1,10 @@
 <?php
-
 /**
  * Admin View: Form Preview
  *
- * Renders a form in the admin area for preview purposes.
+ * Renders the form in an isolated preview shell that does NOT inherit
+ * .genform-admin-wrap, so no admin.css rules can override frontend styling.
+ * Asset loading: this page loads ONLY frontend.css + preview.css (see Core::enqueueAdminAssets).
  *
  * @package GenForm
  */
@@ -30,37 +31,40 @@ $genform_preview_form = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->p
 if ( ! $genform_preview_form ) {
 	wp_die( esc_html__( 'Form not found.', 'genform' ) );
 }
-
-$genform_preview_data     = json_decode( $genform_preview_form->form_data, true );
-$genform_preview_settings = json_decode( $genform_preview_form->form_settings, true );
 ?>
 
-<div class="wrap genform-admin-wrap">
-	<div class="gfm-header-flex">
-		<h1>
-			<?php
-			/* translators: %s: Form name */
-			printf( esc_html__( 'Preview: %s', 'genform' ), esc_html( $genform_preview_form->form_name ) );
-			?>
-		</h1>
-		<div class="gfm-actions">
-			<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=genform-builder&action=edit&form_id=' . $genform_preview_id ), 'genform_edit_form' ) ); ?>" class="gfm-btn gfm-btn-primary">
-				<?php esc_html_e( 'Edit Form', 'genform' ); ?>
-			</a>
-			<a href="<?php echo esc_url( admin_url( 'admin.php?page=genform' ) ); ?>" class="gfm-btn gfm-btn-outline">
-				<?php esc_html_e( 'Back to All Forms', 'genform' ); ?>
-			</a>
-		</div>
-	</div>
+<div class="wrap">
+	<div class="gfm-preview">
 
-	<div class="gfm-card">
-		<div class="gfm-preview-container" style="max-width: 700px; margin: 30px auto; padding: 30px; border: 1px dashed #c3c4c7; border-radius: 8px; background: #fff;">
-			<div class="gfm-preview-badge" style="text-align: center; margin-bottom: 20px;">
-				<span style="display: inline-block; background: #f0f0f1; color: #50575e; padding: 4px 12px; border-radius: 4px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">
-					<?php esc_html_e( 'Preview Mode – Submissions are disabled', 'genform' ); ?>
-				</span>
+		<header class="gfm-preview__header">
+			<h1 class="gfm-preview__title">
+				<?php
+				/* translators: %s: Form name */
+				printf( esc_html__( 'Preview: %s', 'genform' ), esc_html( $genform_preview_form->form_name ) );
+				?>
+			</h1>
+			<div class="gfm-preview__actions">
+				<a href="<?php echo esc_url( admin_url( 'admin.php?page=genform' ) ); ?>" class="gfm-preview__btn gfm-preview__btn--outline">
+					<span class="dashicons dashicons-arrow-left-alt2"></span>
+					<?php esc_html_e( 'Back to All Forms', 'genform' ); ?>
+				</a>
+				<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=genform-builder&action=edit&form_id=' . $genform_preview_id ), 'genform_edit_form' ) ); ?>" class="gfm-preview__btn gfm-preview__btn--primary">
+					<span class="dashicons dashicons-edit"></span>
+					<?php esc_html_e( 'Edit Form', 'genform' ); ?>
+				</a>
 			</div>
-			<?php echo do_shortcode( '[genform id="' . $genform_preview_id . '"]' ); ?>
+		</header>
+
+		<div class="gfm-preview__body">
+			<div class="gfm-preview__badge">
+				<span class="dashicons dashicons-visibility"></span>
+				<?php esc_html_e( 'Preview Mode — Submissions are disabled', 'genform' ); ?>
+			</div>
+
+			<div class="gfm-preview__frame">
+				<?php echo do_shortcode( '[genform id="' . (int) $genform_preview_id . '"]' ); ?>
+			</div>
 		</div>
+
 	</div>
 </div>

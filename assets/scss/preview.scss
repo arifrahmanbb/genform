@@ -1,0 +1,172 @@
+/**
+ * GenForm Form Preview Page (admin-side)
+ *
+ * Standalone stylesheet loaded ONLY on the preview screen.
+ * Compiles to assets/css/preview.css.
+ *
+ * Goals:
+ *  - Strict BEM naming under `.gfm-preview` block to avoid all admin.css conflicts
+ *  - Self-contained: imports only the design-token abstracts, not admin layouts
+ *  - Pairs with frontend.css to render the form itself
+ */
+
+@use 'abstracts' as *;
+
+.gfm-preview {
+    background: $bg;
+    min-height: calc(100vh - 32px);
+    padding: 32px;
+    font-family: $font-main;
+    color: $text-main;
+    box-sizing: border-box;
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    // ==============================
+    // Header
+    // ==============================
+    &__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: $space-md;
+        margin-bottom: $space-lg;
+        flex-wrap: wrap;
+    }
+
+    &__title {
+        font-size: 26px;
+        font-weight: 800;
+        margin: 0;
+        line-height: 1.25;
+        letter-spacing: -0.02em;
+        color: $text-main;
+    }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        gap: $space-sm;
+    }
+
+    &__btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        height: 42px;
+        padding: 0 20px;
+        border-radius: $radius-md;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+        text-decoration: none;
+        border: 1px solid transparent;
+        transition: $transition-base;
+        line-height: 1;
+        white-space: nowrap;
+        box-sizing: border-box;
+
+        .dashicons {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+        }
+
+        &--primary {
+            background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+            color: $white;
+            box-shadow: 0 6px 14px -4px rgba($primary, 0.35);
+
+            &:hover {
+                color: $white;
+                transform: translateY(-1px);
+                box-shadow: 0 10px 22px -6px rgba($primary, 0.45);
+            }
+        }
+
+        &--outline {
+            background: $white;
+            border-color: $border;
+            color: $text-main;
+
+            &:hover {
+                background: $bg;
+                border-color: $border-dark;
+            }
+        }
+    }
+
+    // ==============================
+    // Body — wraps badge + form
+    // ==============================
+    &__body {
+        max-width: 760px;
+        margin: 0 auto;
+    }
+
+    &__badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: $space-md;
+        padding: 6px 14px;
+        background: rgba($warning, 0.12);
+        color: color-mix(in srgb, $warning, $text-main 30%);
+        border: 1px solid rgba($warning, 0.3);
+        border-radius: 999px;
+        font-size: 12.5px;
+        font-weight: 600;
+        text-transform: none;
+
+        .dashicons {
+            font-size: 14px;
+            width: 14px;
+            height: 14px;
+        }
+    }
+
+    &__frame {
+        background: $white;
+        border: 1px solid $border;
+        border-radius: $radius-lg;
+        box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+
+        // Form rendered inside should fill cleanly without its own outer card.
+        .gfm-form {
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+        }
+    }
+
+    &__hint {
+        margin: $space-md 0 0;
+        font-size: 12.5px;
+        color: $text-muted;
+        line-height: 1.5;
+        text-align: center;
+    }
+}
+
+// ==============================
+// Lightweight defensive resets
+// (only for elements rendered inside the preview body — never global)
+// ==============================
+.gfm-preview__frame {
+    .gfm-label {
+        text-transform: none !important;
+        letter-spacing: normal !important;
+        color: $text-main !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+    }
+
+    // Restore native font-rendering for placeholder text inside preview.
+    input::placeholder,
+    textarea::placeholder {
+        opacity: 0.55;
+        color: $text-light;
+    }
+}

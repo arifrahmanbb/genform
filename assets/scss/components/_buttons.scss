@@ -1,21 +1,30 @@
 @use 'sass:color';
 @use '../abstracts' as *;
 
+// ==========================================
+// Unified Button System
+// All variants share the same height & radius
+// for visual consistency.
+// ==========================================
+
 .gfm-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: $space-xs;
-    padding: 12px 24px;
+    height: 42px;
+    padding: 0 20px;
     border-radius: $radius-md;
     font-weight: $weight-bold;
-    font-size: $size-base;
+    font-size: 14px;
     cursor: pointer;
     text-decoration: none;
     border: 1px solid transparent;
     transition: $transition-base;
     box-shadow: $shadow-sm;
     line-height: 1;
+    box-sizing: border-box;
+    white-space: nowrap;
 
     &:active {
         transform: scale(0.98);
@@ -26,13 +35,30 @@
         outline-offset: 2px;
     }
 
+    // Size modifier — used for primary CTAs in headers.
+    &-large {
+        height: 46px;
+        padding: 0 28px;
+        font-size: 14.5px;
+    }
+
+    // Size modifier — compact actions in tables.
+    &-small {
+        height: 34px;
+        padding: 0 14px;
+        font-size: 13px;
+    }
+
+    // ---- Color variants ----
+
     &-primary {
         background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
         color: $white !important;
+        border-color: transparent;
 
         &:hover {
             box-shadow: 0 8px 20px -6px rgba($primary, 0.4);
-            transform: translateY(-2px);
+            transform: translateY(-1px);
         }
     }
 
@@ -59,10 +85,33 @@
         }
     }
 
+    &-danger {
+        background: $danger;
+        color: $white !important;
+
+        &:hover {
+            background: color.scale($danger, $lightness: -8%);
+            box-shadow: 0 8px 20px -6px rgba($danger, 0.4);
+        }
+    }
+
     .dashicons {
         font-size: 18px;
         width: 18px;
         height: 18px;
-        margin-top: -1px;
+        margin-top: 0;
+    }
+}
+
+// ==========================================
+// Save bar — header button group alignment
+// ==========================================
+.gfm-save-area {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+
+    .gfm-btn {
+        margin: 0;
     }
 }

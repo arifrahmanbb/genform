@@ -36,18 +36,9 @@ $genform_settings = $genform_form ? json_decode($genform_form->form_settings, tr
 			 */
 			do_action( 'genform_builder_tabs' );
 			?>
-			<?php if ( ! FeatureGate::has( 'conditional_logic' ) ) : ?>
-				<button type="button" class="gfm-tab-link gfm-pro-tab-locked" data-pro="conditional_logic">
-					<?php esc_html_e('Logic', 'genform'); ?>
-					<?php echo FeatureGate::proBadge( 'conditional_logic' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-				</button>
-			<?php endif; ?>
-			<?php if ( ! FeatureGate::has( 'payment_stripe' ) ) : ?>
-				<button type="button" class="gfm-tab-link gfm-pro-tab-locked" data-pro="payment_stripe">
-					<?php esc_html_e('Payments', 'genform'); ?>
-					<?php echo FeatureGate::proBadge( 'payment_stripe' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-				</button>
-			<?php endif; ?>
+			<?php // Pro tabs are only registered via the genform_builder_tabs action when the
+			// Pro plugin is active. Locked-tab teasers were removed for a cleaner builder —
+			// the Pro feature grid in Settings → Tools already handles upsell. ?>
 		</div>
 	</div>
 
@@ -60,18 +51,19 @@ $genform_settings = $genform_form ? json_decode($genform_form->form_settings, tr
 				<input type="text" name="form_name" value="<?php echo esc_attr($genform_form->form_name ?? ''); ?>" required placeholder="<?php esc_attr_e('e.g. Contact Us', 'genform'); ?>">
 			</div>
 			<div class="gfm-save-area">
-				<button type="submit" name="genform_save" class="gfm-btn gfm-btn-primary gfm-btn-large">
-					<?php esc_html_e('Save Form', 'genform'); ?>
-				</button>
+				<a href="<?php echo esc_url(admin_url('admin.php?page=genform')); ?>" class="gfm-btn gfm-btn-outline gfm-btn-large">
+					<?php esc_html_e('Cancel', 'genform'); ?>
+				</a>
 				<?php if ($genform_id) : ?>
-					<a href="<?php echo esc_url(admin_url('admin.php?page=genform-preview&form_id=' . $genform_id)); ?>" class="gfm-btn gfm-btn-outline" target="_blank">
-						<span class="dashicons dashicons-visibility" style="margin-top: 3px;"></span>
+					<a href="<?php echo esc_url(admin_url('admin.php?page=genform-preview&form_id=' . $genform_id)); ?>" class="gfm-btn gfm-btn-outline gfm-btn-large" target="_blank">
+						<span class="dashicons dashicons-visibility"></span>
 						<?php esc_html_e('Preview', 'genform'); ?>
 					</a>
 				<?php endif; ?>
-				<a href="<?php echo esc_url(admin_url('admin.php?page=genform')); ?>" class="gfm-btn gfm-btn-outline">
-					<?php esc_html_e('Cancel', 'genform'); ?>
-				</a>
+				<button type="submit" name="genform_save" class="gfm-btn gfm-btn-primary gfm-btn-large">
+					<span class="dashicons dashicons-yes"></span>
+					<?php esc_html_e('Save Form', 'genform'); ?>
+				</button>
 			</div>
 		</div>
 
@@ -301,7 +293,13 @@ $genform_settings = $genform_form ? json_decode($genform_form->form_settings, tr
 				<div class="gfm-setting-row gfm-mt-md">
 					<label><?php esc_html_e('Email Body', 'genform'); ?></label>
 					<textarea id="gfm-email-body" rows="8" class="widefat" placeholder="<?php esc_attr_e("{all_fields}\n\nSent from {site_title}", 'genform'); ?>"><?php echo esc_textarea($genform_settings['gfm_email_body'] ?? ''); ?></textarea>
-					<span class="gfm-setting-desc"><?php esc_html_e('Tags: {all_fields}, {form_name}, {site_title}, {field_ID}', 'genform'); ?></span>
+					<div class="gfm-tag-picker" data-target="#gfm-email-body">
+						<span class="gfm-tag-picker-label"><?php esc_html_e('Insert tag:', 'genform'); ?></span>
+						<button type="button" class="gfm-tag-chip" data-tag="{all_fields}" title="<?php esc_attr_e('Outputs all submitted form fields', 'genform'); ?>">{all_fields}</button>
+						<button type="button" class="gfm-tag-chip" data-tag="{form_name}" title="<?php esc_attr_e('The name of the form', 'genform'); ?>">{form_name}</button>
+						<button type="button" class="gfm-tag-chip" data-tag="{site_title}" title="<?php esc_attr_e('Your site title', 'genform'); ?>">{site_title}</button>
+						<button type="button" class="gfm-tag-chip" data-tag="{field_ID}" title="<?php esc_attr_e('Replace ID with a field key, e.g. {field_email}', 'genform'); ?>">{field_ID}</button>
+					</div>
 				</div>
 			</div>
 
@@ -330,7 +328,13 @@ $genform_settings = $genform_form ? json_decode($genform_form->form_settings, tr
 					<div class="gfm-setting-row gfm-mt-md">
 						<label><?php esc_html_e( 'Message Body', 'genform' ); ?></label>
 						<textarea id="gfm-conf-body" rows="6" class="widefat" placeholder="<?php esc_attr_e( "Hi,\n\nThank you for your submission. We'll get back to you shortly.\n\n{all_fields}", 'genform' ); ?>"><?php echo esc_textarea( $genform_settings['gfm_conf_body'] ?? '' ); ?></textarea>
-						<span class="gfm-setting-desc"><?php esc_html_e( 'Tags: {all_fields}, {form_name}, {site_title}, {field_ID}', 'genform' ); ?></span>
+						<div class="gfm-tag-picker" data-target="#gfm-conf-body">
+							<span class="gfm-tag-picker-label"><?php esc_html_e('Insert tag:', 'genform'); ?></span>
+							<button type="button" class="gfm-tag-chip" data-tag="{all_fields}">{all_fields}</button>
+							<button type="button" class="gfm-tag-chip" data-tag="{form_name}">{form_name}</button>
+							<button type="button" class="gfm-tag-chip" data-tag="{site_title}">{site_title}</button>
+							<button type="button" class="gfm-tag-chip" data-tag="{field_ID}">{field_ID}</button>
+						</div>
 					</div>
 				</div>
 			</div>

@@ -731,3 +731,34 @@ class GenFormBuilder {
 }
 
 new GenFormBuilder();
+
+// ============================================================
+// Template Tag Picker — click a chip to insert it at the cursor
+// position of the related textarea/input.
+// ============================================================
+document.addEventListener('click', function (e) {
+    const chip = e.target.closest('.gfm-tag-chip');
+    if (!chip) return;
+    e.preventDefault();
+
+    const picker = chip.closest('.gfm-tag-picker');
+    if (!picker) return;
+    const targetSel = picker.getAttribute('data-target');
+    const target = targetSel ? document.querySelector(targetSel) : null;
+    if (!target) return;
+
+    const tag = chip.getAttribute('data-tag') || chip.textContent.trim();
+    const start = target.selectionStart ?? target.value.length;
+    const end = target.selectionEnd ?? target.value.length;
+    target.value = target.value.slice(0, start) + tag + target.value.slice(end);
+
+    target.focus();
+    const caret = start + tag.length;
+    if (typeof target.setSelectionRange === 'function') {
+        target.setSelectionRange(caret, caret);
+    }
+    target.dispatchEvent(new Event('input', { bubbles: true }));
+
+    chip.classList.add('is-inserted');
+    setTimeout(() => chip.classList.remove('is-inserted'), 600);
+});

@@ -11,8 +11,10 @@
     color: $text-main;
     -webkit-font-smoothing: antialiased;
 
-    // Global Label Styling
-    label {
+    // Global Label Styling — only applies to standalone field labels.
+    // Labels that wrap their input (checkbox/radio inline labels) keep
+    // natural casing for readability.
+    label:not(:has(input[type="checkbox"])):not(:has(input[type="radio"])):not(.gfm-inline-label) {
         display: block;
         margin-bottom: 8px;
         font-size: 13px;
@@ -229,7 +231,7 @@
             display: flex;
             flex-direction: column;
 
-            input,
+            input:not([type="checkbox"]):not([type="radio"]),
             select,
             textarea {
                 width: 100%;

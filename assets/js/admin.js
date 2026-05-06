@@ -78,33 +78,96 @@
 		if (spinner) spinner.classList.remove('show');
 	};
 
-	const showNotice = (msg, type = 'success') => {
-		const notice = document.createElement('div');
-		notice.className = `gfm-builder-notice gfm-notice-${type}`;
-		const icon = type === 'error' ? 'warning' : 'yes-alt';
-		notice.innerHTML = `<span class="dashicons dashicons-${icon}"></span> ${escapeHtml(msg)}`;
-		document.body.appendChild(notice);
-		setTimeout(() => notice.classList.add('show'), 10);
-		setTimeout(() => {
-			notice.classList.remove('show');
-			setTimeout(() => notice.remove(), 400);
-		}, 3500);
+	const NOTICE_ICONS = {
+		success: 'yes-alt',
+		error:   'warning',
+		info:    'info-outline',
+		warning: 'flag',
+		loading: 'update',
 	};
 
 	/**
-	 * AJAX Fetch Wrapper
+	 * Floating notice HUD.
+	 *
+	 * @param {string}   msg
+	 * @param {string}   type    success|error|info|warning|loading
+	 * @param {object}   opts    { duration: ms (default 3500), action: { label, onClick } }
+	 * @returns {{ dismiss: () => void, update: (msg, type) => void }}
 	 */
-	const gfmFetch = async (action, data = {}) => {
+	const showNotice = (msg, type = 'success', opts = {}) => {
+		const notice = document.createElement('div');
+		notice.className = `gfm-builder-notice gfm-notice-${type}`;
+		const buildBody = (m, t) => {
+			const icon = NOTICE_ICONS[t] || 'yes-alt';
+			let html = `<span class="dashicons dashicons-${icon} ${t === 'loading' ? 'is-spinning' : ''}"></span><span class="gfm-notice-text">${escapeHtml(m)}</span>`;
+			if (opts.action && opts.action.label) {
+				html += `<button type="button" class="gfm-notice-action">${escapeHtml(opts.action.label)}</button>`;
+			}
+			return html;
+		};
+		notice.innerHTML = buildBody(msg, type);
+
+		if (opts.action && typeof opts.action.onClick === 'function') {
+			notice.addEventListener('click', (e) => {
+				if (e.target.classList.contains('gfm-notice-action')) {
+					opts.action.onClick();
+					dismiss();
+				}
+			});
+		}
+
+		document.body.appendChild(notice);
+		setTimeout(() => notice.classList.add('show'), 10);
+
+		const duration = opts.duration ?? (type === 'loading' ? 0 : 3500);
+		let timer = null;
+		const dismiss = () => {
+			if (timer) { clearTimeout(timer); timer = null; }
+			notice.classList.remove('show');
+			setTimeout(() => notice.remove(), 400);
+		};
+		if (duration > 0) timer = setTimeout(dismiss, duration);
+
+		return {
+			dismiss,
+			update: (newMsg, newType) => {
+				notice.className = `gfm-builder-notice gfm-notice-${newType} show`;
+				notice.innerHTML = buildBody(newMsg, newType);
+				if (timer) clearTimeout(timer);
+				if (newType !== 'loading') timer = setTimeout(dismiss, 3500);
+			},
+		};
+	};
+
+	/**
+	 * AJAX Fetch Wrapper.
+	 * Pass `{ loadingMessage: 'Saving…' }` to auto-show a loading toast that
+	 * resolves to success/error on completion.
+	 */
+	const gfmFetch = async (action, data = {}, opts = {}) => {
 		const formData = new FormData();
 		formData.append('action', action);
 		formData.append('nonce', genform.nonce);
 		for (const key in data) formData.append(key, data[key]);
 
+		const toast = opts.loadingMessage
+			? showNotice(opts.loadingMessage, 'loading')
+			: null;
+
 		try {
 			const response = await fetch(genform.ajax_url, { method: 'POST', body: formData });
-			return await response.json();
+			const json = await response.json();
+			if (toast && opts.successMessage && json.success) {
+				toast.update(opts.successMessage, 'success');
+			} else if (toast && !json.success) {
+				toast.update(json.data?.message || 'Action failed.', 'error');
+			} else if (toast) {
+				toast.dismiss();
+			}
+			return json;
 		} catch (error) {
 			console.error('GenForm AJAX Error:', error);
+			if (toast) toast.update('Network error — please try again.', 'error');
 			return { success: false, data: { message: 'Network error occurred.' } };
 		}
 	};
